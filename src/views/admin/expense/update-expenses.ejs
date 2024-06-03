@@ -1,0 +1,256 @@
+<%- include('../../partials/main', { pageTitle: 'Add Products' }) %>
+
+<style>
+    .inline{
+        display: inline-flex;
+    }
+    #select2-product-container , #select2-unit-container{
+        font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+    }
+        .mb-4{
+            justify-content: space-evenly;
+        }
+        .completebutton{
+            align-items: end;
+            width: 30%;
+            margin-right: 2rem;
+        }
+        .addbutton{
+            align-items: flex-end;
+            width: 30%;
+            }
+</style>
+
+
+<div class="page-body">
+<!-- tracking table start -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="title-header title-header-block package-card">
+                        <div>
+                            <h5>Update Expense</h5>
+                        </div>
+                        <form class="theme-form theme-form-2 mega-form" method="post" action="/admin/order/update-expense/<%= expense._id %>">
+                            <div class="add-product">
+                                <div class="card-header-1">
+                                    <h5>Product Details</h5>
+                                </div>
+
+                                <input type="hidden" name="orderId" value="<%= orderId %>">
+                                <div class="mb-4 row align-items-center">
+                                    <label class="form-label-title col-lg-2 col-md-3 mb-0">Select Product</label>
+                                    <div class="col-sm-9 col-lg-10">
+                                        <input type="text" class="form-control" name="name" id="product" value="<%= expense.name %>">
+                                    </div>
+                                </div>
+
+                                <div class="mb-4 row align-items-center">
+                                    <label class="col-sm-3 col-form-label form-label-title">Unit</label>
+                                    <div class="col-sm-9">
+                                        <select class="js-example-basic-single w-100" name="unit" id="unit">
+                                            <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="none" disabled selected>-- Select Unit Type --</option> 
+                                            <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="SQRFT">SQRFT</option> 
+                                            <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="NOS">NOS</option> 
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="mb-4 row align-items-center">
+                                            <label class="form-label-title col-sm-3 mb-0">Width</label>
+                                            <div class="col-sm-9">
+                                                <input class="form-control" type="text" oninput="validateFloat(this)" placeholder="Enter Product width" name="width" id="width" value="<%= expense.width %>" required >
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="mb-4 row align-items-center">
+                                            <label class="form-label-title col-sm-3 mb-0">Height</label>
+                                            <div class="col-sm-9">
+                                                <input class="form-control" type="text" oninput="validateFloat(this)" placeholder="Enter Product Height" name="height" id="height" value="<%= expense.height %>"  required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4 row align-items-center">
+                                    <label class="form-label-title col-sm-3 mb-0">Quantity</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="number" placeholder="Quantity of Product" name="quantity" id="quantity" value="<%= expense.quantity %>"  required>
+                                    </div>
+                                </div>
+                    
+                                <div class="mb-4 row align-items-center">
+                                    <label class="form-label-title col-sm-3 mb-0">Total Area</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="text" placeholder="Total area covered" name="area" id="total_area" value="<%= expense.area %>"  required>
+                                    </div>
+                                </div>
+                    
+                                <div class="mb-4 row align-items-center">
+                                    <label class="form-label-title col-sm-3 mb-0">Rate</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="text" placeholder="Rate of Product" name="rate" id="rate" value="<%= expense.rate %>" required>
+                                    </div>
+                                </div>
+                                                
+                                <div class="mb-4 row align-items-center">
+                                    <label class="form-label-title col-sm-3 mb-0">Total Amount</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="text" placeholder="Amount" name="amount" id="total_amount" value="<%= expense.amount %>"  required>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4 row align-items-center">
+                                    <button id="addProductButton" class="btn btn-solid addbutton col-6 mr-3" type="submit">Update Expense</button>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>    
+            </div>
+        </div> 
+    </div>
+</div>
+<!-- tracking table end -->
+
+<div class="container-fluid">
+    <!-- footer start-->
+    <%- include('../../partials/footer')%>
+</div>
+</div>
+<script>
+    // Update Total Area
+    function updateTotalArea() {
+        var width = parseFloat(document.getElementById('width').value) || 0; // Default to 1 if width is 0
+        var height = parseFloat(document.getElementById('height').value) || 0; // Default to 1 if height is 0
+        var quantity = parseFloat(document.getElementById('quantity').value) || 0;
+        var total_area = (width * height * quantity).toFixed(2);
+        document.getElementById('total_area').value = total_area;
+    }
+
+    // Update Total Amount
+    function updateTotalAmount() {
+        var width = parseFloat(document.getElementById('width').value) || 1; // Default to 1 if width is 0
+        var height = parseFloat(document.getElementById('height').value) || 1; // Default to 1 if height is 0
+        var quantity = parseFloat(document.getElementById('quantity').value) || 0;
+        var rate = parseFloat(document.getElementById('rate').value) || 0;
+        var total_amount = (width * height * quantity * rate).toFixed(2);
+        document.getElementById('total_amount').value = total_amount;
+    }
+
+    // Update Rate
+    function updateRate() {
+        var width = parseFloat(document.getElementById('width').value) || 1; // Default to 1 if width is 0
+        var height = parseFloat(document.getElementById('height').value) || 1; // Default to 1 if height is 0
+        var quantity = parseFloat(document.getElementById('quantity').value) || 0;
+        var amount = parseFloat(document.getElementById('total_amount').value) || 0;
+        var rate = (amount / (width * height * quantity)).toFixed(2);
+        document.getElementById('rate').value = rate;
+    }
+
+    // Event listeners for input fields
+    document.getElementById('width').addEventListener('input', updateTotalArea);
+    document.getElementById('height').addEventListener('input', updateTotalArea);
+    document.getElementById('quantity').addEventListener('input', updateTotalArea);
+
+    document.getElementById('width').addEventListener('input', updateTotalAmount);
+    document.getElementById('height').addEventListener('input', updateTotalAmount);
+    document.getElementById('quantity').addEventListener('input', updateTotalAmount);
+    document.getElementById('rate').addEventListener('input', updateTotalAmount);
+
+    document.getElementById('width').addEventListener('input', updateRate);
+    document.getElementById('height').addEventListener('input', updateRate);
+    document.getElementById('quantity').addEventListener('input', updateRate);
+    document.getElementById('total_amount').addEventListener('input', updateRate);
+</script>
+
+<script>
+    function validateFloat(floatField) {
+        // Remove any non-numeric characters (including '.') from the input
+        floatField.value = floatField.value.replace(/[^0-9.]/g, '');
+
+        // Parse the entered value as a float
+        var enteredValue = parseFloat(floatField.value);
+
+        // Display an error message if the entered value is not a valid number or less than or equal to 0
+        var errorMessage = document.getElementById("errorMessage");
+        if (isNaN(enteredValue) || enteredValue <= 0) {
+            errorMessage.textContent = "Please enter a valid number greater than 0.";
+            document.getElementById("confirmStatusChange").disabled = true;
+        } else {
+            errorMessage.textContent = "";
+            document.getElementById("confirmStatusChange").disabled = false;
+        }
+    }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+   var inputField = document.getElementById('productInput');
+   var dropdownMenu = document.getElementById('productDropdown');
+   var options = dropdownMenu.getElementsByTagName('li');
+
+   inputField.addEventListener('input', function() {
+       var filter = inputField.value.toLowerCase();
+       for (var i = 0; i < options.length; i++) {
+           var textValue = options[i].textContent || options[i].innerText;
+           if (textValue.toLowerCase().indexOf(filter) > -1) {
+               options[i].style.display = "";
+           } else {
+               options[i].style.display = "none";
+           }
+       }
+   });
+
+   inputField.addEventListener('click', function() {
+       toggleDropdown();
+   });
+
+   inputField.addEventListener('focus', function() {
+       toggleDropdown();
+   });
+
+   dropdownMenu.addEventListener('click', function(event) {
+       if (event.target.tagName === 'LI') {
+           inputField.value = event.target.textContent;
+           toggleDropdown();
+       }
+   });
+
+   function toggleDropdown() {
+       if (dropdownMenu.style.display === 'none') {
+           dropdownMenu.style.display = 'block';
+       } else {
+           dropdownMenu.style.display = 'none';
+       }
+   }
+});
+
+</script>
+
+<script>
+    $(document).ready(function() {
+        // Add event listener to unit select element
+        $('#unit').on('change', function() {
+            var unitValue = $(this).val();
+            // Check the selected unit value
+            if (unitValue === 'SQRFT') {
+                console.log("changes to sqrft")
+                // Enable width, height, and area inputs
+                $('#width, #height, #total_area').prop('disabled', false);
+            } else if (unitValue === 'NOS') {
+                console.log("changes to nos")
+                // Disable width, height, and area inputs
+                $('#width, #height, #total_area').prop('disabled', true);
+            }
+        });
+    });
+</script>
+
+<%- include('../../partials/end')%>

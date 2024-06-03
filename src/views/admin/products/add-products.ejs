@@ -1,0 +1,443 @@
+<%- include('../../partials/main', { pageTitle: 'Add Products' }) %>
+
+<style>
+    .inline{
+        display: inline-flex;
+    }
+    #select2-product-container , #select2-unit-container{
+        font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+    }
+        .mb-4{
+            justify-content: space-evenly;
+        }
+        .completebutton{
+            align-items: end;
+            width: 30%;
+            margin-right: 2rem;
+        }
+        .addbutton{
+            align-items: flex-end;
+            width: 30%;
+            }
+</style>
+
+
+<div class="page-body">
+<!-- tracking table start -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="title-header title-header-block package-card">
+                        <div>
+                            <h5>Add Products</h5>
+                        </div>
+                        <div class="card-order-section">
+                            <ul>
+                                <li>
+                                    <a href="/admin/inventory/select-vendor" style="color: gray !important; pointer-events: none;">
+                                        Select Vendor 
+                                    </a>
+                                </li>                                           
+                                <li>
+                                    <a href="/admin/inventory/add-products/<%= bill_no %>">
+                                        Add Products
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <form class="theme-form theme-form-2 mega-form" id="addProductForm" >
+                            <div class="add-product">
+                                <div class="card-header-1">
+                                    <h5>Product Details</h5>
+                                </div>
+
+                                <input type="hidden" name="orderId" value="<%= bill_no %>">
+                                <div class="mb-4 row align-items-center">
+                                    <label class="form-label-title col-lg-3 col-md-3 mb-0">Product Name</label>
+                                    <div class="col-sm-9 col-lg-9">
+                                        <div class="custom-dropdown">
+                                            <input class="form-control" type="text" name="name" id="productInput" placeholder="Select or Enter the product name">
+                                            <ul class="dropdown-menu" style="width: 96%;" id="productDropdown">
+                                                <% if (products != '') { %>        
+                                                    <% products.forEach((row, index) => { %> 
+                                                        <li class="form-control w-100" value="<%- row._id %>"><%- row.name %></li>
+                                                        <% }) %>
+                                                <%  } else { %>
+                                                    <li class="form-control w-100 disabled" class="disabled">No Products In Inventory</li>
+                                                <% } %>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4 row align-items-center">
+                                    <label class="col-sm-3 col-form-label form-label-title">Unit</label>
+                                    <div class="col-sm-9">
+                                        <select class="js-example-basic-single w-100" name="unit" id="unit">
+                                            <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="none" disabled selected>-- Select Unit Type --</option> 
+                                            <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="SQRFT">SQRFT</option> 
+                                            <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="NOS">NOS</option> 
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="mb-4 row align-items-center">
+                                            <label class="form-label-title col-sm-3 mb-0">Width</label>
+                                            <div class="col-sm-9">
+                                                <input class="form-control" type="text" oninput="validateFloat(this)" placeholder="Enter Product width" name="width" id="width">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="mb-4 row align-items-center">
+                                            <label class="form-label-title col-sm-3 mb-0">Height</label>
+                                            <div class="col-sm-9">
+                                                <input class="form-control" type="text" oninput="validateFloat(this)" placeholder="Enter Product Height" name="height" id="height">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4 row align-items-center">
+                                    <label class="form-label-title col-sm-3 mb-0">Quantity</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="number" placeholder="Quantity of Product" name="quantity" id="quantity">
+                                    </div>
+                                </div>
+                    
+                                <div class="mb-4 row align-items-center">
+                                    <label class="form-label-title col-sm-3 mb-0">Total Area</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="text" placeholder="Total area covered" name="area" id="total_area">
+                                    </div>
+                                </div>
+                    
+                                <div class="mb-4 row align-items-center">
+                                    <label class="form-label-title col-sm-3 mb-0">Rate</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="text" placeholder="Rate of Product" name="rate" id="rate" >
+                                    </div>
+                                </div>
+                                                
+                                <div class="mb-4 row align-items-center">
+                                    <label class="form-label-title col-sm-3 mb-0">Total Amount</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="text" placeholder="Amount" name="amount" id="total_amount">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4 row align-items-center">
+                                    <button id="addProductButton" class="btn btn-solid addbutton col-6 mr-3" type="button">Add Products</button>
+                                    <button id="completeOrderButton" class="btn btn-solid completebutton col-6 mr-3" type="button">Complete Order</button>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>    
+            </div>
+        </div> 
+    </div>
+
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card card-table">
+                    <div class="card-body">
+                        <div class="table-responsive table-product">
+                            <table class="table all-package theme-table">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align: center;">Product Name</th>                                        
+                                        <th style="text-align: center;">Width</th>
+                                        <th style="text-align: center;">Height</th>
+                                        <th style="text-align: center;">Quantity</th>
+                                        <th style="text-align: center;">unit</th>
+                                        <th style="text-align: center;">Total Area</th>
+                                        <th style="text-align: center;">Rate</th>
+                                        <th style="text-align: center;">Amount</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr> 
+                                        <tbody>
+                                            <% if (purchase != '') { %>        
+                                                <% purchase.forEach((row, index) => { %> 
+                                                    <tr> 
+                                                        <td style="text-align: center;"><%= row.name %></td>
+                                                        <td style="text-align: center;"><%= row.width %></td>
+                                                        <td style="text-align: center;"><%= row.height %></td>
+                                                        <td style="text-align: center;"><%= row.quantity %></td>
+                                                        <td style="text-align: center;"><%= row.unit %></td>
+                                                        <td style="text-align: center;"><%= row.area %></td>
+                                                        <td style="text-align: center;"><%= row.rate %></td>
+                                                        <td style="text-align: center;"><%= row.amount %></td>
+                                                    </tr>
+                                                <% }) %>      
+                                            <% } else { %>
+                                                <tr class="text-center">
+                                                    <td class="text-center" style="padding-right: 10%;"></td>
+                                                    <td class="text-center" style="padding-right: 10%;"></td>
+                                                    <td class="text-center" style="padding-right: 10%;"></td>
+                                                    <td class="text-center" style="padding-right: 10%;"></td>
+                                                    <td class="text-center" style="padding-right: 10%;">
+                                                        Add Products
+                                                    </td>
+                                                    <td class="text-center" style="padding-right: 10%;"></td>
+                                                    <td class="text-center" style="padding-right: 10%;"></td>
+                                                    <td class="text-center" style="padding-right: 10%;"></td>
+                                                    <td class="text-center" style="padding-right: 10%;"></td>
+                                                </tr>
+                                            <% } %> 
+                                        </tbody>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- tracking table end -->
+
+<div class="container-fluid">
+    <!-- footer start-->
+    <%- include('../../partials/footer')%>
+</div>
+</div>
+
+
+<script>
+    $(document).ready(function() {
+        // Add click event listener to the continue button
+        $('.continue-btn').click(function() {
+            // Show the table content
+            $('.hide-table').show();
+
+            // Get the active tab pane
+            var activeTabPane = $('.tab-pane.active');
+            // Find the next tab pane
+            var nextTabPane = activeTabPane.next('.tab-pane');
+
+            // Check if there is a next tab pane
+            if (nextTabPane.length > 0) {
+                // Hide the current tab pane
+                activeTabPane.removeClass('show active');
+                // Show the next tab pane
+                nextTabPane.addClass('show active');
+            }
+        });
+    });
+</script>
+
+<script>
+    function validateFloat(floatField) {
+        // Remove any non-numeric characters (including '.') from the input
+        floatField.value = floatField.value.replace(/[^0-9.]/g, '');
+
+        // Parse the entered value as a float
+        var enteredValue = parseFloat(floatField.value);
+
+        // Display an error message if the entered value is not a valid number or less than or equal to 0
+        var errorMessage = document.getElementById("errorMessage");
+        if (isNaN(enteredValue) || enteredValue <= 0) {
+            errorMessage.textContent = "Please enter a valid number greater than 0.";
+            document.getElementById("confirmStatusChange").disabled = true;
+        } else {
+            errorMessage.textContent = "";
+            document.getElementById("confirmStatusChange").disabled = false;
+        }
+    }
+</script>
+
+<script>
+    $(document).ready(function() {
+    $("#addProductButton").click(function() {
+        var formData = {
+            orderId: $("input[name=orderId]").val(),
+            product: $("#productInput").val(),
+            unit: $("#unit").val(),
+            width: $("#width").val(),
+            height: $("#height").val(),
+            quantity: $("#quantity").val(),
+            area: $("#total_area").val(),
+            rate: $("#rate").val(),
+            amount: $("#total_amount").val()
+        };
+        $.ajax({
+            type: "POST",
+            url: "/admin/inventory/save-products",
+            data: JSON.stringify(formData),
+            dataType: "json",
+            contentType: "application/json",
+            success: function(response) {
+                if (response === "Success") {
+                    console.log("Printed Success");
+                    window.location.reload();
+                } else {
+                    console.log("Server returned an error:", response);
+                    // Handle the error, if needed
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log("Printed Error");
+                window.location.reload();
+            }
+        });
+    });
+});
+</script>
+
+<script>
+    $(document).ready(function() {
+        $("#completeOrderButton").click(function() {
+            var formData = {
+                orderId: $("input[name=orderId]").val(),
+            };
+
+            console.log(formData)
+            
+            $.ajax({
+                type: "POST",
+                url: "/admin/inventory/save-bill",
+                data: JSON.stringify(formData),
+                dataType: "json",
+                contentType: "application/json",
+                success: function(response) {
+                    console.log(response);
+                    window.location.href = `/admin/inventory/products-detail/${formData.orderId}`;
+                    console.log("Printed Success");
+                    window.location.reload();
+                },
+                error: function(xhr, status, error) {
+                    console.log("Printed Error");
+                    console.error(xhr.responseText); // Log the error response
+                    console.error(status); // Log the status
+                    console.error(error); // Log the error
+                    window.location.href = `/admin/inventory/products-detail/${formData.orderId}`; // Change "/another-page" to the desired URL
+                }
+            });
+        });
+    });
+</script>
+
+<script>
+    // Update Total Area
+    function updateTotalArea() {
+        var width = parseFloat(document.getElementById('width').value) || 0; // Default to 1 if width is 0
+        var height = parseFloat(document.getElementById('height').value) || 0; // Default to 1 if height is 0
+        var quantity = parseFloat(document.getElementById('quantity').value) || 1;
+        var total_area = (width * height * quantity).toFixed(2);
+        console.log(total_area);
+        document.getElementById('total_area').value = total_area;
+    }
+
+    // Update Total Amount
+    function updateTotalAmount() {
+        var width = parseFloat(document.getElementById('width').value) || 1; // Default to 1 if width is 0
+        var height = parseFloat(document.getElementById('height').value) || 1; // Default to 1 if height is 0
+        var quantity = parseFloat(document.getElementById('quantity').value) || 1;
+        var rate = parseFloat(document.getElementById('rate').value) || 0;
+        var total_amount = (width * height * quantity * rate).toFixed(2);
+        document.getElementById('total_amount').value = total_amount;
+    }
+
+    // Update Rate
+    function updateRate() {
+        var width = parseFloat(document.getElementById('width').value) || 1; // Default to 1 if width is 0
+        var height = parseFloat(document.getElementById('height').value) || 1; // Default to 1 if height is 0
+        var quantity = parseFloat(document.getElementById('quantity').value) || 1;
+        var amount = parseFloat(document.getElementById('total_amount').value) || 0;
+        var rate = (amount / (width * height * quantity)).toFixed(2);
+        document.getElementById('rate').value = rate;
+    }
+
+    // Event listeners for input fields
+    document.getElementById('width').addEventListener('input', updateTotalArea);
+    document.getElementById('height').addEventListener('input', updateTotalArea);
+    document.getElementById('quantity').addEventListener('input', updateTotalArea);
+
+    document.getElementById('width').addEventListener('input', updateTotalAmount);
+    document.getElementById('height').addEventListener('input', updateTotalAmount);
+    document.getElementById('quantity').addEventListener('input', updateTotalAmount);
+    document.getElementById('rate').addEventListener('input', updateTotalAmount);
+
+    document.getElementById('width').addEventListener('input', updateRate);
+    document.getElementById('height').addEventListener('input', updateRate);
+    document.getElementById('quantity').addEventListener('input', updateRate);
+    document.getElementById('total_amount').addEventListener('input', updateRate);
+</script>
+
+<script>
+    $(document).ready(function() {
+        // Add event listener to unit select element
+        $('#unit').on('change', function() {
+            var unitValue = $(this).val();
+            // Check the selected unit value
+            if (unitValue === 'SQRFT') {
+                console.log("changes to sqrft")
+                // Enable width, height, and area inputs
+                $('#width, #height, #total_area').prop('disabled', false);
+            } else if (unitValue === 'NOS') {
+                console.log("changes to nos")
+                // Disable width, height, and area inputs
+                $('#width, #height, #total_area').prop('disabled', true); 
+            }
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+   var inputField = document.getElementById('productInput');
+   var dropdownMenu = document.getElementById('productDropdown');
+   var options = dropdownMenu.getElementsByTagName('li');
+
+   inputField.addEventListener('input', function() {
+       var filter = inputField.value.toLowerCase();
+       for (var i = 0; i < options.length; i++) {
+           var textValue = options[i].textContent || options[i].innerText;
+           if (textValue.toLowerCase().indexOf(filter) > -1) {
+               options[i].style.display = "";
+           } else {
+               options[i].style.display = "none";
+           }
+       }
+   });
+
+   inputField.addEventListener('click', function() {
+       toggleDropdown();
+   });
+
+   inputField.addEventListener('focus', function() {
+       toggleDropdown();
+   });
+
+   dropdownMenu.addEventListener('click', function(event) {
+       if (event.target.tagName === 'LI') {
+           inputField.value = event.target.textContent;
+           toggleDropdown();
+       }
+   });
+
+   function toggleDropdown() {
+       if (dropdownMenu.style.display === 'none') {
+           dropdownMenu.style.display = 'block';
+       } else {
+           dropdownMenu.style.display = 'none';
+       }
+   }
+});
+
+   </script>
+<%- include('../../partials/end')%>
+

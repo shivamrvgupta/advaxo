@@ -1,0 +1,95 @@
+<div class="sidebar-wrapper">
+    <div id="sidebarEffect"></div>
+    <div>
+        <div class="logo-wrapper logo-wrapper-center">
+            <a href="/admin/auth/dashboard" data-bs-original-title="" title="">
+                <!-- <img class="img-fluid for-white" src="/images/login/logos/logo-white.png" alt="logo"> --> <h2 style="color: azure;">Advaxo</h2>
+            </a>
+            <div class="back-btn">
+                <i class="fa fa-angle-left"></i>
+            </div>
+            <div class="toggle-sidebar">
+                <i class="ri-apps-line middle sidebar-toggle"></i>
+            </div>
+        </div>
+        <nav class="sidebar-main">
+            <div class="left-arrow" id="left-arrow">
+                <i data-feather="arrow-left"></i>
+            </div>
+
+            <div id="sidebar-menu">
+                <ul class="sidebar-links" id="simple-bar">
+                    <li class="back-btn"></li>
+
+                    <li class="sidebar-list" id="admin-users">
+                        <a class="sidebar-link sidebar-title link-nav" href="/admin/auth/dashboard">
+                            <i class="ri-home-line"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+
+                    <li class="sidebar-list">
+                        <a class="linear-icon-link sidebar-link sidebar-title" href="javascript:void(0)">
+                            <i class="ri-store-3-line"></i>
+                            <span>Inventory</span>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            <li>
+                                <a href="/admin/inventory/product-list">All Products</a>
+                            </li>
+                            <li>
+                                <a href="/admin/inventory/select-vendor">Add New Product</a>
+                            </li>
+                            <li>
+                                <a href="/admin/inventory/all-bills">All Inventory Bills</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="sidebar-list">
+                        <a class="sidebar-link sidebar-title" href="javascript:void(0)">
+                            <i class="ri-archive-line"></i>
+                            <span>Work Order Production</span>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            <li>
+                                <a href="/admin/order/all-orders">All WOP's</a>
+                            </li>
+                            <li>
+                                <a href="/admin/order/select-customer">Create Order</a>
+                            </li>
+                            <li>
+                                <a href="/admin/order/other-expenses">Other Expenses</a>
+                            </li>
+                        </ul>
+                    </li>
+                    
+                    <li class="sidebar-list">
+                        <a class="sidebar-link sidebar-title" href="javascript:void(0)">
+                            <i class="ri-file-chart-line"></i>
+                            <span>Bank Data</span>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            <li>
+                                <a href="/admin/auth/all-banks">All Banks</a>
+                            </li>
+                            <li>
+                                <a href="/admin/auth/add-bank-data">Add Bank</a>
+                            </li>
+                            <li>
+                                <a href="/admin/auth/internal-transfer">Internal Transfer</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="right-arrow" id="right-arrow">
+                <i data-feather="arrow-right"></i>
+            </div>
+        </nav>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

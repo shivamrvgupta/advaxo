@@ -1,0 +1,199 @@
+<%- include('../../partials/main', { pageTitle: 'Customer Details' }) %>
+
+<style>
+    .inline{
+        display: inline-flex;
+    }
+    .hide-table {
+        display: none;
+    }
+    .inline{
+        display: inline-flex;
+    }
+    #select2-gst-container , #select2-unit-container{
+        font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+    }
+        .mb-4{
+            justify-content: space-evenly;
+        }
+        .completebutton{
+            align-items: end;
+            width: 30%;
+            margin-right: 2rem;
+        }
+        .addbutton{
+            align-items: flex-end;
+            width: 30%;
+            }
+    .selection{
+        width : 100%;
+        border: 1px solid #ced4da;
+    }
+
+        .mb-4{
+            justify-content: space-evenly;
+        }
+        .hide-table {
+            display: none;
+        }
+        .completebutton{
+            align-items: end;
+            width: 30%;
+            margin-right: 2rem;
+        }
+        .addbutton{
+            align-items: flex-end;
+            width: 30%;
+            }
+</style>
+
+
+<div class="page-body">
+<!-- tracking table start -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="title-header title-header-block package-card">
+                        <div>
+                            <h5>Create Order</h5>
+                        </div>
+                        <div class="card-order-section">
+                            <ul>
+                                <li class="text-selected">
+                                    <a href="/admin/order/select-customer">
+                                        Select Customer
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/admin/customer/list" style="color: gray !important; pointer-events: none;">
+                                        Order Details
+                                    </a>
+                                </li>                                
+                                
+                            </ul>
+                        </div>
+
+                        <form class="theme-form theme-form-2 mega-form" method="POST" action="/admin/order/create-order/">
+                            <div class="order-detail">
+                                <div class="card-header-1">
+                                    <h5>Order Details</h5>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="mb-4 row align-items-center">
+
+                                            <input type="hidden" name="token" value="<%= token %>">
+
+                                            <label class="form-label-title col-sm-3 mb-0">Order Id</label>
+                                            <div class="col-sm-9">
+                                                <input class="form-control" type="text" name="orderId" placeholder="Enter the Order ID" required >
+                                            </div>
+                                            <span id="error" style="color: #ee2727;font-size: 12px;"></span>
+                                        </div> 
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="mb-4 row align-items-center">
+                                            <label class="form-label-title col-sm-3 mb-0">Order Date</label>
+                                            <div class="col-sm-9">
+                                                <input class="form-control" type="date" name="order_date" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="mb-4 row align-items-center">
+                                            <label class="form-label-title col-sm-3 mb-0">Delivery Date</label>
+                                            <div class="col-sm-9">
+                                                <input class="form-control" type="date" name="delivery_date" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="mb-4 row align-items-center">
+                                            <label class="col-sm-3 col-form-label form-label-title">Gst</label>
+                                            <div class="col-sm-9">
+                                                <select class="js-example-basic-single w-100" name="gst" id="gst">
+                                                    <option value="none" disabled selected>-- Select GST --</option> 
+                                                    <option value="true">With GST</option> 
+                                                    <option value="false">Without GST</option> 
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4 row align-items-center">
+                                    <label class="form-label-title col-sm-3 mb-0">Order Created By</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="text" placeholder="Order Created By" name="created_by" required>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4 row align-items-center">
+                                    <button class="btn btn-solid continue-btn" type="submit" id="submitButton">Continue</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>    
+            </div>
+        </div> 
+    </div>
+</div>
+<!-- tracking table end -->
+
+<div class="container-fluid">
+    <!-- footer start-->
+    <%- include('../../partials/footer')%>
+</div>
+</div>
+
+<script>
+    // Get the order ID input field and submit button
+var orderIdInput = document.querySelector('input[name="orderId"]');
+var submitButton = document.getElementById('submitButton');
+
+// Add an event listener to the order ID input field
+orderIdInput.addEventListener('blur', function() {
+    // Get the value of the order ID input field
+    var orderId = this.value;
+
+    // Make an API call to fetch the order data based on the order ID
+    fetch('/admin/order/validate-orderid/' + orderId)
+        .then(response => {
+            // Check if the response is successful
+            if (!response.ok) {
+                // If not successful, display an error message
+                document.getElementById('error').textContent = 'Error fetching order data';
+                throw new Error('Error fetching order data');
+            }
+            // If successful, return the response data as JSON
+            return response.json();
+        })
+        .then(data => {
+            // Check if the status is true and message is "Order Id Already Exists"
+            if(data.status === true ){
+                submitButton.disabled = true;
+                // Display the message in the error span
+                document.getElementById('error').textContent = data.message;
+            }else{
+                submitButton.disabled = false;
+                // Display the message in the error span
+                document.getElementById('error').textContent = data.message;
+            }
+        })
+        .catch(error => {
+            // Handle any errors that occur during the fetch operation
+            console.error('Fetch error:', error);
+            // Display an error message on the UI
+            document.getElementById('error').textContent = 'Error fetching order data';
+        });
+});
+
+</script>
+
+
+<%- include('../../partials/end')%>
+

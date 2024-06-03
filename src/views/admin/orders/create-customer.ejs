@@ -1,0 +1,214 @@
+<%- include('../../partials/main', { pageTitle: 'Customer Details' }) %>
+
+<style>
+    .inline{
+        display: inline-flex;
+    }
+    .hide-table {
+        display: none;
+    }
+    .selection{
+        width : 100%;
+        border: 1px solid #ced4da;
+    }
+
+        .mb-4{
+            justify-content: space-evenly;
+        }
+        .hide-table {
+            display: none;
+        }
+        .completebutton{
+            align-items: end;
+            width: 30%;
+            margin-right: 2rem;
+        }
+        .addbutton{
+            align-items: flex-end;
+            width: 30%;
+            }
+</style>
+
+
+<div class="page-body">
+<!-- tracking table start -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="title-header title-header-block package-card">
+                        <div>
+                            <h5>Create Order</h5>
+                        </div>
+                        <div class="card-order-section">
+                            <ul>
+                                <li class="text-selected">
+                                    Select Customer
+                                </li>
+                                
+                            </ul>
+                        </div>
+
+                        <form class="theme-form theme-form-2 mega-form" method="POST" action="/admin/order/select-customer">
+                            <div class="customer-form">
+                                <div class="card-header-1">
+                                    <h5>Personal Information</h5>
+                                </div>
+
+                                <div class="row">
+                                    <input type="hidden" value="<%= token %>" id="token" name="token">
+                                    <div class="mb-4 row align-items-center">
+                                        <label class="form-label-title col-lg-2 col-md-3 mb-0">Customer Name</label>
+                                        <div class="col-sm-9 col-lg-10">
+                                            <div class="custom-dropdown">
+                                                <input class="form-control" type="text" id="customerName" name="name" placeholder="Select or Enter Your Customer name">
+                                                <ul class="dropdown-menu" style="width: 97%;" id="customerDropdown">
+                                                    <% if (clients != '') { %>        
+                                                        <% clients.forEach((row, index) => { %> 
+                                                            <li value="<%= row._id %>" class="form-control w-100"><%= row.name %></li>
+                                                            <span style="display: none;" id="selected_user"><%= row._id %></span>
+                                                        <% }) %>
+                                                    <%  } else { %>
+                                                        <li value="none" class="disabled form-control w-100">No Such Existing Customer</li>
+                                                    <% } %>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4 row align-items-center">
+                                        <label
+                                            class="col-lg-2 col-md-3 col-form-label form-label-title">Client Email
+                                        </label>
+                                        <div class="col-md-9 col-lg-4">
+                                            <input class="form-control" type="email" id="email" name="email" placeholder="Enter Email address">
+                                        </div>
+                                        <label
+                                            class="col-lg-2 col-md-3 col-form-label form-label-title">Phone no
+                                        </label>
+                                        <div class="col-md-9 col-lg-4">
+                                            <input class="form-control" type="text" id="phone" name="phone" placeholder="Enter the Phone number" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="mb-4 row align-items-center">
+                                            <label
+                                                class="form-label-title col-lg-3 col-md-3 mb-0">
+                                                Address
+                                            </label>
+                                            <div class="col-md-9 col-lg-9">
+                                                <input class="form-control" type="text" id="address" name="address_1" placeholder="Enter Address 1...." required>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                
+                                <div class="mb-4 row align-items-center">
+                                    <button class="btn btn-solid continue-btn" type="submit">Continue</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>    
+            </div>
+        </div> 
+    </div>
+</div>
+<!-- tracking table end -->
+
+<div class="container-fluid">
+    <!-- footer start-->
+    <%- include('../../partials/footer')%>
+</div>
+</div>
+
+<script>
+    // Get the dropdown menu
+var dropdownMenu = document.getElementById('customerDropdown');
+
+// Get the input fields
+var emailInput = document.getElementById('email');
+var phoneInput = document.getElementById('phone');
+var addressInput = document.getElementById('address');
+var customerNameInput = document.getElementById('customerName');
+var tokenInput = document.getElementById('token');
+
+// Add an event listener to the dropdown menu
+dropdownMenu.addEventListener('click', function(e) {
+    // Check if the clicked element is an li element
+    if (e.target && e.target.nodeName == 'LI') {
+        // Get the selected customer's ID from the value attribute of the clicked li element
+        var customerId = e.target.getAttribute('value');
+
+        // Make an API call to fetch the user data based on the customer ID
+        fetch('/admin/auth/get-user/' + customerId)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+                console.log(data)
+                console.log(data.data.phone)
+                console.log(data.data.name)
+                console.log(data.data.token)
+                // Update the input fields with the fetched user data
+                emailInput.value = data.data.email;
+                phoneInput.value = data.data.phone;
+                addressInput.value = data.data.address;
+                customerNameInput.value = data.data.name; 
+                tokenInput.value = data.data.token; 
+            })
+            .catch(error => console.error('Error fetching customer data:', error));
+    }
+});
+
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    var inputField = document.getElementById('customerName');
+    var dropdownMenu = document.getElementById('customerDropdown');
+    var options = dropdownMenu.getElementsByTagName('li');
+
+    inputField.addEventListener('input', function() {
+        var filter = inputField.value.toLowerCase();
+        for (var i = 0; i < options.length; i++) {
+            var textValue = options[i].textContent || options[i].innerText;
+            if (textValue.toLowerCase().indexOf(filter) > -1) {
+                options[i].style.display = "";
+            } else {
+                options[i].style.display = "none";
+            }
+        }
+    });
+
+    inputField.addEventListener('click', function() {
+        toggleDropdown();
+    });
+
+    inputField.addEventListener('focus', function() {
+        toggleDropdown();
+    });
+
+    dropdownMenu.addEventListener('click', function(event) {
+        if (event.target.tagName === 'LI') {
+            inputField.value = event.target.textContent;
+            toggleDropdown();
+        }
+    });
+
+    function toggleDropdown() {
+        if (dropdownMenu.style.display === 'none') {
+            dropdownMenu.style.display = 'block';
+        } else {
+            dropdownMenu.style.display = 'none';
+        }
+    }
+    });
+
+</script>
+
+
+<%- include('../../partials/end')%>
+

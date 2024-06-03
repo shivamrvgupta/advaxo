@@ -1,0 +1,218 @@
+<%- include('../../partials/main', { pageTitle: 'Customer Details' }) %>
+
+<style>
+    .inline{
+        display: inline-flex;
+    }
+    .hide-table {
+        display: none;
+    }
+    .inline{
+        display: inline-flex;
+    }
+    #select2-gst-container , #select2-unit-container{
+        font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+    }
+        .mb-4{
+            justify-content: space-evenly;
+        }
+        .completebutton{
+            align-items: end;
+            width: 30%;
+            margin-right: 2rem;
+        }
+        .addbutton{
+            align-items: flex-end;
+            width: 30%;
+            }
+    .selection{
+        width : 100%;
+        border: 1px solid #ced4da;
+    }
+
+        .mb-4{
+            justify-content: space-evenly;
+        }
+        .hide-table {
+            display: none;
+        }
+        .completebutton{
+            align-items: end;
+            width: 30%;
+            margin-right: 2rem;
+        }
+        .addbutton{
+            align-items: flex-end;
+            width: 30%;
+            }
+</style>
+
+
+<div class="page-body">
+<!-- tracking table start -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="title-header title-header-block package-card">
+                        <div>
+                            <h5>Update Order</h5>
+                        </div>
+
+                        
+                        <form class="theme-form theme-form-2 mega-form" method="POST" action="/admin/order/update-order/<%= order.order_id %>">
+                            <div class="customer-form">
+                                <div class="card-header-1">
+                                    <h5>Personal Information</h5>
+                                </div>
+
+                                <div class="row">
+                                    <div class="mb-4 row align-items-center">
+                                        <label class="form-label-title col-lg-2 col-md-3 mb-0">Customer Name</label>
+                                        <div class="col-sm-9 col-lg-10">
+                                            <div class="custom-dropdown">
+                                                <input class="form-control" type="text" id="customerName" name="name" placeholder="Enter Your Customer name" value="<%= order.client_id.name %>">
+                                            </div> 
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4 row align-items-center">
+                                        <label
+                                            class="col-lg-2 col-md-3 col-form-label form-label-title">Client Email
+                                        </label>
+                                        <div class="col-md-9 col-lg-4">
+                                            <input class="form-control" type="email" id="email" name="email" placeholder="Enter Email address" value="<%= order.client_id.email %>">
+                                        </div>
+                                        <label
+                                            class="col-lg-2 col-md-3 col-form-label form-label-title">Phone no
+                                        </label>
+                                        <div class="col-md-9 col-lg-4">
+                                            <input class="form-control" type="text" id="phone" name="phone" placeholder="Enter the Phone number" required value="<%= order.client_id.phone %>">
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="mb-4 row align-items-center">
+                                            <label
+                                                class="form-label-title col-lg-3 col-md-3 mb-0">
+                                                Address
+                                            </label>
+                                            <div class="col-md-9 col-lg-9">
+                                                <input class="form-control" type="text" id="address" name="address_1" placeholder="Enter Address 1...." value="<%= order.client_id.address %>" required>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="order-detail">
+                                <div class="card-header-1">
+                                    <h5>Order Details</h5>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="mb-4 row align-items-center">
+                                            <label class="form-label-title col-sm-3 mb-0">Order Date</label>
+                                            <div class="col-sm-9">
+                                                <input class="form-control" type="date" name="order_date" value="<%= order.order_date %>" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="mb-4 row align-items-center">
+                                            <label class="form-label-title col-sm-3 mb-0">Delivery Date</label>
+                                            <div class="col-sm-9">
+                                                <input class="form-control" type="date" name="delivery_date" required value="<%= order.delivery_date %>">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="mb-4 row align-items-center">
+                                            <label class="col-sm-3 col-form-label form-label-title">Gst</label>
+                                            <div class="col-sm-9">
+                                                <select class="js-example-basic-single w-100" name="gst" id="gst">
+                                                    <option value="none" disabled selected>-- Select GST --</option> 
+                                                    <option value="true">With GST</option> 
+                                                    <option value="false">Without GST</option> 
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="mb-4 row align-items-center">
+                                            <label class="form-label-title col-sm-3 mb-0">Created By</label>
+                                            <div class="col-sm-9">
+                                                <input class="form-control" type="text" placeholder="Order Created By" name="created_by" value="<%= order.created_by %>">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4 row align-items-center">
+                                    <button class="btn btn-solid continue-btn" type="submit" id="submitButton">Continue</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>    
+            </div>
+        </div> 
+    </div>
+</div>
+<!-- tracking table end -->
+
+<div class="container-fluid">
+    <!-- footer start-->
+    <%- include('../../partials/footer')%>
+</div>
+</div>
+
+<script>
+    // Get the order ID input field and submit button
+var orderIdInput = document.querySelector('input[name="orderId"]');
+var submitButton = document.getElementById('submitButton');
+
+// Add an event listener to the order ID input field
+orderIdInput.addEventListener('blur', function() {
+    // Get the value of the order ID input field
+    var orderId = this.value;
+
+    // Make an API call to fetch the order data based on the order ID
+    fetch('/admin/order/validate-orderid/' + orderId)
+        .then(response => {
+            // Check if the response is successful
+            if (!response.ok) {
+                // If not successful, display an error message
+                document.getElementById('error').textContent = 'Error fetching order data';
+                throw new Error('Error fetching order data');
+            }
+            // If successful, return the response data as JSON
+            return response.json();
+        })
+        .then(data => {
+            // Check if the status is true and message is "Order Id Already Exists"
+            if(data.status === true ){
+                submitButton.disabled = true;
+                // Display the message in the error span
+                document.getElementById('error').textContent = data.message;
+            }else{
+                submitButton.disabled = false;
+                // Display the message in the error span
+                document.getElementById('error').textContent = data.message;
+            }
+        })
+        .catch(error => {
+            // Handle any errors that occur during the fetch operation
+            console.error('Fetch error:', error);
+            // Display an error message on the UI
+            document.getElementById('error').textContent = 'Error fetching order data';
+        });
+});
+
+</script>
+
+
+<%- include('../../partials/end')%>
+

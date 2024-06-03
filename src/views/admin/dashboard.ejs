@@ -1,0 +1,325 @@
+<%- include('../partials/main', { pageTitle: 'Advaxo - Dashboard' }) %>
+<link rel="stylesheet" href="/public/css/style2.css">
+
+<style>
+    .item-box {
+        width: 150px;
+        border: #0000003d 1px solid;
+    }
+    
+    .product-card-item{
+            border: #0000003d 1px solid;
+            border-radius: 12px;
+            justify-content: center;
+            flex-wrap: nowrap;
+            padding-bottom: 1rem;
+            cursor: pointer;
+            margin: 1rem;
+    }
+    
+    .upper-card-body {  
+        justify-content: center;
+        overflow-x: auto;
+        -webkit-overflow-scrolling :touch;
+        
+    }
+    
+    .product-card-title {
+        color: #140606bd;
+        margin-bottom: 0.5rem;
+        text-align: center;
+        font-size: 20px;
+        font-weight: 600;
+    }
+    
+    .product-card-text {
+        margin-bottom: 0.5rem;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 600;
+    }
+</style>
+            <!-- index body start -->
+            <div class="page-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <h3 class="mb-4">Dashboard</h3>
+                        <!-- chart caard section start -->
+                        <div class="col-sm-6 col-xxl-3 col-lg-6">
+                            <a href="/admin/auth/all-billed" style="color: black;">
+                                <div class="main-tiles border-5 border-0 card o-hidden card-hover">
+                                    <div class="custome-1-bg b-r-4 card-body">
+                                        <div class="media align-items-center static-top-widget">
+                                            <div class="media-body p-0">
+                                                <span class="m-0">Billed Amount</span>
+                                                <h4 class="mb-0 counter">₹ <%= totalOrder %></h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <div class="col-sm-6 col-xxl-3 col-lg-6">
+                            <a href="/admin/auth/all-dues" style="color: black;">
+                                <div class="main-tiles border-5 border-0 card o-hidden card-hover">
+                                    <div class="custome-2-bg b-r-4 card-body">
+                                        <div class="media static-top-widget">
+                                            <div class="media-body p-0">
+                                                <span class="m-0">Due Balance</span>
+                                                <h4 class="mb-0 counter">₹ <%= totalRemainingBalance %></h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <div class="col-sm-6 col-xxl-3 col-lg-6">
+                            <a href="/admin/auth/all-expense" style="color: black;">
+                                <div class="main-tiles border-5 border-0  card o-hidden card-hover">
+                                    <div class="custome-3-bg b-r-4 card-body">
+                                        <div class="media static-top-widget">
+                                            <div class="media-body p-0">
+                                                <span class="m-0">Total Expenses (WO)</span>
+                                                <h4 class="mb-0 counter">₹ <%= totalExpenses %></h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <div class="col-sm-6 col-xxl-3 col-lg-6">
+                            <a href="/admin/auth/all-profit" style="color: black;">
+                                <div class="main-tiles border-5 border-0 card o-hidden card-hover">
+                                    <div class="custome-4-bg b-r-4 card-body">
+                                        <div class="media static-top-widget">
+                                            <div class="media-body p-0">
+                                                <span class="m-0">Total Profit</span>
+                                                <h4 class="mb-0 counter">₹<%= totalProfit %></h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <h3 class="mb-4">Inventory Stats</h3>
+                        <div class="col-sm-6 col-xxl-4 col-lg-4">
+                            <a href="/admin/auth/all-billed-inventory" style="color: black;">
+                                <div class="main-tiles border-5 border-0 card o-hidden card-hover">
+                                    <div class="custome-1-bg b-r-4 card-body">
+                                        <div class="media align-items-center static-top-widget">
+                                            <div class="media-body p-0">
+                                                <span class="m-0">Billed Inventory</span>
+                                                <h4 class="mb-0 counter">₹ <%= billed_products %></h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-sm-6 col-xxl-4 col-lg-4">
+                            <a href="/admin/auth/all-unbilled-inventory" style="color: black;">
+                                <div class="main-tiles border-5 border-0 card o-hidden card-hover">
+                                    <div class="custome-1-bg b-r-4 card-body">
+                                        <div class="media align-items-center static-top-widget">
+                                            <div class="media-body p-0">
+                                                <span class="m-0">Unpaid Inventory</span>
+                                                <h4 class="mb-0 counter">₹ <%= paid_products %></h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-sm-6 col-xxl-4 col-lg-4">
+                            <a href="/admin/auth/all-paid-inventory" style="color: black;">
+                                <div class="main-tiles border-5 border-0 card o-hidden card-hover">
+                                    <div class="custome-2-bg b-r-4 card-body">
+                                        <div class="media static-top-widget">
+                                            <div class="media-body p-0">
+                                                <span class="m-0">Paid Inventory</span>
+                                                <h4 class="mb-0 counter">₹ <%= remaining_balance %></h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <h3 class="mb-4">Expenses Stats</h3>
+                        <div class="col-sm-6 col-xxl-6 col-lg-6">
+                            <a href="/admin/auth/all-unbilled-expenses" style="color: black;">
+                                <div class="main-tiles border-5 border-0 card o-hidden card-hover">
+                                    <div class="custome-1-bg b-r-4 card-body">
+                                        <div class="media align-items-center static-top-widget">
+                                            <div class="media-body p-0">
+                                                <span class="m-0">Unpaid Expenses</span>
+                                                <h4 class="mb-0 counter">₹ <%= unpaid_expenses %></h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <div class="col-sm-6 col-xxl-6 col-lg-6">
+                            <a href="/admin/auth/all-paid-expenses" style="color: black;">
+                                <div class="main-tiles border-5 border-0 card o-hidden card-hover">
+                                    <div class="custome-2-bg b-r-4 card-body">
+                                        <div class="media static-top-widget">
+                                            <div class="media-body p-0">
+                                                <span class="m-0">Paid Expenses</span>
+                                                <h4 class="mb-0 counter">₹ <%= paid_expenses %></h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <h3 class="mb-4">Bank Stats</h3>
+                        <div class="col-sm-6 col-xxl-3 col-lg-6">
+                            <a href="/admin/auth/transcation-list/cash" style="color: black;">
+                                <div class="main-tiles border-5 border-0 card o-hidden card-hover">
+                                    <div class="custome-1-bg b-r-4 card-body">
+                                        <div class="media align-items-center static-top-widget">
+                                            <div class="media-body p-0">
+                                                <span class="m-0" style="font-size: 15px;">Cash</span>
+                                                <h4 class="mb-0 counter" style="font-size: 15px;">₹ <%= cash.amount || 0 %></h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <div class="col-sm-6 col-xxl-3 col-lg-6">
+                            <a href="/admin/auth/transcation-list/idfc%20sam" style="color: black;">
+                                <div class="main-tiles border-5 border-0 card o-hidden card-hover">
+                                    <div class="custome-2-bg b-r-4 card-body">
+                                        <div class="media static-top-widget">
+                                            <div class="media-body p-0">
+                                                <span class="m-0" style="font-size: 15px;">IDFC SAM</span>
+                                                <h4 class="mb-0 counter" style="font-size: 15px;">₹ <%= sam.amount || 0 %></h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <div class="col-sm-6 col-xxl-3 col-lg-6">
+                            <a href="/admin/auth/transcation-list/idfc%20swati" style="color: black;">
+                                <div class="main-tiles border-5 border-0  card o-hidden card-hover">
+                                    <div class="custome-3-bg b-r-4 card-body">
+                                        <div class="media static-top-widget">
+                                            <div class="media-body p-0">
+                                                <span class="m-0" style="font-size: 15px;">IDFC SWATI</span>
+                                                <h4 class="mb-0 counter" style="font-size: 15px;" >₹ <%= swati.amount || 0 %></h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <div class="col-sm-6 col-xxl-3 col-lg-6">
+                            <a href="/admin/auth/transcation-list/net%20bank" style="color: black;">
+                                <div class="main-tiles border-5 border-0 card o-hidden card-hover">
+                                    <div class="custome-4-bg b-r-4 card-body">
+                                        <div class="media static-top-widget">
+                                            <div class="media-body p-0">
+                                                <span class="m-0" style="font-size: 15px;">Net Banking</span>
+                                                <h4 class="mb-0 counter" style="font-size: 15px;" >₹<%= net.amount || 0 %></h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Container-fluid Ends-->
+
+                <!-- footer start-->
+                <%- include('../partials/footer')%>
+                <!-- footer End-->
+            </div>
+            <!-- index body end -->
+            <!-- Include the necessary ApexCharts and jQuery libraries -->
+            <script src="/public/js/chart/apex-chart/apex-chart1.js"></script>
+            <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+            <script>
+                // Function to get date formatted as 'DD MMM'
+                function getFormattedDate(date) {
+                    return date.toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
+                }
+
+                // Function to update the chart with data
+                function updateChart(data) {
+                    var options = {
+                        series: [{
+                            data: data.map(entry => entry.totalRevenue)
+                        }],
+                        chart: {
+                            height: 250,
+                            type: 'bar',
+                        },
+                        colors: ['#ed702d', '#2483e2', '#3d3d3d'],
+                        plotOptions: {
+                            bar: {
+                                columnWidth: '25%',
+                                distributed: true,
+                                fill: {
+                                    colors: ['#ed702d', '#2483e2', '#3d3d3d'], // Set solid colors for the bars
+                                }
+                            }
+                        },
+                        dataLabels: {
+                            enabled: false
+                        },
+                        legend: {
+                            show: false
+                        },
+                        xaxis: {
+                            categories: data.map(entry => entry.date),
+                            labels: {
+                                style: {
+                                    colors: ['#ed702d', '#2483e2','#3d3d3d', '#3d3d3d', '#3d3d3d', '#3d3d3d', '#3d3d3d'],
+                                    fontSize: '12px'
+                                }
+                            }
+                        },
+                    };
+
+                    var chart = new ApexCharts(document.querySelector("#sales-purchase-chart"), options);
+                    chart.render();
+                }
+
+                // Get current date
+                var currentDate = new Date();
+
+                // Generate previous 6-day date range
+                var dateRange = [];
+                for (var i = 6; i >= 0; i--) {
+                    var date = new Date(currentDate);
+                    console.log(date)
+                    date.setDate(currentDate.getDate() - i);
+                    dateRange.push(getFormattedDate(date));
+                }
+
+                // Call your API to get data
+                fetch('/admin/auth/sales-data')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Assuming your API response is an array with objects having 'date' and 'totalRevenue' properties
+                        // Example API response: [{ date: '01 Jan', totalRevenue: 100 }, { date: '02 Jan', totalRevenue: 150 }, ...]
+                        updateChart(data);
+                    })
+                    .catch(error => console.error('Error fetching data from API:', error));
+            </script>
+
+<%- include('../partials/end')%>

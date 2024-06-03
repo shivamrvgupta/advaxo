@@ -1,0 +1,198 @@
+<%- include('../../partials/main', { pageTitle: 'Add Products' }) %>
+
+<style>
+    .inline{
+        display: inline-flex;
+    }
+    #select2-product-container , #select2-payment_method-container{
+        font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+    }
+        .mb-4{
+            justify-content: space-evenly;
+        }
+        .completebutton{
+            align-items: end;
+            width: 30%;
+            margin-right: 2rem;
+        }
+        .addbutton{
+            align-items: flex-end;
+            width: 30%;
+            }
+</style>
+
+
+<div class="page-body">
+<!-- tracking table start -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="title-header title-header-block package-card">
+                        <div>
+                            <h5>Add Expense</h5>
+                        </div>
+                        <form class="theme-form theme-form-2 mega-form" method="post" action="/admin/order/update-other-expenses/<%= expenses._id %>">
+                            <div class="add-product">
+                                <div class="card-header-1">
+                                    <h5>Expense Details</h5>
+                                </div>
+                                
+                                <% if (expenses.expense_type === 'Order') { %>        
+                                    <div class="mb-4 row align-items-center">
+                                        <label class="form-label-title col-sm-3 mb-0">Client Name</label>
+                                        <div class="col-sm-9">
+                                            <input class="form-control" type="text" placeholder="Client Name" name="client_name"  required value="<%= expenses.client_name %>">
+                                        </div>
+                                    </div>
+                                <% } %>      
+                                
+                                <div class="mb-4 row align-items-center">
+                                    <label class="form-label-title col-sm-3 mb-0">Item</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="text" placeholder="Item" name="item"  required value="<%= expenses.item_name %>">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4 row align-items-center">
+                                    <label class="form-label-title col-sm-3 mb-0">Description</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="text" placeholder="Description" name="description"  required value="<%= expenses.description %>">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4 row align-items-center">
+                                    <label class="form-label-title col-sm-3 mb-0">Date</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="date" placeholder="Date" name="date" value="<%= expenses.date %>">
+                                    </div>
+                                </div>
+
+                                <div class="mb-4 row align-items-center">
+                                    <label class="form-label-title col-sm-3 mb-0">Amount</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="text" placeholder="Amount" name="amount"  required value="<%= expenses.amount %>">
+                                    </div>
+                                </div>
+                                
+
+                                <div class="mb-4 row align-items-center">
+                                    <label class="col-sm-3 col-form-label form-label-title">Payment Method</label>
+                                    <div class="col-sm-9">
+                                        <select class="js-example-basic-single w-100" name="payment_method" id="payment_method">
+                                            <% if(expenses.payment_method !== "UNPAID" ) {%>
+                                                <option value="<%= expenses.mode_of_payment %>" selected>-- Select Payment Method --</option> 
+                                                <option value="CASH">CASH</option> 
+                                                <option value="IDFC SAM">IDFC SAM</option> 
+                                                <option value="IDFC SWATI">IDFC SWATI</option> 
+                                                <option value="NET BANK">NET BANK</option> 
+                                            <% } else { %>
+                                                <option value="<%= expenses.mode_of_payment %>" selected>-- Select Payment Method --</option> 
+                                                <option value="CASH">CASH</option> 
+                                                <option value="IDFC SAM">IDFC SAM</option> 
+                                                <option value="IDFC SWATI">IDFC SWATI</option> 
+                                                <option value="NET BANK">NET BANK</option> 
+                                                <option value="Unpaid">UNPAID</option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4 row align-items-center">
+                                    <button id="addProductButton" class="btn btn-solid addbutton col-6 mr-3" type="submit">Add Expense</button>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>    
+            </div>
+        </div> 
+    </div>
+</div>
+<!-- tracking table end -->
+
+<div class="container-fluid">
+    <!-- footer start-->
+    <%- include('../../partials/footer')%>
+</div>
+</div>
+
+<script>
+    // Update Total Area
+    function updateTotalArea() {
+        var width = parseFloat(document.getElementById('width').value) || 0; // Default to 1 if width is 0
+        var height = parseFloat(document.getElementById('height').value) || 0; // Default to 1 if height is 0
+        var quantity = parseFloat(document.getElementById('quantity').value) || 0;
+        var total_area = (width * height * quantity).toFixed(2);
+        document.getElementById('total_area').value = total_area;
+    }
+
+    // Update Total Amount
+    function updateTotalAmount() {
+        var width = parseFloat(document.getElementById('width').value) || 1; // Default to 1 if width is 0
+        var height = parseFloat(document.getElementById('height').value) || 1; // Default to 1 if height is 0
+        var quantity = parseFloat(document.getElementById('quantity').value) || 0;
+        var rate = parseFloat(document.getElementById('rate').value) || 0;
+        var total_amount = (width * height * quantity * rate).toFixed(2);
+        document.getElementById('total_amount').value = total_amount;
+    }
+
+    // Event listeners for input fields
+    document.getElementById('width').addEventListener('input', updateTotalArea);
+    document.getElementById('height').addEventListener('input', updateTotalArea);
+    document.getElementById('quantity').addEventListener('input', updateTotalArea);
+
+    document.getElementById('width').addEventListener('input', updateTotalAmount);
+    document.getElementById('height').addEventListener('input', updateTotalAmount);
+    document.getElementById('quantity').addEventListener('input', updateTotalAmount);
+    document.getElementById('rate').addEventListener('input', updateTotalAmount);
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+   var inputField = document.getElementById('productInput');
+   var dropdownMenu = document.getElementById('productDropdown');
+   var options = dropdownMenu.getElementsByTagName('li');
+
+   inputField.addEventListener('input', function() {
+       var filter = inputField.value.toLowerCase();
+       for (var i = 0; i < options.length; i++) {
+           var textValue = options[i].textContent || options[i].innerText;
+           if (textValue.toLowerCase().indexOf(filter) > -1) {
+               options[i].style.display = "";
+           } else {
+               options[i].style.display = "none";
+           }
+       }
+   });
+
+   inputField.addEventListener('click', function() {
+       toggleDropdown();
+   });
+
+   inputField.addEventListener('focus', function() {
+       toggleDropdown();
+   });
+
+   dropdownMenu.addEventListener('click', function(event) {
+       if (event.target.tagName === 'LI') {
+           inputField.value = event.target.textContent;
+           toggleDropdown();
+       }
+   });
+
+   function toggleDropdown() {
+       if (dropdownMenu.style.display === 'none') {
+           dropdownMenu.style.display = 'block';
+       } else {
+           dropdownMenu.style.display = 'none';
+       }
+   }
+});
+
+   </script>
+
+<%- include('../../partials/end')%>
+

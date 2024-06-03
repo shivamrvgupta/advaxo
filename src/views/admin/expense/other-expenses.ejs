@@ -1,0 +1,257 @@
+
+<%- include('../../partials/main', { pageTitle: "Other Expenses List's " }) %>
+    
+<style>
+    .hidden-row{
+        display: none;
+    }
+    .status-blue  {
+        background-color:rgba(0, 201, 219, .1);;
+        color: #00c9db;
+        padding: 5px 10px;
+        text-transform: capitalize;
+        display: inline-block;
+        border-radius: 5px;
+        font-size: 12px;
+        visibility: 400;
+    }
+</style>
+<!-- Container-fluid starts-->
+            <div class="page-body">
+                <!-- All User Table Start -->
+                
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card card-table">
+                                <div class="card-body">
+                                    <div class="title-header option-title">
+                                        <h5>All Other Expenses</h5>
+                                        <form class="d-inline-flex">
+                                            <a id="add-expense" href="/admin/order/add-other-expenses"
+                                                class="align-items-center btn btn-theme d-flex">
+                                                <i data-feather="plus-square"></i>Add New Expenses
+                                            </a> 
+                                        </form>
+                                    </div>
+                                    
+
+                                    <div class="table-responsive table-customer">
+                                        <table class="table all-package theme-table" id="table_id">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>Item </th>
+                                                    <th>Description</th>
+                                                    <th>Mode Of Payment</th>
+                                                    <th>Payment Status</th>
+                                                    <th>Amount</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <% if (expenses != '') { %>        
+                                                    <% expenses.forEach((row, index) => { %>   
+                                                        <% if (row.expense_type != 'Order') { %>                                    
+                                                            <tr class="order-row">
+                                                                <td><%= row.date.toLocaleDateString('en-UK',options) %></td>
+                                                                
+                                                                <td>
+                                                                    <%= row.item_name %>
+                                                                </td>
+                                                                
+                                                                <td>
+                                                                    <%= row.description %>
+                                                                </td>
+                                                                
+
+                                                                <td><%= row.mode_of_payment %></td>
+
+                                                                <td>
+                                                                    <div class="<%= row.payment_status ? 'status-close' : 'status-danger' %>">
+                                                                        <span><%= row.payment_status ? 'Paid' : 'Unpaid' %></span>
+                                                                    </div>
+                                                                </td>
+
+                                                                <td><%= row.amount %></td>
+                                                            
+                                                                <td>
+                                                                    <ul>
+                                                                        <li>
+                                                                            <li style="display: contents;">
+                                                                                <a href="/admin/order/update-other-expenses/<%= row.id %>">
+                                                                                    <i class="ri-pencil-line"></i>
+                                                                                </a>
+                                                                            </li>
+                                                                        </li>
+                                                            
+                                                                        <li>
+                                                                            <a onclick="deleteOrder('<%= row._id %>')">
+                                                                                <i class="ri-delete-bin-line"></i>
+                                                                            </a>
+                                                                        </li>                                                         
+                                                                    </ul>
+                                                                </td>
+                                                                
+                                                            </tr>
+                                                        <% } %>      
+                                                    <% })} else { %>
+                                                        <tr class="hidden-row">
+                                                            <td>
+                                                                <tr>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td style="width: 100%;text-align:right;padding-right:10%">
+                                                                        Nothing To Show
+                                                                    </td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    
+                                                                </tr>
+                                                            </td>
+                                                        </tr>
+                                                    <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- All User Table Ends-->
+
+                <div class="container-fluid">
+                    <!-- footer start-->
+                    <%- include('../../partials/footer')%>
+                    <!-- footer end-->
+                </div>
+            </div>
+            <!-- Container-fluid end -->
+
+                        <!-- Container-fluid end -->
+                        
+                    
+                <!-- Delete Modal Box Start -->
+                <div class="modal fade theme-modal remove-coupon" id="exampleModalToggle" aria-hidden="true" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header d-block text-center">
+                                <h5 class="modal-title w-100" id="exampleModalLabel22">Are You Sure ?</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="remove-box">
+                                    <p>You want to delete the record.</p>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-animation btn-md fw-bold" data-bs-dismiss="modal">No</button>
+                                <button type="button" class="btn btn-animation btn-md fw-bold" id="confirmDeleteBtn" data-bs-target="#exampleModalToggle2"
+                                    data-bs-toggle="modal" data-bs-dismiss="modal">Yes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade theme-modal remove-coupon" id="exampleModalToggle2" aria-hidden="true" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title text-center" id="exampleModalLabel12">Done!</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="remove-box text-center">
+                                    <div class="wrapper">
+                                        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                                            <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+                                            <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+                                        </svg>
+                                    </div>
+                                    <h4 class="text-content">It's Removed.</h4>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Delete Modal Box End -->
+                
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                        
+
+                <script>
+                    $(document).ready(function () {
+                        // Add change event listener to the branch dropdown
+                        $('#table_search').change(function () {
+                            var selectedBranch = $(this).val();
+                            
+                            // Show all rows initially
+                            $('.order-row').show();
+                            $('.hidden-row').hide();
+                            
+                            // Flag to check if any match is found
+                            var foundMatch = false;
+                            
+                            // If a branch is selected, hide rows that don't match the selected branch
+                            if (selectedBranch !== '') {
+                                $('.order-row').each(function () {
+                                    var rowBranch = $(this).data('branch');
+                                    if (rowBranch !== selectedBranch) {
+                                        $(this).hide();
+                                    } else {
+                                        foundMatch = true;
+                                    }
+                                });
+                            }
+                            
+                            console.log(foundMatch)
+                            // If no match is found, show the hidden row
+                            if (!foundMatch) {
+                                $('.hidden-row').show();
+                            }
+                        });
+                    });
+                </script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function deleteOrder(expenseId) {
+        if (confirm("Are you sure you want to delete this Expense?")) {
+            // Send AJAX request to delete payment
+            $.ajax({
+                type: "POST",
+                url: `/admin/order/delete-other-expenses/${expenseId}`,
+                data: { expenseId: expenseId },
+                success: function(response) {
+                    
+                    console.log("Expense deleted successfully");
+                    setTimeout(function() {
+                        window.location.reload();
+                        location.reload();
+                    }, 1000); // 10 seconds delay
+                    
+                },
+                error: function(xhr, status, error) {
+                    // Handle error response
+                    console.error("Error deleting expense:", error);
+                    // For example, display an error message to the user
+                    alert("Error deleting expense. Please try again later.");
+                }
+            });
+        }
+        // Prevent default anchor action
+        return false;
+    }
+</script>
+
+<%- include('../../partials/end')%>

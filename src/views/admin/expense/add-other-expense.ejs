@@ -1,0 +1,176 @@
+<%- include('../../partials/main', { pageTitle: 'Add Products' }) %>
+
+<style>
+    .inline{
+        display: inline-flex;
+    }
+    #select2-workorder-container , #select2-expense_type-container, #select2-payment_method-container {
+        font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+    }
+        .mb-4{
+            justify-content: space-evenly;
+        }
+        .completebutton{
+            align-items: end;
+            width: 30%;
+            margin-right: 2rem;
+        }
+        .addbutton{
+            align-items: flex-end;
+            width: 30%;
+            }
+</style>
+
+
+<div class="page-body">
+<!-- tracking table start -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="title-header title-header-block package-card">
+                        <div>
+                            <h5>Add Expense</h5>
+                        </div>
+                        <form class="theme-form theme-form-2 mega-form" method="post" action="/admin/order/add-other-expense">
+                            <div class="add-product">
+                                <div class="card-header-1">
+                                    <h5>Expense Details</h5>
+                                </div>
+                                                
+                                <div class="mb-4 row align-items-center">
+                                    <label class="col-sm-3 col-form-label form-label-title">Expense Type</label>
+                                    <div class="col-sm-9">
+                                        <select class="js-example-basic-single w-100" name="expense_type" id="expense_type">
+                                            <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="none" disabled selected>-- Select Unit Type --</option> 
+                                            <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="General">General</option> 
+                                            <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="Fuels">Fuels</option> 
+                                            <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="Office">Office</option> 
+                                            <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="Order">Work Order</option> 
+                                            <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="Salary">Salary</option> 
+                                            <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="Loan">Loan</option> 
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4 row align-items-center">
+                                    <label class="col-sm-3 col-form-label form-label-title">Work Order_Id</label>
+                                    <div class="col-sm-9">
+                                        <select class="js-example-basic-single w-100" name="work_order" id="workorder">
+                                            <option value="none" disabled selected>-- Select the Work Order --</option> 
+                                            <% if (orders != '') { %>        
+                                                <% orders.forEach((row, index) => { %> 
+                                                    <option value="<%= row.order_id %>"><%- row.client_id.name %> || <%- row.order_id %></option>
+                                                <% }) %> 
+                                            <%  } else { %>
+                                                <option value="none" disabled>No Orders Placed</option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4 row align-items-center">
+                                    <label class="form-label-title col-sm-3 mb-0">Item</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="text" placeholder="Item" name="item"  required>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4 row align-items-center">
+                                    <label class="form-label-title col-sm-3 mb-0">Description</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="text" placeholder="Description" name="description"  required>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4 row align-items-center">
+                                    <label class="form-label-title col-sm-3 mb-0">Date</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="date" placeholder="Date" name="date"  required>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4 row align-items-center">
+                                    <label class="form-label-title col-sm-3 mb-0">Amount</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="text" placeholder="Amount" name="amount"  required>
+                                    </div>
+                                </div>
+                                
+
+                                <div class="mb-4 row align-items-center">
+                                    <label class="col-sm-3 col-form-label form-label-title">Payment Method</label>
+                                    <div class="col-sm-9">
+                                        <select class="js-example-basic-single w-100" name="payment_method" id="payment_method">
+                                            <option value="none" disabled selected>-- Select Payment Method --</option> 
+                                            <option value="CASH">CASH</option> 
+                                            <option value="IDFC SAM">IDFC SAM</option> 
+                                            <option value="IDFC SWATI">IDFC SWATI</option> 
+                                            <option value="NET BANK">NET BANK</option> 
+                                            <option value="Unpaid">UNPAID</option> 
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4 row align-items-center">
+                                    <button id="addProductButton" class="btn btn-solid addbutton col-6 mr-3" type="submit">Add Expense</button>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>    
+            </div>
+        </div> 
+    </div>
+</div>
+<!-- tracking table end -->
+
+<div class="container-fluid">
+    <!-- footer start-->
+    <%- include('../../partials/footer')%>
+</div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Add event listener to unit select element
+        $('#expense_type').on('change', function() {
+            var unitValue = $(this).val();
+            // Check the selected unit value
+            if (unitValue === 'Order') {
+                console.log("changes to Order")
+                // Enable width, height, and area inputs
+                $('#workorder').prop('disabled', false);
+            } else if (unitValue === 'General') {
+                console.log("changes to nos")
+                // Disable width, height, and area inputs
+                $('#workorder').prop('disabled', true);
+            } else if (unitValue === 'Fuels') {
+                console.log("changes to nos")
+                // Disable width, height, and area inputs
+                $('#workorder').prop('disabled', true);
+            }else if (unitValue === 'Office') {
+                console.log("changes to nos")
+                // Disable width, height, and area inputs
+                $('#workorder').prop('disabled', true);
+            }else if (unitValue === 'Salary') {
+                console.log("changes to nos")
+                // Disable width, height, and area inputs
+                $('#workorder').prop('disabled', true);
+            }else if (unitValue === 'Loan') {
+                console.log("changes to nos")
+                // Disable width, height, and area inputs
+                $('#workorder').prop('disabled', true);
+            }else if (unitValue === 'none') {
+                console.log("changes to nos")
+                // Disable width, height, and area inputs
+                $('#workorder').prop('disabled', true);
+            }
+        });
+    });
+</script>
+
+<%- include('../../partials/end')%>
+

@@ -1,0 +1,147 @@
+<%- include('../../partials/main', { pageTitle: 'Customer Details' }) %>
+
+
+<style>
+    .inline{
+        display: inline-flex;
+    }
+    .modal-dialog{
+        min-width: 54% ;
+    }
+    #select2-product-container , #select2-unit-container{
+        font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+    }
+        .mb-4{
+            justify-content: space-evenly;
+        }
+        .completebutton{
+            align-items: end;
+            width: 30%;
+            margin-right: 2rem;
+        }
+        .addbutton{
+            align-items: flex-end;
+            width: 30%;
+            }
+</style>
+
+<div class="page-body">
+    <!-- tracking table start -->
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="bg-inner cart-section order-details-table">
+                            <div class="row g-4">
+
+
+                                <!-- Order table -->
+                                <div class="table-responsive table-details">
+                                    <table class="table cart-table table-borderless">
+                                        <thead>
+                                            <tr>
+                                                <th style="border: 1px solid black;padding: 8px;width: 5%;">Sr.No</th>
+                                                <th style="border: 1px solid black;padding: 8px;width: 35%;">Material</th>
+                                                <th style="border: 1px solid black;padding: 8px;">Height</th>
+                                                <th style="border: 1px solid black;padding: 8px;">Weight</th> 
+                                                <th style="border: 1px solid black;padding: 8px;">QTY</th>
+                                                <th style="border: 1px solid black;padding: 8px;">SQ. FT</th>
+                                                <th style="border: 1px solid black;padding: 8px;">Rate</th>
+                                                <th style="border: 1px solid black;padding: 8px;">Amount</th>
+                                                <th style="border: 1px solid black;padding: 8px;">Action</th>
+                                            </tr>
+                                            <% if (purchase != '') { %>        
+                                                <% purchase.forEach((row, index) => { %> 
+                                                <tr>
+                                                    <td style="border: 1px solid black;padding: 8px;width: 5%;"><%= index + 1 %></td>
+                                                    <td style="border: 1px solid black;padding: 8px;width: 35%;"><%= row.name %></td>
+                                                    <td style="border: 1px solid black;padding: 8px;"><%= row.height %></td>
+                                                    <td style="border: 1px solid black;padding: 8px;"><%= row.width %></td>
+                                                    <td style="border: 1px solid black;padding: 8px;"><%= row.quantity %></td>
+                                                    <td style="border: 1px solid black;padding: 8px;"><%= row.area %></td>
+                                                    <td style="border: 1px solid black;padding: 8px;"><%= row.rate %></td>
+                                                    <td style="border: 1px solid black;padding: 8px;text-align: center;"><%= row.amount %></td>
+                                                    <td style="text-align: center;border: 1px solid black;padding: 8px;text-align: center;">
+                                                        <ul>
+                                                            <li style="display: contents;">
+                                                                <a href="/admin/order/update-product/<%= row._id %>">
+                                                                    <i class="ri-pencil-line"></i>
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </td>
+                                                </tr>   
+                                            <% }) %>      
+                                            <% } else { %>
+                                                <tr class="text-center">
+                                                    <td class="text-center" style="padding-right: 10%;">
+                                                        Nothing To Show
+                                                    </td>
+                                                </tr>
+                                            <% } %> 
+                                            <tr>
+                                                <td style="border: 1px solid black;padding: 8px;width: 5%;" colspan="6"></td>
+                                                <td style="border: 1px solid black;padding: 8px;"> Total </td>
+                                                <td style="border: 1px solid black;padding: 8px;text-align: center;" colspan="2"> 
+                                                    <% var formattedTotal = orders.grand_total.toFixed(2); %>
+                                                    <%= formattedTotal %>
+                                                </td>
+                                            </tr>   
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- section end -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- tracking table end -->
+
+    <!-- Delete Modal Box Start -->
+    
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+    <div class="container-fluid">
+        <!-- footer start-->
+        <%- include('../../partials/footer')%>        
+    </div>
+</div>
+
+<div class="modal fade theme-modal remove-coupon" id="exampleModalToggle2" aria-hidden="true" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-center" id="exampleModalLabel12">Done!</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="remove-box text-center">
+                    <div class="wrapper">
+                        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                            <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+                            <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+                        </svg>
+                    </div>
+                    <h4 class="text-content">It's Removed.</h4>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../../partials/end')%>
+
+
+<!-- Delete Modal Box End -->
