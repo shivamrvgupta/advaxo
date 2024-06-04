@@ -38,24 +38,22 @@
                                                 
                                                     <% if (inventory != '') { %>
                                                         <% inventory.forEach((row, index) => { %>
-                                                            <% if(row.remaining_balance !== "0"){ %>
-                                                                <tr>
-                                                                    <td style="text-align: center;"><%= row.created_date.toLocaleDateString('en-UK',options) %></td>
-                                                                    <td style="text-align: center;">
-                                                                        <a href="/admin/inventory/products-detail/<%= row.id %>">
-                                                                            <%= row.bill_no %>
-                                                                        </a>
-                                                                    </td>
-                                                                    <td style="text-align: center;">
-                                                                        <a href="/admin/inventory/products-detail/<%= row.id %>">
-                                                                            <%= row.vendor_id.name %>
-                                                                        </a>
-                                                                    </td>
-                                                                    <td style="text-align: center;"><%= row.grand_total.toFixed(2) %></td>
-                                                                    <td style="text-align: center;"><%= (parseFloat(row.grand_total) - parseFloat(row.remaining_balance.toFixed(2))).toFixed(2) %></td>
-                                                                    <td style="text-align: center;"><%= row.remaining_balance.toFixed(2) %></td>
-                                                                </tr>
-                                                            <% } %>
+                                                            <tr>
+                                                                <td style="text-align: center;"><%= row.created_date.toLocaleDateString('en-UK',options) %></td>
+                                                                <td style="text-align: center;">
+                                                                    <a href="/admin/inventory/products-detail/<%= row.id %>">
+                                                                        <%= row.bill_no %>
+                                                                    </a>
+                                                                </td>
+                                                                <td style="text-align: center;">
+                                                                    <a href="/admin/inventory/products-detail/<%= row.id %>">
+                                                                        <%= row.vendor_id.name %>
+                                                                    </a>
+                                                                </td>
+                                                                <td style="text-align: center;"><%= row.grand_total.toFixed(2) %></td>
+                                                                <td style="text-align: center;"><%= row.remaining_balance.toFixed(2) %></td>
+                                                                <td style="text-align: center;"><%= (parseFloat(row.grand_total) - parseFloat(row.remaining_balance.toFixed(2))).toFixed(2) %></td>
+                                                            </tr>
                                                         <% }) %>
                                                     <% }else{ %>
                                                         <tr>
