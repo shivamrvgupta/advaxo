@@ -41,6 +41,7 @@
                                                     <th>Total Dues</th>
                                                     <th>Total Expenses</th>
                                                     <th>Payment Status</th>
+                                                    <th>GST</th>
                                                     <th>Order Status</th>
                                                     <th>Actions</th>
                                                 </tr>
@@ -71,6 +72,7 @@
                                                                 </div>
                                                                 
                                                             </td>
+                                                            <td><%= row.gst ? "With GST" : "Without GST" %></td>
                                                             <td>
                                                                 <div id="orderStatusElement">
                                                                     <span id="orderStatus">

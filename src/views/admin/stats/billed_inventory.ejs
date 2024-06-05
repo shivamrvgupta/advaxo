@@ -39,12 +39,12 @@
                                                                 <tr>
                                                                     <td style="text-align: center;"><%= row.created_date.toLocaleDateString('en-UK',options) %></td>
                                                                     <td style="text-align: center;">
-                                                                        <a href="/admin/inventory/products-detail/<%= row.id %>">
+                                                                        <a href="/admin/inventory/products-detail/<%= row.bill_no %>">
                                                                             <%= row.bill_no %>
                                                                         </a>
                                                                     </td>
                                                                     <td style="text-align: center;">
-                                                                        <a href="/admin/inventory/products-detail/<%= row.id %>">
+                                                                        <a href="/admin/inventory/products-detail/<%= row.bill_no %>">
                                                                             <%= row.vendor_id.name %>
                                                                         </a>
                                                                     </td>

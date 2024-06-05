@@ -28,6 +28,7 @@
                                                     <th style="text-align: center;">Date</th>
                                                     <th style="text-align: center;">Client Name</th>
                                                     <th style="text-align: center;">Order Cost</th>
+                                                    <th style="text-align: center;">Received Amount</th>
                                                     <th style="text-align: center;">Due Balance</th>
                                                 </tr>
                                             </thead>
@@ -40,6 +41,7 @@
                                                                 <td style="text-align: center;"><%= row.created_date.toLocaleDateString('en-UK',options) %></td>
                                                                 <td style="text-align: center;"><%= row.client_id.name %></td>
                                                                 <td style="text-align: center;"><%= row.grand_total %></td>
+                                                                <td style="text-align: center;"><%= row.grand_total - row.remaining_balance %></td>
                                                                 <td style="text-align: center;"><%= row.remaining_balance %></td>
                                                             </tr>
                                                         <% }) %>

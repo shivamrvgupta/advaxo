@@ -41,6 +41,7 @@
                                             <thead>
                                                 <tr>
                                                     <th>Date</th>
+                                                    <th>Expense Type</th>
                                                     <th>Item </th>
                                                     <th>Description</th>
                                                     <th>Mode Of Payment</th>
@@ -56,6 +57,10 @@
                                                         <% if (row.expense_type != 'Order') { %>                                    
                                                             <tr class="order-row">
                                                                 <td><%= row.date.toLocaleDateString('en-UK',options) %></td>
+                                                                
+                                                                <td>
+                                                                    <%= row.expense_type %>
+                                                                </td>
                                                                 
                                                                 <td>
                                                                     <%= row.item_name %>
