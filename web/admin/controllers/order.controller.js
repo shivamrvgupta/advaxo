@@ -327,7 +327,7 @@ module.exports = {
       }
       const orderId = req.params.orderId;
       
-      const products = await models.ProductModel.Product.find() ;
+      const products = await models.ProductModel.Stocks.find() ;
       
       res.render('admin/expense/add-expense', {
         orderId,
