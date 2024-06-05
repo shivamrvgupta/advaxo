@@ -47,7 +47,7 @@
                                             <option value="none" disabled selected>-- Select the Product --</option> 
                                             <% if (products != '') { %>        
                                                 <% products.forEach((row, index) => { %> 
-                                                    <option value="<%- row._id %>"><%- row.name %> ||  Quantity <%= row.quantity %></option>
+                                                    <option value="<%- row._id %>"><%- row.product_id.name %> ||  Quantity <%= row.quantity %></option>
                                                 <% }) %>
                                             <%  } else { %>
                                                 <option value="none" disabled>No Products In Inventory</option>
