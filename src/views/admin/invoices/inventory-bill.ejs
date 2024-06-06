@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Advaxo | Inventory Invoice</title>
+    <style>
+        .container {
+            width: 60%;
+            margin: auto;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+            border-radius: 8px;
+        }
+        .button-group ul {
+            padding: 0;
+            margin: 0;
+            display: flex;
+            list-style: none;
+            justify-content: center;
+        }
+
+        .button-group li {
+            margin-right: 5%; /* Adjust the spacing between buttons as needed */
+        }
+
+        .mt-5{
+            padding-top: 2%;
+            padding-bottom: 2%;
+        }
+        .btn {
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            -webkit-box-pack: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+            padding: calc(7px + (10 - 7) * ((100vw - 320px) / (1920 - 320))) calc(14px + (32 - 14) * ((100vw - 320px) / (1920 - 320)));
+            font-weight: 500;
+            -webkit-transition: all 0.3s ease;
+            transition: all 0.3s ease;
+            position: relative;
+            border: none;
+            font-size: 14px;
+            z-index: 0;
+            white-space: nowrap;
+        }
+        .btn-primary {
+            border: 2px solid #ed702d !important;
+            width: 100%;
+            color: #ed702d;
+            background-color: #f9f9f6;
+        }
+
+        .btn-primary:hover {
+            color: white;
+            background-color: #ed702d !important;
+            border-color: #ed702d !important;
+        }
+    </style>
+</head>
+<body>
+    <section id="printableArea">
+        <div class="container">
+            <h2><center>Invoice</center></h2>
+            <table style="border-collapse: collapse;width: 100%;">
+                <tr>
+                    <td style="border: 1px solid black;padding: 8px;" rowspan="2" colspan="4">
+                        <strong><%= vendor.name %> </strong><br>
+                        <%= vendor.address %> <br>
+                        Phone : <%= vendor.phone %>
+                    </td>
+                    <td style="border: 1px solid black;padding: 8px;" colspan="2">Invoice No. <strong><br> <%= vendor_id %></strong></td>
+                    <td style="border: 1px solid black;padding: 8px;" colspan="2">Order Date<strong><br><%= bill.created_date.toLocaleString('en-US', options) %></strong></td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid black;padding: 8px;" colspan="2">Delivery Note<strong><br> --- </strong></td>
+                    <td style="border: 1px solid black;padding: 8px;" colspan="2">Payment Status<strong><br> <%= bill.payment_status %> </strong></td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid black;padding: 8px;" rowspan="2" colspan="4">
+                        Buyer <br>
+                        <strong> ADVAXO SIGN </strong><br>
+                        Plot No : 34, Cidco Service Industry Area,<br>
+                        Sector : 01 , Shiravne , Thane
+                        Maharashtra , Code: 27 %>
+                    </td>
+                    <td style="border: 1px solid black;padding: 8px;" colspan="2">Refrence Number<strong><br>-----</strong></td>
+                    <td style="border: 1px solid black;padding: 8px;" colspan="2">Other Refrence<strong><br>-----</strong></td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid black;padding: 8px;" colspan="2">Buyer's Contact Person.<strong><br> --- </strong></td>
+                    <td style="border: 1px solid black;padding: 8px;" colspan="2">Delivery Date<strong> <br> ----
+
+                </tr>
+                <tr>
+                    <th style="border: 1px solid black;padding: 8px;width: 5%;">Sr.No</th>
+                    <th style="border: 1px solid black;padding: 8px;width: 35%;">Material</th>
+                    <th style="border: 1px solid black;padding: 8px;">Height</th>
+                    <th style="border: 1px solid black;padding: 8px;">Weight</th> 
+                    <th style="border: 1px solid black;padding: 8px;">QTY</th>
+                    <th style="border: 1px solid black;padding: 8px;">SQ. FT</th>
+                    <th style="border: 1px solid black;padding: 8px;">Rate</th>
+                    <th style="border: 1px solid black;padding: 8px;">Amount</th>
+                </tr>
+                <% products.forEach(function(row, index){ %>
+                    <tr>
+                        <td style="border: 1px solid black;padding: 8px;width: 5%;"><%= index + 1 %></td>
+                        <td style="border: 1px solid black;padding: 8px;width: 35%;"><%= row.name %></td>
+                        <td style="border: 1px solid black;padding: 8px;"><%= row.height %></td>
+                        <td style="border: 1px solid black;padding: 8px;"><%= row.width %></td>
+                        <td style="border: 1px solid black;padding: 8px;"><%= row.quantity %></td>
+                        <td style="border: 1px solid black;padding: 8px;"><%= row.area %></td>
+                        <td style="border: 1px solid black;padding: 8px;"><%= row.rate %></td>
+                        <td style="border: 1px solid black;padding: 8px;text-align: center;"><%= row.amount %></td>
+                        
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid black;padding: 8px;width: 5%;" colspan="5"></td>
+                        <td style="border: 1px solid black;padding: 8px;"> Total </td>
+                        <td style="border: 1px solid black;padding: 8px;text-align: center;" colspan="3"> 
+                            <% var formattedTotal = bill.grand_total.toFixed(2); %>
+                            <%= formattedTotal %>
+                        </td>
+                    </tr>   
+                    <tr>
+                        <td style="border: 1px solid black;padding: 8px;" colspan="8">
+                            Amount Chargeable (in words)<br>
+                            <strong> INR <%= totalPriceInWords %></strong>
+                        </td>
+                    </tr>
+                <% }) %>
+                <tr>
+                    <td style="border: 1px solid black;padding: 8px;" colspan="8">
+                        <u>Declaration </u><br>
+                        1.We declare that this Invoice shows the Actual Price of the Goods described and that all Particulars are True and Correct.<br>
+                        2. Bills Strictly to be paid Against the Delivery. Prosecution under MSME Act 2006 will apply on Unpaid Bills.<br>
+                        3. Interest will be charged as per MSME ACT 2006 terms & conditions.<br>
+                        4. No Claim or Complaint Shall be Entertained by us after the Goods are Delivered.
+                    </td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid black;padding: 8px;" colspan="4">
+                        <img src="" width="150" height="auto" alt="">
+                        Customer's Seal and Signature
+                    </td>
+                    <td style="border: 1px solid black;padding: 8px;" colspan="4">
+                        <strong>For <%= vendor.name %></strong>
+                        <br>
+                    </td>
+                    
+                </tr>
+            </table>
+            <br>
+            <center>This is a computer generated invoice</center>
+            <center>THANKS FOR DOING BUSINESS WITH US</center>
+
+        </div>
+    </section>
+
+    <div class="row mt-5">
+        <div class="col-xxl-12 mx-auto my-3">
+            <div class="button-group hide-on-print">
+                <ul>
+                    <li class="back-button ">
+                        <a href="/admin/inventory/products-detail/<%= vendor_id %>" class="btn btn-primary text-white print-button rounded ms-2"> Back </a>
+                    </li>
+                    <li class="print-button">
+                        <a class="btn btn-primary text-white print-button rounded ms-2" onclick="printInvoice()"> Print </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script>
+        function printInvoice() {
+  // Hide elements that should not be printed
+  const elementsToHide = document.querySelectorAll('.hide-on-print');
+  elementsToHide.forEach((element) => {
+    element.style.display = 'none';
+  });
+
+  // Get the content within the printable area
+  const printableArea = document.getElementById('printableArea');
+  const tableContent = printableArea.innerHTML; // Get the table content
+
+  // Open a new window for printing
+  const printWindow = window.open('', '', 'width=600,height=600');
+  printWindow.document.open();
+  printWindow.document.write('<html><head><style>table {border-collapse: collapse;width: 100%;}th, td {border: 1px solid black;padding: 8px;} </style> </head><body>');
+  printWindow.document.write(tableContent); // Write the table content
+  printWindow.document.write('</body></html');
+  printWindow.document.close();
+
+  // Print the content
+  printWindow.print();
+
+  // Close the print window
+  printWindow.close();
+
+  // Restore the hidden elements after printing is done
+  elementsToHide.forEach((element) => {
+    element.style.display = '';
+  });
+}
+
+    </script>
+
+<!-- Add this line in your HTML head to include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    function SendInvoice(order_id) {
+        $.ajax({
+            type: "POST",
+            url: `/admin/orders/send-invoice`,
+            data: { order_id: order_id },
+            success: function (response) {
+                // Update the status text
+                window.location.reload();
+                console.log("Email Sent Successfully!");
+            },
+            error: function (error) {
+                console.error("Error sending the email");
+            }
+        });
+    }
+    
+</script>
+</body>
+</html>
+
+

@@ -5,6 +5,7 @@ const { format, addDays, isSameISOWeek, getISOWeek, parse } = require('date-fns'
 const {generateAccessToken} = require('../middlewares/auth.middleware');
 const models = require('../../../managers/models');
 const { urlencoded } = require('body-parser');
+const { NumberHelper } = require('../../../managers/helpers');
 
 // This would be your token blacklist storage
 const options = { day: '2-digit', month: 'short', year: 'numeric' };
@@ -925,6 +926,36 @@ module.exports = {
     }catch(err){
       console.log(err)
       res.redirect(`/admin/order/select-customer?error="${encodeURIComponent(err)}"`);
+    }
+  },
+
+  inventoryBill : async (req, res) => {
+    const referer = req.get('Referer');
+    try{
+      const user = req.user;
+
+      if(!user){
+        res.render('a-login',{
+          title: "Advaxo",
+          error: "User Not Found"
+        })   
+      }
+
+      const vendor_id = req.params.vendor_id;
+
+      const bill = await models.ProductModel.InventoryBill.findOne({bill_no : vendor_id}).sort({ created_date: -1 });
+      const totalPriceInWords = NumberHelper.convertNumberToWords(bill.grand_total);
+      const vendor = await models.ProductModel.Vendor.findOne({ _id : bill.vendor_id}).sort({ created_date: -1 });
+      console.log(bill)
+      const products = await models.ProductModel.BillProduct.find({bill_no : vendor_id}).sort({ created_date: -1 });
+      const payment = await models.ProductModel.InventoryPay.find({bill_no : vendor_id}).sort({ created_date: -1 });
+
+      console.log(vendor)
+
+      res.render('admin/invoices/inventory-bill',{user ,bill,vendor_id, totalPriceInWords, vendor,options,products, payment , error: "Product Details"})
+    }catch(err){
+      console.log(err);
+      res.redirect(`${referer}?error=${encodeURIComponent(err)}`)
     }
   },
 }

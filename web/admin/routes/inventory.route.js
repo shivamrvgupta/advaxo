@@ -22,5 +22,7 @@ router.post('/delete-payment/:paymentId', AuthMiddleware.authenticateToken , Inv
 router.post('/update-product/:product_id', AuthMiddleware.authenticateToken ,InventoryController.postUpdateInventory);
 router.post('/save-products', AuthMiddleware.authenticateToken ,InventoryController.saveProducts);
 
+router.get('/invoice/:vendor_id' , AuthMiddleware.authenticateToken, InventoryController.inventoryBill);
+
 router.delete('/delete-product/:product_id', AuthMiddleware.authenticateToken, InventoryController.deleteInventory);
 module.exports = router;
