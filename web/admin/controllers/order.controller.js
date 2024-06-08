@@ -353,7 +353,8 @@ module.exports = {
       }
 
       const server = req.body;
-      const products = await models.ProductModel.Product.findOne({_id : server.product});
+      const stocks = await models.ProductModel.Stocks.findOne({_id : server.product});
+      const products = await models.ProductModel.Product.findOne({_id : stocks.product_id});
       const expenseData = {
         order_id : server.orderId,
         product_id : server.product,
@@ -374,8 +375,8 @@ module.exports = {
       orders.client_balance = parseFloat(orders.client_balance) - parseFloat(server.amount);
       orders.save();
 
-      const liveStocks = await models.ProductModel.Stocks.findOne({ product_id : expense.product_id });
-
+      const liveStocks = await models.ProductModel.Stocks.findOne({ _id : server.product });
+      console.log(liveStocks);
       if(server.unit === "SQRFT"){
         console.log("I am here in SQRFT")
         liveStocks.area = parseFloat(liveStocks.area) - parseFloat(server.area);

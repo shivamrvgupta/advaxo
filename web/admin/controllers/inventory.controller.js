@@ -491,7 +491,7 @@ module.exports = {
 
         const product_id = req.params.product_id;
 
-        const product = await models.ProductModel.Product.findById(product_id);
+        const product = await models.ProductModel.Stocks.findById(product_id);
         
         console.log(product)
 

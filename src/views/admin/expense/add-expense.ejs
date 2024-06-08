@@ -47,7 +47,14 @@
                                             <option value="none" disabled selected>-- Select the Product --</option> 
                                             <% if (products != '') { %>        
                                                 <% products.forEach((row, index) => { %> 
-                                                    <option value="<%- row._id %>"><%- row.product_id.name %> ||  Quantity <%= row.quantity %></option>
+                                                    <option value="<%- row._id %>">
+                                                        <%- row.product_id.name %> || 
+                                                        <% if (row.unit === 'SQRFT') { %>
+                                                          Total Area Available <%= row.area %>
+                                                        <% } else { %>
+                                                            Total Quantity Available <%= row.quantity %>
+                                                        <% } %>
+                                                      </option>
                                                 <% }) %>
                                             <%  } else { %>
                                                 <option value="none" disabled>No Products In Inventory</option>
@@ -59,11 +66,7 @@
                                 <div class="mb-4 row align-items-center">
                                     <label class="col-sm-3 col-form-label form-label-title">Unit</label>
                                     <div class="col-sm-9">
-                                        <select class="js-example-basic-single w-100" name="unit" id="unit">
-                                            <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="none" disabled selected>-- Select Unit Type --</option> 
-                                            <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="SQRFT">SQRFT</option> 
-                                            <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="NOS">NOS</option> 
-                                        </select>
+                                        <input class="form-control" type="text" placeholder="Product Unit" name="unit" id="product_unit" required>
                                     </div>
                                 </div>
 
@@ -195,6 +198,16 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log(data)
+                    if(data.unit === "SQRFT") {
+                        console.log("changes to sqrft")
+                        // Enable width, height, and area inputs
+                        $('#width, #height, #total_area').prop('disabled', false);
+                        document.getElementById("product_unit").value = "SQRFT";
+                    }else{
+                        console.log("changes to nos")
+                        document.getElementById("product_unit").value = "NOS";
+                        $('#width, #height, #total_area').prop('disabled', true); 
+                    }
                     // Update the rate input field with the fetched rate value
                     document.getElementById("rate").value = data.rate;
                     var unitType = data.unitType; // assuming unitType is the property in the data object
@@ -208,41 +221,35 @@
     function getProductQuantity() {
         var selectedProductId = document.getElementById("product").value;
         var quantity = parseInt(document.getElementById("quantity").value);
+        var total_area = parseInt(document.getElementById("total_area").value);
         
         // Make a request to your API using the selected product ID
         fetch(`/admin/inventory/products/${selectedProductId}`)
             .then(response => response.json())
             .then(data => {
-                console.log(data)
                 var available = parseFloat(data.quantity); // Convert string to float
                 console.log(available)
                 console.log(quantity)
-                if(quantity > data.quantity) {
-                    document.getElementById("addProductButton").disabled = true;
-                    alert("Quantity is greater than available quantity");
+                console.log(data.unit)
+                if(data.unit === "NOS"){
+                    if(quantity > data.quantity) {
+                        document.getElementById("addProductButton").disabled = true;
+                        alert("Quantity is greater than available quantity.");
+                    }else{
+                        document.getElementById("addProductButton").disabled = false;
+                    }
+                }else{
+                    if(total_area > data.area) {
+                        document.getElementById("addProductButton").disabled = true;
+                        alert("Area is greater than available area.");
+                    }else{
+                        document.getElementById("addProductButton").disabled = false;
+                    }
                 }
+                document.getElementById("addProductButton").disabled = false;
             })
             .catch(error => console.error('Error fetching product data:', error));
         }
-</script>
-
-<script>
-    $(document).ready(function() {
-        // Add event listener to unit select element
-        $('#unit').on('change', function() {
-            var unitValue = $(this).val();
-            // Check the selected unit value
-            if (unitValue === 'SQRFT') {
-                console.log("changes to sqrft")
-                // Enable width, height, and area inputs
-                $('#width, #height, #total_area').prop('disabled', false);
-            } else if (unitValue === 'NOS') {
-                console.log("changes to nos")
-                // Disable width, height, and area inputs
-                $('#width, #height, #total_area').prop('disabled', true);
-            }
-        });
-    });
 </script>
 
 <%- include('../../partials/end')%>

@@ -171,12 +171,10 @@
                 console.log("changes to sqrft")
                 // Enable width, height, and area inputs
                 $('#width, #height, #total_area').prop('disabled', false);
-                $('#quantity').prop('disabled', true);
             } else if (unitValue === 'NOS') {
                 console.log("changes to nos")
                 // Disable width, height, and area inputs
                 $('#width, #height, #total_area').prop('disabled', true);
-                $('#quantity').prop('disabled', false);
             }
         });
     });
