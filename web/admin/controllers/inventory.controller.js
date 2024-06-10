@@ -399,82 +399,88 @@ module.exports = {
         }
       },
     
-    deleteInventory: async (req, res) => {
-      const referer = req.get('Referer');
-      try {
-        const user = req.user;
-        if (!user) {
-          return res.render('a-login', {
-            title: "Advaxo",
-            error: "User Not Found"
-          });
-        }
-        const product_id = req.params.product_id;
-        
-        let billed_product = await models.ProductModel.BillProduct.findOne({ _id: product_id });
-        if (!billed_product) {
-          return res.redirect(`${referer}/?error="Product Not Found"`);
-        }
-        
-        const oldAmount = parseFloat(billed_product.amount) || 0;
-        console.log("Old Amount",oldAmount);
-        const oldWidth = parseFloat(billed_product.width) || 0;
-        console.log("Old Width",oldWidth);
-        const oldHeight = parseFloat(billed_product.height) || 0;
-        console.log("Old Height",oldHeight);
-        const oldQuantity = parseFloat(billed_product.quantity) || 0;
-        console.log("Old Quantity",oldQuantity);
-        const oldArea = parseFloat(billed_product.area) || 0;
-        console.log("Old Area",oldArea);
-    
-        // Update the InventoryBill to reduce the grand_total
-        const bill = await models.ProductModel.InventoryBill.findOne({ bill_no: billed_product.bill_no });
-        if (bill) {
-          bill.grand_total = parseFloat(bill.grand_total) - oldAmount;
-          await bill.save();
-        } else {
-          return res.redirect(`${referer}/?error="Inventory Bill Not Found"`);
-        }
-        
-        // Update the Product inventory
-        const saveProduct = await models.ProductModel.Product.findOne({ name: billed_product.name.toLowerCase() });
-        if (saveProduct) {
-          if (billed_product.unit === 'SQRFT') {
-            saveProduct.width = parseFloat(saveProduct.width) - oldWidth;
-            saveProduct.height = parseFloat(saveProduct.height) - oldHeight;
-            saveProduct.area = parseFloat(saveProduct.area) - oldArea;
-          } else {
-            saveProduct.quantity = parseFloat(saveProduct.quantity) - oldQuantity;
+      deleteInventory: async (req, res) => {
+        const referer = req.get('Referer');
+        try {
+          const user = req.user;
+          if (!user) {
+            return res.render('a-login', {
+              title: "Advaxo",
+              error: "User Not Found"
+            });
           }
-          await saveProduct.save();
-        } else {
-          return res.redirect(`${referer}/?error="Product Not Found in Inventory"`);
-        }
-    
-        // Update the Stock inventory
-        const stockUpdate = await models.ProductModel.Stocks.findOne({ product_id: saveProduct._id });
-        if (stockUpdate) {
-          if (billed_product.unit === 'SQRFT') {
-            stockUpdate.width = parseFloat(stockUpdate.width) - oldWidth;
-            stockUpdate.height = parseFloat(stockUpdate.height) - oldHeight;
-            stockUpdate.area = parseFloat(stockUpdate.area) - oldArea;
+          const product_id = req.params.product_id;
+          const expense = await models.ProductModel.Expense.find({ product_id: product_id }).populate('product_id');
+      
+          if (expense.length > 0) {
+            const errorMsg = "Product has been issued for Work Order";
+            return res.status(400).json(errorMsg);
           } else {
-            stockUpdate.quantity = parseFloat(stockUpdate.quantity) - oldQuantity;
+            let billed_product = await models.ProductModel.BillProduct.findOne({ _id: product_id });
+            if (!billed_product) {
+              return res.redirect(`${referer}/?error="Product Not Found"`);
+            }
+            
+            const oldAmount = parseFloat(billed_product.amount) || 0;
+            console.log("Old Amount",oldAmount);
+            const oldWidth = parseFloat(billed_product.width) || 0;
+            console.log("Old Width",oldWidth);
+            const oldHeight = parseFloat(billed_product.height) || 0;
+            console.log("Old Height",oldHeight);
+            const oldQuantity = parseFloat(billed_product.quantity) || 0;
+            console.log("Old Quantity",oldQuantity);
+            const oldArea = parseFloat(billed_product.area) || 0;
+            console.log("Old Area",oldArea);
+        
+            // Update the InventoryBill to reduce the grand_total
+            const bill = await models.ProductModel.InventoryBill.findOne({ bill_no: billed_product.bill_no });
+            if (bill) {
+              bill.grand_total = parseFloat(bill.grand_total) - oldAmount;
+              await bill.save();
+            } else {
+              return res.redirect(`${referer}/?error="Inventory Bill Not Found"`);
+            }
+            
+            // Update the Product inventory
+            const saveProduct = await models.ProductModel.Product.findOne({ name: billed_product.name.toLowerCase() });
+            if (saveProduct) {
+              if (billed_product.unit === 'SQRFT') {
+                saveProduct.width = parseFloat(saveProduct.width) - oldWidth;
+                saveProduct.height = parseFloat(saveProduct.height) - oldHeight;
+                saveProduct.area = parseFloat(saveProduct.area) - oldArea;
+              } else {
+                saveProduct.quantity = parseFloat(saveProduct.quantity) - oldQuantity;
+              }
+              await saveProduct.save();
+            } else {
+              return res.redirect(`${referer}/?error="Product Not Found in Inventory"`);
+            }
+        
+            // Update the Stock inventory
+            const stockUpdate = await models.ProductModel.Stocks.findOne({ product_id: saveProduct._id });
+            if (stockUpdate) {
+              if (billed_product.unit === 'SQRFT') {
+                stockUpdate.width = parseFloat(stockUpdate.width) - oldWidth;
+                stockUpdate.height = parseFloat(stockUpdate.height) - oldHeight;
+                stockUpdate.area = parseFloat(stockUpdate.area) - oldArea;
+              } else {
+                stockUpdate.quantity = parseFloat(stockUpdate.quantity) - oldQuantity;
+              }
+              await stockUpdate.save();
+            } else {
+              return res.redirect(`${referer}/?error="Stock Not Found"`);
+            }
+        
+            // Finally, delete the billed product
+            await models.ProductModel.BillProduct.deleteOne({ _id: product_id });
+        
+            res.redirect(`/admin/inventory/products-detail/${billed_product.bill_no}?success="Product Deleted Successfully"`);
           }
-          await stockUpdate.save();
-        } else {
-          return res.redirect(`${referer}/?error="Stock Not Found"`);
+        } catch (err) {
+          console.log(err);
+          res.redirect(`${referer}/?error=${encodeURIComponent(err)}`);
         }
-    
-        // Finally, delete the billed product
-        await models.ProductModel.BillProduct.deleteOne({ _id: product_id });
-    
-        res.redirect(`/admin/inventory/products-detail/${billed_product.bill_no}?success="Product Deleted Successfully"`);
-      } catch (err) {
-        console.log(err);
-        res.redirect(`${referer}/?error=${encodeURIComponent(err)}`);
-      }
-    },
+      },
       
 
     getProduct : async (req, res) => {
@@ -958,5 +964,34 @@ module.exports = {
       res.redirect(`${referer}?error=${encodeURIComponent(err)}`)
     }
   },
+  deleteBill : async (req, res) => {
+    const referer = req.get('Referer');
+    try{
+      const user = req.user;
+
+      if(!user){
+        res.render('a-login',{
+          title: "Advaxo",
+          error: "User Not Found"
+        })   
+      }
+
+      const bill_no = req.params.bill_no;
+      const bill = await models.ProductModel.InventoryBill.findOne({bill_no : bill_no});
+
+      const vendor = await models.ProductModel.Vendor.findOne({ _id : bill.vendor_id});
+      const billed_products = await models.ProductModel.BillProduct.find({bill_no : bill_no});
+
+      for(let i = 0; i < billed_products.length; i++){
+        const product = await models.ProductModel.Product.findOne({ _id : billed_products[i].product_id});
+      }
+
+      res.json({success: true});
+
+    }catch(err){
+      console.log(err)
+      res.redirect(`${referer}?error=${encodeURIComponent(err)}`);
+    }
+  }
 }
 

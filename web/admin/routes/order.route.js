@@ -17,6 +17,7 @@ router.get('/add-other-expenses', AuthMiddleware.authenticateToken , OrderContro
 router.get('/update-other-expenses/:expenseId', AuthMiddleware.authenticateToken , OrderControllers.getEditOtherExpenses);
 router.get('/validate-orderid/:orderId', AuthMiddleware.authenticateToken , OrderControllers.validOrderId);
 router.get('/update-order/:orderId', AuthMiddleware.authenticateToken , OrderControllers.getUpdateOrder);
+router.get('/invoice/:order_id' , AuthMiddleware.authenticateToken, OrderControllers.getBill);
 
 router.post('/select-customer', AuthMiddleware.authenticateToken, OrderControllers.postCreateUser);
 router.post('/create-order', AuthMiddleware.authenticateToken , OrderControllers.postDetails);

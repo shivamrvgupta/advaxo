@@ -4,6 +4,7 @@ const { v4: uuidv4 } = require('uuid');
 const { format, addDays, isSameISOWeek, getISOWeek, parse } = require('date-fns');
 const {generateAccessToken} = require('../middlewares/auth.middleware');
 const models = require('../../../managers/models');
+const { NumberHelper } = require('../../../managers/helpers');
 const { urlencoded, json } = require('body-parser');
 const currentDate = new Date();
 
@@ -1642,4 +1643,29 @@ module.exports = {
       res.redirect(`${referer}?error="${encodeURIComponent(err)}"`);
     }
   },
+  getBill : async (req, res) => {
+    const referer = req.get('Referer');
+    try{
+      const user = req.user;
+
+      if(!user){
+        res.render('a-login',{
+          title: "Advaxo",
+          error: "User Not Found"
+        })   
+      }
+
+      const order_id = req.params.order_id;
+      const order = await models.ProductModel.Order.findOne({order_id : order_id}).populate("order_id").populate("client_id");
+      const totalPriceInWords = NumberHelper.convertNumberToWords(order.grand_total);
+      const products = await models.ProductModel.Purchased.find({order_id : order_id});
+
+      res.render('admin/invoices/work-order-bill',{user ,order,order_id,products, totalPriceInWords, options, error: "Product Details"})
+
+    }catch(err){
+      console.log(err)
+      res.redirect(`${referer}?error="${encodeURIComponent(err)}"`);
+    }
+  }
+
 }
