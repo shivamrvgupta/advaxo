@@ -711,6 +711,55 @@ module.exports = {
     }
   },
 
-  
+  getChangePass : async (req, res) => {
+    try {
+      const user = req.user;
+
+      if (!user) {
+        return res.redirect('/admin/auth/login');
+      }
+
+      console.log(user)
+      res.render('admin/stats/change_pass', {user , error: "Change your password"});
+    } catch (error) {
+      console.error('Error fetching total revenue data:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  },
+
+  postChangePass : async (req, res) => {
+    try {
+      const user = req.user;
+
+      if (!user) {
+        return res.redirect('/admin/auth/login');
+      }
+
+      console.log(user)
+
+      const { password, confirmPassword } = req.body;
+      if (!password || !confirmPassword) {
+        return res.redirect('/admin/auth/change-password?error=Please enter password and confirm password');
+      }
+
+      if (password !== confirmPassword) {
+        return res.redirect('/admin/auth/change-password?error=Passwords do not match');
+      }
+
+      console.log(user.userId)
+      const all_users = await models.CustomerModel.User.find();
+      console.log(all_users)
+      const users = await models.CustomerModel.User.findById(user.userId);
+      console.log(users)
+      users.password = await bcrypt.hash(password, 10);
+      
+      await users.save();
+
+      res.redirect('/admin/auth/dashboard?success=Password changed successfully');
+    } catch (error) {
+      console.error('Error fetching :', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  },
 } 
 

@@ -986,7 +986,12 @@ module.exports = {
       const billed_products = await models.ProductModel.BillProduct.find({bill_no : bill_no});
       console.log("Deleted Products: ", billed_products);
 
-      const expense = await models.ProductModel.Expense.find({ name : billed_products[0].name});  
+      if(billed_products.length == 0) {
+        console.log("No Products Found");
+        const deleteBill = await models.ProductModel.InventoryBill.findByIdAndDelete(bill._id);
+        res.json({success: true , message : "Deleted Successfully"});
+      }else{
+        const expense = await models.ProductModel.Expense.find({ name : billed_products[0].name});  
       if (expense.length > 0) {
         console.log("Products already in use :", billed_products[0].name);
         res.json({success: true , message : "Cannot Delete Product is already issued to Work Order"});
@@ -1083,8 +1088,9 @@ module.exports = {
   
           const deleteBill = await models.ProductModel.InventoryBill.findByIdAndDelete(bill._id);
           
-          res.json({success: true});
+          res.json({success: true , message : "Bill Deleted Successfully"});
         }
+      }
       }
 
     }catch(err){

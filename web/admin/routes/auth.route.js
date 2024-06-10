@@ -27,4 +27,7 @@ router.post('/update-bank-data/:id', AuthMiddleware.authenticateToken, AuthContr
 router.post('/internal-transfer', AuthMiddleware.authenticateToken, AuthController.postInternalTransfer);
 
 
+router.get('/change-password', AuthMiddleware.authenticateToken ,AuthController.getChangePass );
+
+router.post('/change-password', AuthMiddleware.authenticateToken ,AuthController.postChangePass );
 module.exports = router;
