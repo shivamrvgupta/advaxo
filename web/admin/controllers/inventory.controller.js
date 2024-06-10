@@ -410,7 +410,9 @@ module.exports = {
             });
           }
           const product_id = req.params.product_id;
-          const expense = await models.ProductModel.Expense.find({ product_id: product_id }).populate('product_id');
+
+          const billed_product = await models.ProductModel.BillProduct.findOne({ _id: product_id });
+          const expense = await models.ProductModel.Expense.find({ name : billed_product.name });
       
           if (expense.length > 0) {
             const errorMsg = "Product has been issued for Work Order";
@@ -978,11 +980,112 @@ module.exports = {
 
       const bill_no = req.params.bill_no;
       const bill = await models.ProductModel.InventoryBill.findOne({bill_no : bill_no});
-
+      console.log("Bill --- ",bill)
       const vendor = await models.ProductModel.Vendor.findOne({ _id : bill.vendor_id});
+      console.log("Vendor --- ",vendor)
       const billed_products = await models.ProductModel.BillProduct.find({bill_no : bill_no});
+      console.log("Deleted Products: ", billed_products);
 
-      res.json({success: true});
+      const expense = await models.ProductModel.Expense.find({ name : billed_products[0].name});  
+      if (expense.length > 0) {
+        console.log("Products already in use :", billed_products[0].name);
+        res.json({success: true , message : "Cannot Delete Product is already issued to Work Order"});
+      }else{
+        for (const billed_product of billed_products) {
+          const expensesWithSameName = await models.ProductModel.BillProduct.find({ bill_no: billed_product.bill_no , name : billed_product.name});
+          console.log("Expenses with same bill No :", expensesWithSameName);
+  
+         
+  
+          const products = await models.ProductModel.Product.findOne({ name : billed_product.name});
+  
+          if (products) {
+            const deduct = expensesWithSameName;
+  
+            const totalArea = deduct.reduce((sum, e) => sum + parseFloat(e.area), 0).toFixed(2);
+            const totalQuantity = deduct.reduce((sum, e) => sum + parseFloat(e.quantity), 0).toFixed(2);
+            const totalAmount = deduct.reduce((sum, e) => sum + parseFloat(e.amount), 0).toFixed(2);
+            const totalHeight = deduct.reduce((sum, e) => sum + parseFloat(e.height), 0).toFixed(2);
+            const totalWidth = deduct.reduce((sum, e) => sum + parseFloat(e.width), 0).toFixed(2);
+  
+            const deductUnit = deduct.length > 0 ? deduct[0].unit : '';
+            const quantityChange = parseFloat(products.quantity) - parseFloat(totalQuantity);
+            const areaChange = deductUnit === 'SQRFT' ? parseFloat(products.area) - parseFloat(totalArea) : 0;
+            const amountChange = parseFloat(products.amount) - parseFloat(totalAmount);
+            const heightChange = parseFloat(products.height) - parseFloat(totalHeight);
+            const widthChange = parseFloat(products.width) - parseFloat(totalWidth);
+  
+            products.quantity = quantityChange;
+            products.area = areaChange;
+            products.amount = amountChange;
+            products.height = heightChange;
+            products.width = widthChange;
+  
+            await products.save();
+            console.log("Updated Product:", products);
+  
+            const live_stocks = await models.ProductModel.Stocks.findOne({product_id : products._id});
+            if (live_stocks) {
+                const deduct = expensesWithSameName;
+  
+                const totalArea = deduct.reduce((sum, e) => sum + parseFloat(e.area), 0).toFixed(2);
+                const totalQuantity = deduct.reduce((sum, e) => sum + parseFloat(e.quantity), 0).toFixed(2);
+                const totalAmount = deduct.reduce((sum, e) => sum + parseFloat(e.amount), 0).toFixed(2);
+  
+                const deductUnit = deduct.length > 0 ? deduct[0].unit : '';
+                const quantityChange = parseFloat(totalQuantity) - parseFloat(live_stocks.quantity);
+                const areaChange = deductUnit === 'SQRFT' ?  parseFloat(totalArea) - parseFloat(live_stocks.area) : 0;
+                const amountChange = parseFloat(live_stocks.amount) - parseFloat(totalAmount) ;
+  
+                live_stocks.quantity = quantityChange;
+                live_stocks.area = areaChange;
+                live_stocks.amount = amountChange;
+                
+                await live_stocks.save();
+                console.log("Updated Live Stock:", live_stocks);
+  
+            } else {
+                console.log("Live Stock not found for product ID:", products._id);
+            }
+            const deleteExpense = await models.ProductModel.BillProduct.findOneAndDelete(billed_product._id);
+          } else {
+              console.log("Products not found:", billed_product.name);
+          }
+          
+  
+          const payments = await models.ProductModel.InventoryPay.find({bill_no : bill_no});
+          
+          if(payments){
+            for (const payment of payments) {
+              const from = await models.ProductModel.Bank.findOne({ name : payment.payment_method});
+              from.amount = (Number(from.amount) + Number(payment.amount));
+              await from.save();
+  
+              const debitTransactionData = {
+                type: from.name, // You can adjust the type based on your requirements
+                from: "Inventory Return -- "  + vendor.name,
+                to: from.name,
+                transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
+                debited: 0.0,
+                credited: payment.amount,
+                available: Number(from.amount),
+                date: formattedDate
+              }; 
+              
+              const debitTransaction = await models.ProductModel.Transaction.create(debitTransactionData);
+              await debitTransaction.save();
+  
+              const deletePayment = await models.ProductModel.InventoryPay.findByIdAndDelete(payment._id);
+  
+              console.log(deletePayment);
+            }
+          }
+  
+          const deleteBill = await models.ProductModel.InventoryBill.findByIdAndDelete(bill._id);
+          
+          res.json({success: true});
+        }
+      }
 
     }catch(err){
       console.log(err)

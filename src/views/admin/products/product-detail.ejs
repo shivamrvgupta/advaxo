@@ -529,65 +529,7 @@
     }
 </script>
 
-<script>
-    function deleteOtherExpense(expenseId) {
-        if (confirm("Are you sure you want to delete this payment?")) {
-            // Send AJAX request to delete payment
-            $.ajax({
-                type: "POST",
-                url: `/admin/order/delete-other-expenses/${expenseId}`,
-                data: { expenseId: expenseId },
-                success: function(response) {
-                    
-                    console.log("Expense deleted successfully");
-                    setTimeout(function() {
-                        window.location.reload();
-                        location.reload();
-                    }, 1000); // 10 seconds delay
-                },
-                error: function(xhr, status, error) {
-                    // Handle error response
-                    console.error("Error deleting payment:", error);
-                    // For example, display an error message to the user
-                    alert("Error deleting payment. Please try again later.");
-                }
-            });
-        }
-        // Prevent default anchor action
-        return false;
-    }
-</script>
 
 
-
-<script>
-    function deleteExpense(expenseId) {
-        if (confirm("Are you sure you want to delete this Expense?")) {
-            // Send AJAX request to delete payment
-            $.ajax({
-                type: "POST",
-                url: `/admin/order/delete-expense/${expenseId}`,
-                data: { expenseId: expenseId },
-                success: function(response) {
-                    
-                    console.log("Expense deleted successfully");
-                    setTimeout(function() {
-                        window.location.reload();
-                        location.reload();
-                    }, 1000); // 10 seconds delay
-                    
-                },
-                error: function(xhr, status, error) {
-                    // Handle error response
-                    console.error("Error deleting expense:", error);
-                    // For example, display an error message to the user
-                    alert("Error deleting expense. Please try again later.");
-                }
-            });
-        }
-        // Prevent default anchor action
-        return false;
-    }
-</script>
 
 <!-- Delete Modal Box End -->

@@ -25,4 +25,5 @@ router.post('/save-products', AuthMiddleware.authenticateToken ,InventoryControl
 router.get('/invoice/:vendor_id' , AuthMiddleware.authenticateToken, InventoryController.inventoryBill);
 
 router.delete('/delete-product/:product_id', AuthMiddleware.authenticateToken, InventoryController.deleteInventory);
+router.post('/delete-bill/:bill_no', AuthMiddleware.authenticateToken, InventoryController.deleteBill);
 module.exports = router;
