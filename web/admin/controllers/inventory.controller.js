@@ -982,10 +982,6 @@ module.exports = {
       const vendor = await models.ProductModel.Vendor.findOne({ _id : bill.vendor_id});
       const billed_products = await models.ProductModel.BillProduct.find({bill_no : bill_no});
 
-      for(let i = 0; i < billed_products.length; i++){
-        const product = await models.ProductModel.Product.findOne({ _id : billed_products[i].product_id});
-      }
-
       res.json({success: true});
 
     }catch(err){

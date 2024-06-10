@@ -33,7 +33,11 @@
                                                     <% if (vendor != '') { %>        
                                                         <% vendor.forEach((row, index) => { %> 
                                                             <tr> 
-                                                                <td style="text-align: center;"><%= row.bill_no %></td>
+                                                                <td style="text-align: center;">
+                                                                    <a href="/admin/inventory/products-detail/<%= row.bill_no %>">
+                                                                        <%= row.bill_no %>
+                                                                    </a>
+                                                                </td>
                                                                 <td style="text-align: center;"><%= row.vendor_id.name %></td>
                                                                 <td style="text-align: center;"><%= row.grand_total.toFixed(2) %></td>
                                                                 <td style="text-align: center;"><%= row.gst ? "With GST" : "Without GST" %></td>
