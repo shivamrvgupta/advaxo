@@ -111,6 +111,81 @@ module.exports = {
       res.redirect('/admin/auth/dashboard');
     }
   },
+  getUpdateVendors: async (req, res) => {
+    try {
+      const user = req.user;
+  
+      if (!user) {
+        return res.render('a-login', {
+          title: "Advaxo",
+          error: "User Not Found"
+        });
+      }
+  
+      const bill_no = req.params.bill_no;
+      // Fetch and sort vendors, remove duplicates
+      const bill = await models.ProductModel.InventoryBill.findOne({ bill_no : bill_no });
+      const vendor = await models.ProductModel.Vendor.findOne({ _id : bill.vendor_id });
+      console.log(vendor)
+
+      res.render('admin/products/update-vendor', {
+        title: "Advaxo",
+        user,
+        vendor,
+        bill,
+        error : "Please Select Vendor",
+      });
+
+    } catch (err) {
+      console.log(err);
+      res.redirect('/admin/inventory/product-list');
+    }
+  },
+  postUpdateVendors: async (req, res) => {
+    try {
+      const user = req.user;
+  
+      if (!user) {
+        return res.render('a-login', {
+          title: "Advaxo",
+          error: "User Not Found"
+        });
+      }
+
+      const server = req.body;
+
+      const vendorData = {
+        name: server.vendor.toUpperCase(),
+        address: server.vendor_address,
+        phone: server.vendor_phone,
+        phone: server.gst,
+      };
+
+      console.log(vendorData)
+      let vendor_id;
+      const bill = await models.ProductModel.InventoryBill.findOne({ bill_no : server.bill_no });
+      const checkVendor = await models.ProductModel.Vendor.findOne({ _id : bill.vendor_id });
+      console.log(checkVendor)
+
+      if(!checkVendor) {
+        return res.redirect(`/admin/inventory/products-detail/${server.bill_no}?error=Vendor Not Found`);
+      } 
+
+      checkVendor.name = vendorData.name || checkVendor.name;
+      checkVendor.address = vendorData.address || checkVendor.address;
+      checkVendor.phone = vendorData.phone || checkVendor.phone;
+      await checkVendor.save();
+
+      bill.gst = server.gst || bill.gst;
+
+      await bill.save()
+
+      return res.redirect(`/admin/inventory/products-detail/${server.bill_no}?success=Vendor Updated`);
+    } catch (err) {
+      console.log(err);
+      res.redirect('/admin/auth/dashboard');
+    }
+  },
   //GET Add Inventory
   getAddInventory: async (req, res) => {
     try {

@@ -1,0 +1,210 @@
+<%- include('../../partials/main', { pageTitle: 'Vendor Details' }) %>
+
+<style>
+    .inline{
+        display: inline-flex;
+    }
+    .hide-table {
+        display: none;
+    }
+    .selection{
+        width : 100%;
+        border: 1px solid #ced4da;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered{
+        font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+    }
+
+        .mb-4{
+            justify-content: space-evenly;
+        }
+        .hide-table {
+            display: none;
+        }
+        .completebutton{
+            align-items: end;
+            width: 30%;
+            margin-right: 2rem;
+        }
+        .addbutton{
+            align-items: flex-end;
+            width: 30%;
+            }
+</style>
+
+
+<div class="page-body">
+<!-- tracking table start -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="title-header title-header-block package-card">
+                        <div>
+                            <h5>Update Inventory</h5>
+                        </div>
+                        <div class="card-order-section">
+                            <ul>
+                                <li class="text-selected">
+                                    Update Vendor
+                                </li>
+                                
+                            </ul>
+                        </div>
+
+                        <form class="theme-form theme-form-2 mega-form" method="POST" action="/admin/inventory/update-vendor/<%= bill.bill_no %>">
+                            <div class="customer-form">
+                                <div class="card-header-1">
+                                    <h5>Vendor Information</h5>
+                                </div>
+
+                                <div class="row">
+                                    <div class="mb-4 row align-items-center">
+                                        <label class="form-label-title col-sm-3 mb-0">Vendor Name</label>
+                                        <div class="col-sm-9">
+                                            <div class="custom-dropdown">
+                                                <input class="form-control" type="text" placeholder="Select or Enter the vendor name" id="vendorInput" value="<%= vendor.name %>" name="vendor">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4 row align-items-center">
+                                        <label
+                                            class="form-label-title col-lg-3 col-md-3 mb-0">Phone no
+                                        </label>
+                                        <div class="col-sm-9">
+                                            <input class="form-control" type="text" id="vendor_phone" name="vendor_phone" value="<%= vendor.phone %>" placeholder="Enter the Phone number" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="mb-4 row align-items-center">
+                                            <label
+                                                class="form-label-title col-lg-3 col-md-3 mb-0">
+                                                Address
+                                            </label>
+                                            <div class="col-md-9 col-lg-9">
+                                                <input class="form-control" type="text" id="vendor_address" name="vendor_address" value="<%= vendor.address %>" placeholder="Enter Address 1...." required>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <input type="hidden" name="bill_no" value="<%= bill.bill_no %>">
+                                    <div class="mb-4 row align-items-center">
+                                        <label class="col-sm-3 col-form-label form-label-title">Gst</label>
+                                        <div class="col-sm-9">
+                                            <select class="js-example-basic-single w-100" name="gst" id="gst">
+                                                <option value="none" disabled selected>-- Select GST --</option> 
+                                                <option value="true">With GST</option> 
+                                                <option value="false">Without GST</option> 
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4 row align-items-center">
+                                    <button class="btn btn-solid continue-btn" type="submit">Update</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>    
+            </div>
+        </div> 
+    </div>
+</div>
+<!-- tracking table end -->
+
+<div class="container-fluid">
+    <!-- footer start-->
+    <%- include('../../partials/footer')%>
+</div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+   var inputField = document.getElementById('vendorInput');
+   var dropdownMenu = document.getElementById('vendorDropdown');
+   var options = dropdownMenu.getElementsByTagName('li');
+
+   inputField.addEventListener('input', function() {
+       var filter = inputField.value.toLowerCase();
+       for (var i = 0; i < options.length; i++) {
+           var textValue = options[i].textContent || options[i].innerText;
+           if (textValue.toLowerCase().indexOf(filter) > -1) {
+               options[i].style.display = "";
+           } else {
+               options[i].style.display = "none";
+           }
+       }
+   });
+
+   inputField.addEventListener('click', function() {
+       toggleDropdown();
+   });
+
+   inputField.addEventListener('focus', function() {
+       toggleDropdown();
+   });
+
+   dropdownMenu.addEventListener('click', function(event) {
+       if (event.target.tagName === 'LI') {
+           inputField.value = event.target.textContent;
+           toggleDropdown();
+       }
+   });
+
+   function toggleDropdown() {
+       if (dropdownMenu.style.display === 'none') {
+           dropdownMenu.style.display = 'block';
+       } else {
+           dropdownMenu.style.display = 'none';
+       }
+   }
+});
+
+   </script>
+
+
+<script>
+    // Get the dropdown menu
+var dropdownMenu = document.getElementById('vendorDropdown');
+
+// Get the input fields
+var phoneInput = document.getElementById('vendor_phone');
+var addressInput = document.getElementById('vendor_address');
+var customerNameInput = document.getElementById('vendorInput');
+var tokenInput = document.getElementById('token');
+
+// Add an event listener to the dropdown menu
+dropdownMenu.addEventListener('click', function(e) {
+    // Check if the clicked element is an li element
+    if (e.target && e.target.nodeName == 'LI') {
+        // Get the selected customer's ID from the value attribute of the clicked li element
+        var customerId = e.target.getAttribute('value');
+
+        // Make an API call to fetch the user data based on the customer ID
+        fetch('/admin/auth/get-vendor/' + customerId)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+                console.log(data)
+                console.log(data.data.phone)
+                console.log(data.data.name)
+                console.log(data.data.token)
+                // Update the input fields with the fetched user data
+                phoneInput.value = data.data.phone;
+                addressInput.value = data.data.address;
+                customerNameInput.value = data.data.name; 
+                tokenInput.value = data.data.token; 
+            })
+            .catch(error => console.error('Error fetching customer data:', error));
+    }
+});
+
+</script>
+
+
+<%- include('../../partials/end')%>
+

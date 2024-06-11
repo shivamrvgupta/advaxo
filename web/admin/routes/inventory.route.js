@@ -3,7 +3,9 @@ const { InventoryController }= require('../controllers');
 const { AuthMiddleware } = require('../middlewares');
 
 router.get('/select-vendor', AuthMiddleware.authenticateToken ,InventoryController.getVendors);
+router.get('/update-vendor/:bill_no', AuthMiddleware.authenticateToken ,InventoryController.getUpdateVendors);
 router.post('/select-vendor', AuthMiddleware.authenticateToken ,InventoryController.postVendors);
+router.post('/update-vendor/:bill_no', AuthMiddleware.authenticateToken ,InventoryController.postUpdateVendors);
 router.get('/add-products/:bill_no', AuthMiddleware.authenticateToken ,InventoryController.getAddInventory);
 router.get('/product-list', AuthMiddleware.authenticateToken ,InventoryController.getInventoryList);
 router.get('/update-product/:product_id', AuthMiddleware.authenticateToken ,InventoryController.getUpdateInventory);
