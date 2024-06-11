@@ -52,7 +52,7 @@
                                         <div class="media align-items-center static-top-widget">
                                             <div class="media-body p-0">
                                                 <span class="m-0">Billed Amount</span>
-                                                <h4 class="mb-0 counter">₹ <%= totalOrder %></h4>
+                                                <h4 class="mb-0 counter">₹ <%= parseFloat(totalOrder).toFixed(2) %></h4>
                                             </div>
                                         </div>
                                     </div>
@@ -67,7 +67,7 @@
                                         <div class="media static-top-widget">
                                             <div class="media-body p-0">
                                                 <span class="m-0">Due Balance</span>
-                                                <h4 class="mb-0 counter">₹ <%= totalRemainingBalance %></h4>
+                                                <h4 class="mb-0 counter">₹ <%= parseFloat(totalRemainingBalance).toFixed(2) %></h4>
                                             </div>
                                         </div>
                                     </div>
@@ -82,7 +82,7 @@
                                         <div class="media static-top-widget">
                                             <div class="media-body p-0">
                                                 <span class="m-0">Total Expenses (WO)</span>
-                                                <h4 class="mb-0 counter">₹ <%= totalExpenses %></h4>
+                                                <h4 class="mb-0 counter">₹ <%= parseFloat(totalExpenses).toFixed(2) %></h4>
                                             </div>
                                         </div>
                                     </div>
@@ -97,7 +97,7 @@
                                         <div class="media static-top-widget">
                                             <div class="media-body p-0">
                                                 <span class="m-0">Total Profit</span>
-                                                <h4 class="mb-0 counter">₹<%= totalProfit %></h4>
+                                                <h4 class="mb-0 counter">₹<%= parseFloat(totalProfit).toFixed(2) %></h4>
                                             </div>
                                         </div>
                                     </div>
@@ -112,7 +112,7 @@
                                         <div class="media align-items-center static-top-widget">
                                             <div class="media-body p-0">
                                                 <span class="m-0">Billed Inventory</span>
-                                                <h4 class="mb-0 counter">₹ <%= billed_products %></h4>
+                                                <h4 class="mb-0 counter">₹ <%= parseFloat(billed_products).toFixed(2) %></h4>
                                             </div>
                                         </div>
                                     </div>
@@ -126,7 +126,7 @@
                                         <div class="media align-items-center static-top-widget">
                                             <div class="media-body p-0">
                                                 <span class="m-0">Unpaid Inventory</span>
-                                                <h4 class="mb-0 counter">₹ <%= paid_products %></h4>
+                                                <h4 class="mb-0 counter">₹ <%= parseFloat(paid_products).toFixed(2) %></h4>
                                             </div>
                                         </div>
                                     </div>
@@ -140,7 +140,7 @@
                                         <div class="media static-top-widget">
                                             <div class="media-body p-0">
                                                 <span class="m-0">Paid Inventory</span>
-                                                <h4 class="mb-0 counter">₹ <%= remaining_balance %></h4>
+                                                <h4 class="mb-0 counter">₹ <%= parseFloat(remaining_balance).toFixed(2) %></h4>
                                             </div>
                                         </div>
                                     </div>
@@ -156,7 +156,7 @@
                                         <div class="media align-items-center static-top-widget">
                                             <div class="media-body p-0">
                                                 <span class="m-0">Unpaid Expenses</span>
-                                                <h4 class="mb-0 counter">₹ <%= unpaid_expenses %></h4>
+                                                <h4 class="mb-0 counter">₹ <%= parseFloat(unpaid_expenses).toFixed(2) %></h4>
                                             </div>
                                         </div>
                                     </div>
@@ -171,7 +171,7 @@
                                         <div class="media static-top-widget">
                                             <div class="media-body p-0">
                                                 <span class="m-0">Paid Expenses</span>
-                                                <h4 class="mb-0 counter">₹ <%= paid_expenses %></h4>
+                                                <h4 class="mb-0 counter">₹ <%= parseFloat(paid_expenses).toFixed(2) %></h4>
                                             </div>
                                         </div>
                                     </div>
@@ -187,7 +187,7 @@
                                         <div class="media align-items-center static-top-widget">
                                             <div class="media-body p-0">
                                                 <span class="m-0" style="font-size: 15px;">Cash</span>
-                                                <h4 class="mb-0 counter" style="font-size: 15px;">₹ <%= cash.amount || 0 %></h4>
+                                                <h4 class="mb-0 counter" style="font-size: 15px;">₹ <%= parseFloat(cash.amount).toFixed(2) || 0 %></h4>
                                             </div>
                                         </div>
                                     </div>
@@ -202,7 +202,7 @@
                                         <div class="media static-top-widget">
                                             <div class="media-body p-0">
                                                 <span class="m-0" style="font-size: 15px;">IDFC SAM</span>
-                                                <h4 class="mb-0 counter" style="font-size: 15px;">₹ <%= sam.amount || 0 %></h4>
+                                                <h4 class="mb-0 counter" style="font-size: 15px;">₹ <%= parseFloat(sam.amount).toFixed(2) || 0 %></h4>
                                             </div>
                                         </div>
                                     </div>
@@ -217,7 +217,7 @@
                                         <div class="media static-top-widget">
                                             <div class="media-body p-0">
                                                 <span class="m-0" style="font-size: 15px;">IDFC SWATI</span>
-                                                <h4 class="mb-0 counter" style="font-size: 15px;" >₹ <%= swati.amount || 0 %></h4>
+                                                <h4 class="mb-0 counter" style="font-size: 15px;" >₹ <%= parseFloat(swati.amount).toFixed(2) || 0 %></h4>
                                             </div>
                                         </div>
                                     </div>
@@ -232,7 +232,7 @@
                                         <div class="media static-top-widget">
                                             <div class="media-body p-0">
                                                 <span class="m-0" style="font-size: 15px;">Net Banking</span>
-                                                <h4 class="mb-0 counter" style="font-size: 15px;" >₹<%= net.amount || 0 %></h4>
+                                                <h4 class="mb-0 counter" style="font-size: 15px;" >₹<%= parseFloat(net.amount).toFixed(2) || 0 %></h4>
                                             </div>
                                         </div>
                                     </div>
