@@ -62,9 +62,9 @@
                                                                 <%= row.client_id.name %>
                                                             </td>
 
-                                                            <td><%= row.grand_total %></td>
+                                                            <td><%= row.grand_total.toFixed(2) %></td>
                                                             <td><%= row.remaining_balance.toFixed(2) %></td>
-                                                            <td><%= row.grand_total - row.client_balance %></td>
+                                                            <td><%= (row.grand_total - row.client_balance).toFixed(2) %></td>
                                                             
                                                             <td>
                                                                 <div class="<%= row.payment_status === 'paid' ? 'status-close' : (row.payment_status === 'partially_paid' ? 'status-blue' : 'status-danger') %>">

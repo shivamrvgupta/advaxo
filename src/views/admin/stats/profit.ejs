@@ -41,8 +41,8 @@
                                                                 <td style="text-align: center;"><%= row.date %></td>
                                                                 <td style="text-align: center;"><%= row.name %></td>
                                                                 <td style="text-align: center;"><%= row.order_cost %></td>
-                                                                <td style="text-align: center;"><%= row.total_expenses %></td>
-                                                                <td style="text-align: center;"><%= row.profit %></td>
+                                                                <td style="text-align: center;"><%= row.total_expenses.toFixed(2) %></td>
+                                                                <td style="text-align: center;"><%= row.profit.toFixed(2) %></td>
                                                             </tr>
                                                         <% }) %>
                                                     <% }else{ %>

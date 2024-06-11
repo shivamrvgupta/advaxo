@@ -41,8 +41,8 @@
                                                                 <td style="text-align: center;"><%= row.created_date.toLocaleDateString('en-UK',options) %></td>
                                                                 <td style="text-align: center;"><%= row.client_id.name %></td>
                                                                 <td style="text-align: center;"><%= row.grand_total %></td>
-                                                                <td style="text-align: center;"><%= row.grand_total - row.remaining_balance %></td>
-                                                                <td style="text-align: center;"><%= row.remaining_balance %></td>
+                                                                <td style="text-align: center;"><%= (row.grand_total - row.remaining_balance).toFixed(2) %></td>
+                                                                <td style="text-align: center;"><%= row.remaining_balance.toFixed(2) %></td>
                                                             </tr>
                                                         <% }) %>
                                                     <% }else{ %>
