@@ -97,14 +97,16 @@
                                                 <tbody>
                                                     <% if (live_stock != '') { %>        
                                                         <% live_stock.forEach((row, index) => { %> 
-                                                            <tr> 
-                                                                <td style="text-align: center;"><%= row.product_id.name.toUpperCase() %></td>
-                                                                <td style="text-align: center;"><%= row.quantity %></td>
-                                                                <td style="text-align: center;"><%= row.product_id.unit %></td>
-                                                                <td style="text-align: center;"><%= row.area %></td>
-                                                                <td style="text-align: center;"><%= row.rate %></td>
-                                                                <td style="text-align: center;"><%= row.unit == 'SQRFT' ? (row.rate * row.area) : (row.rate * row.quantity) %></td>
-                                                            </tr>
+                                                            <% if (row.unit === 'SQRFT' && row.area !== 0 || row.unit === 'NOS' && row.quantity !== 0) { %>
+                                                                <tr> 
+                                                                    <td style="text-align: center;"><%= row.product_id.name.toUpperCase() %></td>
+                                                                    <td style="text-align: center;"><%= row.quantity %></td>
+                                                                    <td style="text-align: center;"><%= row.product_id.unit %></td>
+                                                                    <td style="text-align: center;"><%= row.area %></td>
+                                                                    <td style="text-align: center;"><%= row.rate %></td>
+                                                                    <td style="text-align: center;"><%= row.unit == 'SQRFT' ? (row.rate * row.area) : (row.rate * row.quantity) %></td>
+                                                                </tr>
+                                                            <% } %>      
                                                         <% }) %>      
                                                     <% } else { %>
                                                         <tr class="text-center">

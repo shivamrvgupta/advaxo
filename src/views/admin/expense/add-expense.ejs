@@ -47,14 +47,16 @@
                                             <option value="none" disabled selected>-- Select the Product --</option> 
                                             <% if (products != '') { %>        
                                                 <% products.forEach((row, index) => { %> 
-                                                    <option value="<%- row._id %>">
-                                                        <%- row.product_id.name %> || 
-                                                        <% if (row.unit === 'SQRFT') { %>
-                                                          Total Area Available <%= row.area %>
-                                                        <% } else { %>
-                                                            Total Quantity Available <%= row.quantity %>
-                                                        <% } %>
-                                                      </option>
+                                                    <% if (row.unit === 'SQRFT' && row.area !== 0 || row.unit === 'NOS' && row.quantity !== 0) { %>
+                                                        <option value="<%- row._id %>">
+                                                            <%- row.product_id.name %> || 
+                                                            <% if (row.unit === 'SQRFT') { %>
+                                                            Total Area Available <%= row.area %>
+                                                            <% } else { %>
+                                                                Total Quantity Available <%= row.quantity %>
+                                                            <% } %>
+                                                        </option>
+                                                    <% } %>
                                                 <% }) %>
                                             <%  } else { %>
                                                 <option value="none" disabled>No Products In Inventory</option>
