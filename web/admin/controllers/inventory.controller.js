@@ -927,8 +927,11 @@ module.exports = {
 
       const payment_id = req.params.paymentId;
       const payment = await models.ProductModel.InventoryPay.findById(payment_id);
-      const order_id = payment.vendor_id;
-
+      const bill_no = payment.bill_no;
+      const bill = await models.ProductModel.InventoryBill.findOne({bill_no : bill_no})
+      const order_id = bill.vendor_id;
+      console.log("Vendor Id",order_id)
+      console.log("Payemnt Id",payment_id)
       const orders = await models.ProductModel.Vendor.findOne({_id : order_id});
       orders.remaining_balance = parseFloat(orders.remaining_balance) + parseFloat(payment.amount);
       
