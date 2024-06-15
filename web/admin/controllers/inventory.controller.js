@@ -303,7 +303,7 @@ module.exports = {
             if(server.unit === 'SQRFT'){
               saveProducts.width = parseFloat(saveProducts.width) + parseFloat(server.width);
               saveProducts.height = parseFloat(saveProducts.height) + parseFloat(server.height);
-              saveProducts.area = parseFloat(saveProducts.area) + parseFloat(server.area);
+              saveProducts.area = parseFloat(saveProducts.width) * parseFloat(saveProducts.height);
               saveProducts.rate = parseFloat(server.rate);
               await saveProducts.save();
             }else{

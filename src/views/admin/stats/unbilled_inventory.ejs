@@ -37,6 +37,7 @@
                                                 
                                                     <% if (inventory != '') { %>
                                                         <% inventory.forEach((row, index) => { %>
+                                                            <% if((parseFloat(row.grand_total) - parseFloat(row.remaining_balance.toFixed(2))).toFixed(2) > 0) {%>
                                                                 <tr>
                                                                     <td style="text-align: center;"><%= row.created_date.toLocaleDateString('en-UK',options) %></td>
                                                                     <td style="text-align: center;">
@@ -52,13 +53,13 @@
                                                                     <td style="text-align: center;"><%= row.grand_total.toFixed(2) %></td>
                                                                     <td style="text-align: center;"><%= (parseFloat(row.grand_total) - parseFloat(row.remaining_balance.toFixed(2))).toFixed(2) %></td>
                                                                 </tr>
+                                                            <% } %>
                                                         <% }) %>
                                                     <% }else{ %>
                                                         <tr>
                                                             <td colspan="7" class="text-center">No Transactions Available</td>
                                                         </tr>
                                                     <% } %>
-                                                
                                             </tbody>
                                         </table>
                                     </div>

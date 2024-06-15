@@ -39,10 +39,8 @@
                                                 <thead>
                                                     <tr>
                                                         <th style="text-align: center;">Product Name</th>
-                                                        <th style="text-align: center;">Width</th>
-                                                        <th style="text-align: center;">Height</th>
-                                                        <th style="text-align: center;">Quantity</th>
                                                         <th style="text-align: center;">Unit</th>
+                                                        <th style="text-align: center;">Quantity</th>
                                                         <th style="text-align: center;">Total Area</th>
                                                         <th style="text-align: center;">Rate</th>
                                                         <th style="text-align: center;">Amount</th>
@@ -54,10 +52,8 @@
                                                         <% products.forEach((row, index) => { %> 
                                                             <tr> 
                                                                 <td style="text-align: center;"><%= row.name.toUpperCase() %></td>
-                                                                <td style="text-align: center;"><%= row.width %></td>
-                                                                <td style="text-align: center;"><%= row.height %></td>
-                                                                <td style="text-align: center;"><%= row.quantity %></td>
                                                                 <td style="text-align: center;"><%= row.unit %></td>
+                                                                <td style="text-align: center;"><%= row.quantity %></td>
                                                                 <td style="text-align: center;"><%= row.area %></td>
                                                                 <td style="text-align: center;"><%= row.rate %></td>
                                                                 <td style="text-align: center;">
@@ -86,8 +82,8 @@
                                                 <thead>
                                                     <tr>
                                                         <th style="text-align: center;">Product Name</th>
-                                                        <th style="text-align: center;">Quantity</th>
                                                         <th style="text-align: center;">Unit</th>
+                                                        <th style="text-align: center;">Quantity</th>
                                                         <th style="text-align: center;">Total Area</th>
                                                         <th style="text-align: center;">Rate</th>
                                                         <th style="text-align: center;">Amount</th>
@@ -100,8 +96,8 @@
                                                             <% if (row.unit === 'SQRFT' && row.area !== 0 || row.unit === 'NOS' && row.quantity !== 0) { %>
                                                                 <tr> 
                                                                     <td style="text-align: center;"><%= row.product_id.name.toUpperCase() %></td>
-                                                                    <td style="text-align: center;"><%= row.quantity %></td>
                                                                     <td style="text-align: center;"><%= row.product_id.unit %></td>
+                                                                    <td style="text-align: center;"><%= row.quantity %></td>
                                                                     <td style="text-align: center;"><%= row.area %></td>
                                                                     <td style="text-align: center;"><%= row.rate %></td>
                                                                     <td style="text-align: center;"><%= row.unit == 'SQRFT' ? (row.rate * row.area) : (row.rate * row.quantity) %></td>
