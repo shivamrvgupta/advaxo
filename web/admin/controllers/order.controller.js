@@ -382,6 +382,10 @@ module.exports = {
         console.log("I am here in SQRFT")
         liveStocks.area = parseFloat(liveStocks.area) - parseFloat(server.area);
         liveStocks.amount = parseFloat(liveStocks.amount) - parseFloat(expense.amount);
+        // Check if quantity is 1 than delete if it is more than one the no need to update
+        if(parseFloat(liveStocks.quantity) > 1){
+          liveStocks.quantity = parseFloat(liveStocks.quantity) - parseFloat(server.quantity);
+        }
         await liveStocks.save();
       }else if(server.unit === "NOS"){
         console.log("I am here")
@@ -881,8 +885,54 @@ module.exports = {
 
       const expense_id = req.params.expenseId;
       const server = req.body;
+      console.log(server);
       
       const expense = await models.ProductModel.Expense.findOne({_id : expense_id});
+      console.log(expense);
+
+      const ordered_expense = await models.ProductModel.Order.findOne({order_id : expense.order_id});
+      const all_expenses = await models.ProductModel.Expense.find({order_id : expense.order_id});
+      const other_expenses = await models.ProductModel.GenralExpense.find({order_id : expense.order_id});
+      const totalExpense = (all_expenses.reduce((sum, expense) => parseFloat(sum) + parseFloat(expense.amount), 0)).toFixed(2);
+      const totalOtherExpense = (other_expenses.reduce((sum, expense) => parseFloat(sum) + parseFloat(expense.amount), 0)).toFixed(2);
+      ordered_expense.client_balance = (parseFloat(ordered_expense.grand_total) - parseFloat(totalExpense) - parseFloat(totalOtherExpense)).toFixed(2);
+
+      const live_stocks = await models.ProductModel.Stocks.findOne({_id : expense.product_id});
+
+      console.log(parseFloat(expense.quantity), parseFloat(server.quantity));
+      console.log(parseFloat(expense.quantity) > parseFloat(server.area));
+      console.log(parseFloat(expense.quantity) < parseFloat(expense.area));
+      if(server.unit === "SQRFT"){
+        console.log("I am here in SQRFT")
+        if(parseFloat(expense.area) > parseFloat(server.area)){
+          live_stocks.area = parseFloat(live_stocks.area) + (parseFloat(expense.area) - parseFloat(server.area));
+          // Check if quantity is 1 than delete if it is more than one the no need to update
+          if(parseFloat(expense.quantity) > 1){
+            live_stocks.quantity = parseFloat(live_stocks.quantity) + (parseFloat(expense.quantity) - parseFloat(server.quantity));
+          }
+          await live_stocks.save(); 
+        }else if(parseFloat(expense.area) < parseFloat(server.area)){
+          live_stocks.area = parseFloat(live_stocks.area) - (parseFloat(server.area) - parseFloat(expense.area));
+          // Check if quantity is 1 than delete if it is more than one the no need to update
+          if(parseFloat(expense.quantity) > 1 ){
+            live_stocks.quantity = parseFloat(live_stocks.quantity) - (parseFloat(server.quantity) - parseFloat(expense.quantity));
+          }
+          await live_stocks.save(); 
+        }else{
+          console.log("hehehehe")
+        }
+      }else if(server.unit === "NOS"){
+        console.log("I am here in NOS")
+        if(parseFloat(expense.quantity) > parseFloat(server.quantity)){
+          live_stocks.quantity = parseFloat(live_stocks.quantity) + (parseFloat(expense.quantity) - parseFloat(server.quantity));
+          await live_stocks.save();
+        }else if(parseFloat(expense.quantity) < parseFloat(server.quantity)){
+          live_stocks.quantity = parseFloat(live_stocks.quantity) - (parseFloat(server.quantity) - parseFloat(expense.quantity));
+          await live_stocks.save();
+        }else{
+          console.log("hehehehe")
+        }
+      }
 
       expense.name = server.name ;
       expense.unit = server.unit || expense.unit ;
@@ -892,33 +942,10 @@ module.exports = {
       expense.area = server.area ;
       expense.rate = server.rate ;
       expense.amount= server.amount ;
-      
 
-      await expense.save();
-
-      const ordered_expense = await models.ProductModel.Order.findOne({order_id : expense.order_id});
-      const all_expenses = await models.ProductModel.Expense.find({order_id : expense.order_id});
-      const other_expenses = await models.ProductModel.GenralExpense.find({order_id : expense.order_id});
-      const products = await models.ProductModel.Product.findOne({_id : expense.product_id});
-      const totalExpense = (all_expenses.reduce((sum, expense) => parseFloat(sum) + parseFloat(expense.amount), 0)).toFixed(2);
-      const totalOtherExpense = (other_expenses.reduce((sum, expense) => parseFloat(sum) + parseFloat(expense.amount), 0)).toFixed(2);
-
-      console.log(ordered_expense);
-      console.log(ordered_expense.grand_total);
-      ordered_expense.client_balance = (parseFloat(ordered_expense.grand_total) - parseFloat(totalExpense) - parseFloat(totalOtherExpense)).toFixed(2);
-      await ordered_expense.save(); 
-
-      const deduct = await models.ProductModel.Expense.find({product_id : expense.product_id});
-      const live_stocks = await models.ProductModel.Stocks.findOne({product_id : expense.product_id});
-
-      const total_area = deduct.reduce((sum, deduct) => parseFloat(sum) + parseFloat(deduct.area), 0).toFixed(2);
-      const total_quantity = deduct.reduce((sum, deduct) => parseFloat(sum) + parseFloat(deduct.quantity), 0).toFixed(2);
-      const total_amount = deduct.reduce((sum, deduct) => parseFloat(sum) + parseFloat(deduct.amount), 0).toFixed(2);          
-
-      live_stocks.quantity = (expense.unit === 'SQRFT' ? 0 : parseFloat(products.quantity) - parseFloat(total_quantity));
-      live_stocks.area = (expense.unit === 'SQRFT' ? parseFloat(products.area) - parseFloat(total_area) : 0);
-      live_stocks.amount = parseFloat(products.amount) - parseFloat(total_amount);
       await live_stocks.save();
+      await ordered_expense.save(); 
+      await expense.save();
     
 
       res.redirect(`/admin/order/order-summary/${expense.order_id}?success="Expense Added Successfully"`);
@@ -945,8 +972,6 @@ module.exports = {
       const expense = await models.ProductModel.Expense.findOne({_id : expense_id});
       const orderId = expense.order_id;
       const expense_amount = expense.amount;
-
-      const expense_delete = await models.ProductModel.Expense.findByIdAndDelete(expense_id); 
               
       const products = await models.ProductModel.Product.findOne({ _id : expense.product_id});
       const ordered_expense = await models.ProductModel.Order.findOne({order_id : orderId});
@@ -954,18 +979,28 @@ module.exports = {
 
       await ordered_expense.save();
       
-      const deduct = await models.ProductModel.Expense.find({product_id : expense.product_id});
-      const live_stocks = await models.ProductModel.Stocks.findOne({product_id : expense.product_id});
+      const live_stocks = await models.ProductModel.Stocks.findOne({_id : expense.product_id});
 
-      const total_area = deduct.reduce((sum, deduct) => parseFloat(sum) + parseFloat(deduct.area), 0).toFixed(2);
-      const total_quantity = deduct.reduce((sum, deduct) => parseFloat(sum) + parseFloat(deduct.quantity), 0).toFixed(2);
-      const total_amount = deduct.reduce((sum, deduct) => parseFloat(sum) + parseFloat(deduct.amount), 0).toFixed(2);          
+      console.log("Live stocks", live_stocks);
 
-      live_stocks.quantity = (expense.unit === 'SQRFT' ? 0 : parseFloat(products.quantity) - parseFloat(total_quantity));
-      live_stocks.area = (expense.unit === 'SQRFT' ? parseFloat(products.area) - parseFloat(total_area) : 0);
-      live_stocks.amount = parseFloat(products.amount) - parseFloat(total_amount);
-      await live_stocks.save();
+      if(expense.unit === "SQRFT"){
+        console.log("I am here in SQRFT")
+        live_stocks.area = parseFloat(live_stocks.area) + parseFloat(expense.area);
+        // Check if quantity is 1 than delete if it is more than one the no need to update
+        if(parseFloat(expense.quantity) > 1){
+          live_stocks.quantity = parseFloat(live_stocks.quantity) + parseFloat(expense.quantity);
+        }
+        await live_stocks.save();
+      }else if(expense.unit === "NOS"){
+        console.log("I am here")
+        live_stocks.quantity = parseFloat(live_stocks.quantity) + parseFloat(expense.quantity);
+        await live_stocks.save();
+      }
       
+      await live_stocks.save();
+      console.log("Live stocks", live_stocks);
+      const expense_delete = await models.ProductModel.Expense.findByIdAndDelete(expense_id); 
+
       res.json({success: true});
 
     }catch(err){

@@ -6,6 +6,11 @@ const inventorySchema = new mongoose.Schema({
         required: true,
         default : 0
     },
+    date : {
+        type: String,
+        required: true,
+        default: Date.now
+    },
     gst : {
         type: String,
         required: false

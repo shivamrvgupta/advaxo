@@ -72,6 +72,7 @@ module.exports = {
           bill_no : server.bill_no,
           gst : server.gst,
           vendor_id: vendor_id,
+          date : server.date || formattedDate
         }
 
         console.log(billData)
@@ -177,6 +178,7 @@ module.exports = {
       await checkVendor.save();
 
       bill.gst = server.gst || bill.gst;
+      bill.date = server.date || bill.date || formattedDate;
 
       await bill.save()
 
@@ -303,7 +305,8 @@ module.exports = {
             if(server.unit === 'SQRFT'){
               saveProducts.width = parseFloat(saveProducts.width) + parseFloat(server.width);
               saveProducts.height = parseFloat(saveProducts.height) + parseFloat(server.height);
-              saveProducts.area = parseFloat(saveProducts.width) * parseFloat(saveProducts.height);
+              saveProducts.quantity = parseFloat(saveProducts.quantity) + parseFloat(server.quantity);
+              saveProducts.area = parseFloat(saveProducts.area) + parseFloat(server.area);
               saveProducts.rate = parseFloat(server.rate);
               await saveProducts.save();
             }else{
@@ -331,6 +334,7 @@ module.exports = {
             if(server.unit === 'SQRFT'){
               stockUpdate.width = parseFloat(stockUpdate.width) + parseFloat(server.width);
               stockUpdate.height = parseFloat(stockUpdate.height) + parseFloat(server.height);
+              stockUpdate.quantity = parseFloat(stockUpdate.quantity) + parseFloat(server.quantity);
               stockUpdate.area = parseFloat(stockUpdate.area) + parseFloat(server.area);
               stockUpdate.rate = parseFloat(server.rate);
               await stockUpdate.save();
@@ -349,32 +353,32 @@ module.exports = {
       }
     },
 
-    getUpdateInventory : async (req, res) => {
-      try{
-        const user = req.user;
+      getUpdateInventory : async (req, res) => {
+        try{
+          const user = req.user;
 
-        if(!user){
-          res.render('a-login',{
-            title: "Advaxo",
-            error: "User Not Found"
-          })   
+          if(!user){
+            res.render('a-login',{
+              title: "Advaxo",
+              error: "User Not Found"
+            })   
+          }
+
+          const product_id = req.params.product_id;
+
+          const product = await models.ProductModel.BillProduct.findById(product_id);
+
+          res.render('admin/products/update-products',{
+              title: "Advaxo" ,
+              user,
+              product,
+              error: "Add New Product"
+          })
+        }catch(err){
+          console.log(err)
+          res.redirect(`/admin/auth/dashboard?error=${encodeURIComponent(err)}`)
         }
-
-        const product_id = req.params.product_id;
-
-        const product = await models.ProductModel.BillProduct.findById(product_id);
-
-        res.render('admin/products/update-products',{
-            title: "Advaxo" ,
-            user,
-            product,
-            error: "Add New Product"
-        })
-      }catch(err){
-        console.log(err)
-        res.redirect(`/admin/auth/dashboard?error=${encodeURIComponent(err)}`)
-      }
-    },
+      },
 
       postUpdateInventory: async (req, res) => {
         const referer = req.get('Referer');
@@ -783,8 +787,10 @@ module.exports = {
         const date = server.date || payment.date || formattedDate;
 
         const difference = Number(payment.amount) - Number(server.amount);
-        console.log(server.amount);
+        console.log("Remaining Balance",orders.remaining_balance);
+        console.log("Remaining Balance",Number(orders.remaining_balance) + difference);
         console.log(difference);
+        console.log(server.amount);
         console.log(payment.amount);
         console.log(payment.amount < server.amount);
         console.log(payment.amount > server.amount);
@@ -836,58 +842,10 @@ module.exports = {
           console.log(debitTransactionData);
           const debitTransaction = new models.ProductModel.Transaction(debitTransactionData);
           await debitTransaction.save();
+          await orders.save();
         } else {
           // Handle equal payment and server amounts
-          console.log(server.payment_method);
-          if (payment.payment_method === "CASH" || payment.payment_method === "IDFC SWATI" || payment.payment_method === "IDFC SAM" || payment.payment_method === "NET BANK") {
-            const from = await models.ProductModel.Bank.findOne({ name: server.payment_method });
-            const to = await models.ProductModel.Bank.findOne({ name: payment.payment_method });
-            console.log("I am here in Same ")
-            // Calculate the amount to be transferred
-            const amount = Number(server.amount);
-            console.log(amount);
-        
-            // Update the 'from' bank's amount (debit)
-            from.amount = Number(from.amount) + amount;
-            await from.save();
-        
-            // Update the 'to' bank's amount (credit)
-            to.amount = Number(to.amount) - amount;
-            await to.save();
-        
-            // Create a transaction record for debit
-            const debitTransactionData = {
-              type: to.name,
-              from: `Client Payment`,
-              to: `${orders.bill_no}`,
-              transaction_id: uuidv4(),
-              debited: amount,
-              credited: 0.0,
-              available: Number(from.amount),
-              date: server.date || formattedDate
-            };
-        
-            console.log(debitTransactionData);
-            const debitTransaction = new models.ProductModel.Transaction(debitTransactionData);
-            await debitTransaction.save();
-        
-            // Create a transaction record for credit
-            const creditTransactionData = {
-              type: from.name,
-              from: `Client Payment`,
-              to: `${orders.bill_no}`,
-              transaction_id: uuidv4(),
-              debited: 0.0,
-              credited: amount,
-              available: Number(to.amount),
-              date: server.date || formattedDate
-            };
-            console.log(creditTransactionData);
-            const creditTransaction = new models.ProductModel.Transaction(creditTransactionData);
-            await creditTransaction.save();
-          } else {
-            console.log("Passed");
-          }
+          console.log("I am here in Equal");
         }
 
         payment.date = server.date || payment.date;
@@ -895,9 +853,10 @@ module.exports = {
         payment.amount = server.amount;
         await payment.save();
         
-        orders.remaining_balance = parseFloat(orders.grand_total) - parseFloat(server.amount);
-        await orders.save();
+        console.log(parseFloat(orders.grand_total))
+        console.log(parseFloat(server.amount))
 
+        await orders.save();
         if(orders.remaining_balance != 0){
           orders.payment_status = "paid";
           orders.save();
@@ -913,107 +872,107 @@ module.exports = {
       }
     },
 
-  deletePayment : async (req, res) => {
-    const referer = req.get('Referer');
-    try{
-      const user = req.user;
+    deletePayment : async (req, res) => {
+      const referer = req.get('Referer');
+      try{
+        const user = req.user;
 
-      if(!user){
-        res.render('a-login',{
-          title: "Advaxo",
-          error: "User Not Found"
-        })   
+        if(!user){
+          res.render('a-login',{
+            title: "Advaxo",
+            error: "User Not Found"
+          })   
+        }
+
+        const payment_id = req.params.paymentId;
+        const payment = await models.ProductModel.InventoryPay.findById(payment_id);
+        const bill_no = payment.bill_no;
+        const bill = await models.ProductModel.InventoryBill.findOne({bill_no : bill_no})
+        const order_id = bill.vendor_id;
+        console.log("Vendor Id",order_id)
+        console.log("Payemnt Id",payment_id)
+        const orders = await models.ProductModel.Vendor.findOne({_id : order_id});
+        orders.remaining_balance = parseFloat(orders.remaining_balance) + parseFloat(payment.amount);
+        
+        const payment_delete = await models.ProductModel.InventoryPay.findByIdAndDelete(payment_id);
+
+        await orders.save();
+
+        const from = await models.ProductModel.Bank.findOne({name: payment.payment_method});
+
+        from.amount = parseFloat(from.amount) + parseFloat(payment.amount);
+        
+        await from.save();
+
+        console.log(payment.payment_method)
+        const creditedTransactionData = {
+          type: payment.payment_method,
+          from: `Vendor Refund ${orders.bill_no} - ${orders.name}`,
+          to: payment.payment_method,
+          transaction_id: uuidv4(),
+          debited: 0.0,
+          credited: payment.amount,
+          available: Number(from.amount),
+          date: formattedDate
+        };
+        const creditedTransaction = new models.ProductModel.Transaction(creditedTransactionData);
+        await creditedTransaction.save();
+
+        res.json({success: true});
+
+      }catch(err){
+        console.log(err)
+        res.redirect(`${referer}?error=${encodeURIComponent(err)}`);
       }
+    },
 
-      const payment_id = req.params.paymentId;
-      const payment = await models.ProductModel.InventoryPay.findById(payment_id);
-      const bill_no = payment.bill_no;
-      const bill = await models.ProductModel.InventoryBill.findOne({bill_no : bill_no})
-      const order_id = bill.vendor_id;
-      console.log("Vendor Id",order_id)
-      console.log("Payemnt Id",payment_id)
-      const orders = await models.ProductModel.Vendor.findOne({_id : order_id});
-      orders.remaining_balance = parseFloat(orders.remaining_balance) + parseFloat(payment.amount);
-      
-      const payment_delete = await models.ProductModel.InventoryPay.findByIdAndDelete(payment_id);
+    getQuantity : async (req, res) => {
+      const referer = req.get('Referer');
+      try{
+        const user = req.user;
 
-      await orders.save();
+        if(!user){
+          res.render('a-login',{
+            title: "Advaxo",
+            error: "User Not Found"
+          })   
+        }
 
-      const from = await models.ProductModel.Bank.findOne({name: payment.payment_method});
+        const product_id = req.params.product_id;
 
-      from.amount = parseFloat(from.amount) + parseFloat(payment.amount);
-      
-      await from.save();
+        const product = await models.ProductModel.Product.findById(product_id);
 
-      console.log(payment.payment_method)
-      const creditedTransactionData = {
-        type: payment.payment_method,
-        from: `Vendor Refund ${orders.bill_no} - ${orders.name}`,
-        to: payment.payment_method,
-        transaction_id: uuidv4(),
-        debited: 0.0,
-        credited: payment.amount,
-        available: Number(from.amount),
-        date: formattedDate
-      };
-      const creditedTransaction = new models.ProductModel.Transaction(creditedTransactionData);
-      await creditedTransaction.save();
+        if(req.body.quantity > product.quantity){
+          res.json({message : "Product Quantity Not Available" ,success: false, quantity: product.quantity});
+        }else{
+          res.json({message : "Success " , success: true, quantity: product.quantity});
+        }
+        
 
-      res.json({success: true});
-
-    }catch(err){
-      console.log(err)
-      res.redirect(`${referer}?error=${encodeURIComponent(err)}`);
-    }
-  },
-
-  getQuantity : async (req, res) => {
-    const referer = req.get('Referer');
-    try{
-      const user = req.user;
-
-      if(!user){
-        res.render('a-login',{
-          title: "Advaxo",
-          error: "User Not Found"
-        })   
+      }catch(err){
+        console.log(err)
+        res.redirect(`${referer}?error=${encodeURIComponent(err)}`);
       }
+    },
+    completeBill : async (req, res) => {
+      try{
+        const user = req.user;
 
-      const product_id = req.params.product_id;
+        if(!user){  
+          res.render('a-login',{
+            title: "Advaxo",
+            error: "User Not Found"
+          })   
+        }
 
-      const product = await models.ProductModel.Product.findById(product_id);
+        const orderId = req.body.orderId; 
 
-      if(req.body.quantity > product.quantity){
-        res.json({message : "Product Quantity Not Available" ,success: false, quantity: product.quantity});
-      }else{
-        res.json({message : "Success " , success: true, quantity: product.quantity});
+        res.redirect(`/admin/inventory/products-detail/${orderId}?success="Order Created Successfully"`);
+      }catch(err){
+        console.log(err)
+        res.redirect(`/admin/order/select-customer?error="${encodeURIComponent(err)}"`);
       }
-      
-
-    }catch(err){
-      console.log(err)
-      res.redirect(`${referer}?error=${encodeURIComponent(err)}`);
-    }
-  },
-  completeBill : async (req, res) => {
-    try{
-      const user = req.user;
-
-      if(!user){  
-        res.render('a-login',{
-          title: "Advaxo",
-          error: "User Not Found"
-        })   
-      }
-
-      const orderId = req.body.orderId; 
-
-      res.redirect(`/admin/inventory/products-detail/${orderId}?success="Order Created Successfully"`);
-    }catch(err){
-      console.log(err)
-      res.redirect(`/admin/order/select-customer?error="${encodeURIComponent(err)}"`);
-    }
-  },
+    },
 
   inventoryBill : async (req, res) => {
     const referer = req.get('Referer');

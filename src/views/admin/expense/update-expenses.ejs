@@ -41,49 +41,53 @@
 
                                 <input type="hidden" name="orderId" value="<%= orderId %>">
                                 <div class="mb-4 row align-items-center">
-                                    <label class="form-label-title col-lg-2 col-md-3 mb-0">Select Product</label>
+                                    <label class="form-label-title col-lg-2 col-md-3 mb-0">Selected Product</label>
                                     <div class="col-sm-9 col-lg-10">
-                                        <input type="text" class="form-control" name="name" id="product" value="<%= expense.name %>">
+                                        <input type="text" class="form-control" name="name" id="product" value="<%= expense.name %>" readonly>
                                     </div>
                                 </div>
 
                                 <div class="mb-4 row align-items-center">
                                     <label class="col-sm-3 col-form-label form-label-title">Unit</label>
                                     <div class="col-sm-9">
-                                        <select class="js-example-basic-single w-100" name="unit" id="unit">
-                                            <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="none" disabled selected>-- Select Unit Type --</option> 
-                                            <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="SQRFT">SQRFT</option> 
-                                            <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="NOS">NOS</option> 
-                                        </select>
+                                        <input type="text" class="form-control" name="unit" id="unit" value="<%= expense.unit %>" readonly>
                                     </div>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-sm-6">
-                                        <div class="mb-4 row align-items-center">
-                                            <label class="form-label-title col-sm-3 mb-0">Width</label>
-                                            <div class="col-sm-9">
-                                                <input class="form-control" type="text" oninput="validateFloat(this)" placeholder="Enter Product width" name="width" id="width" value="<%= expense.width %>" required >
+                                <% if(expense.unit == 'SQRFT' ){ %>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="mb-4 row align-items-center">
+                                                <label class="form-label-title col-sm-3 mb-0">Width</label>
+                                                <div class="col-sm-9">
+                                                    <input class="form-control" type="text" oninput="validateFloat(this)" placeholder="Enter Product width" name="width" id="width" value="<%= expense.width %>" required >
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="mb-4 row align-items-center">
+                                                <label class="form-label-title col-sm-3 mb-0">Height</label>
+                                                <div class="col-sm-9">
+                                                    <input class="form-control" type="text" oninput="validateFloat(this)" placeholder="Enter Product Height" name="height" id="height" value="<%= expense.height %>"  required>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-sm-6">
-                                        <div class="mb-4 row align-items-center">
-                                            <label class="form-label-title col-sm-3 mb-0">Height</label>
-                                            <div class="col-sm-9">
-                                                <input class="form-control" type="text" oninput="validateFloat(this)" placeholder="Enter Product Height" name="height" id="height" value="<%= expense.height %>"  required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <div class="mb-4 row align-items-center">
-                                    <label class="form-label-title col-sm-3 mb-0">Quantity</label>
-                                    <div class="col-sm-9">
-                                        <input class="form-control" type="number" placeholder="Quantity of Product" name="quantity" id="quantity" value="<%= expense.quantity %>"  required>
+                                    <div class="mb-4 row align-items-center">
+                                        <label class="form-label-title col-sm-3 mb-0">Quantity</label>
+                                        <div class="col-sm-9">
+                                            <input class="form-control" type="number" placeholder="Quantity of Product" name="quantity" id="quantity" value="<%= expense.quantity %>"  required>
+                                        </div>
                                     </div>
-                                </div>
-                    
+                                <% } else { %>
+                                    <div class="mb-4 row align-items-center">
+                                        <label class="form-label-title col-sm-3 mb-0">Quantity</label>
+                                        <div class="col-sm-9">
+                                            <input class="form-control" type="number" placeholder="Quantity of Product" name="quantity" id="quantity" value="<%= expense.quantity %>"  required>
+                                        </div>
+                                    </div>
+                                <% } %>
                                 <div class="mb-4 row align-items-center">
                                     <label class="form-label-title col-sm-3 mb-0">Total Area</label>
                                     <div class="col-sm-9">

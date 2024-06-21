@@ -42,6 +42,7 @@
                                                     <th>Total Expenses</th>
                                                     <th>Payment Status</th>
                                                     <th>GST</th>
+                                                    <th>Order By</th>
                                                     <th>Order Status</th>
                                                     <th>Actions</th>
                                                 </tr>
@@ -73,6 +74,7 @@
                                                                 
                                                             </td>
                                                             <td><%= row.gst ? "With GST" : "Without GST" %></td>
+                                                            <td><%= row.created_by %></td>
                                                             <td>
                                                                 <div id="orderStatusElement">
                                                                     <span id="orderStatus">
