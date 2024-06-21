@@ -654,6 +654,7 @@ module.exports = {
         res.render('admin/products/add-payment', {
           vendor_id,
           orderId,
+          vendor,
           user,
           error: "Add Payment for Bill : " + vendor_id})
       }catch(err){
@@ -741,12 +742,14 @@ module.exports = {
         const payments = await models.ProductModel.InventoryPay.find({ _id: payment_id});
         console.log(payments);
         const payment = payments[0];
+        const vendor = await models.ProductModel.InventoryBill.findOne({bill_no : payment.bill_no}).populate('vendor_id');
         console.log(payment);
         const orderId = payments.vendor_id;
 
         res.render('admin/products/update-payment', {
           orderId,
           user,
+          vendor,
           payment,
           error: "Update Payment  for Vendor : " + orderId
         })
@@ -813,9 +816,13 @@ module.exports = {
             available: Number(from.amount),
             date: date
           };
-        
+
+          orders.remaining_balance = parseFloat(orders.remaining_balance ) + (parseFloat(server.amount) - parseFloat(payment.amount));
+          console.log("paid --- ",orders.remaining_balance);
+          await orders.save();          
           const debitTransaction = new models.ProductModel.Transaction(debitTransactionData);
           await debitTransaction.save();
+
         } else if (payment.amount > server.amount) {
           // Handle payment amount greater than server amount
           console.log("I am here in Less");
@@ -842,6 +849,12 @@ module.exports = {
           console.log(debitTransactionData);
           const debitTransaction = new models.ProductModel.Transaction(debitTransactionData);
           await debitTransaction.save();
+
+          console.log("server --- ",server.amount);
+          console.log("prev --- ",payment.amount);
+          orders.remaining_balance = parseFloat(orders.remaining_balance ) - (parseFloat(payment.amount) - parseFloat(server.amount));
+          console.log("remaing --- ",orders.remaining_balance);
+
           await orders.save();
         } else {
           // Handle equal payment and server amounts

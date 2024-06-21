@@ -73,7 +73,7 @@
 
                                             <tbody >
                                                 <tr class="table-order" style="border: 1px solid black;">
-                                                    <td style="border: 1px solid black;">
+                                                    <td style="border: 1px solid black;" colspan="2">
                                                         <p>Name: </p>
                                                         <h5><%= vendor.name %></h5>
                                                     </td>
@@ -88,10 +88,13 @@
                                                 </tr>
 
                                                 <tr class="table-order">
-                                                 
-                                                    <td style="border: 1px solid black;" colspan="4">
+                                                    <td style="border: 1px solid black;" colspan="3">
                                                         <p>Vendor Address</p>
                                                         <h5><%= vendor.address %></h5>
+                                                    </td>
+                                                    <td style="border: 1px solid black;">
+                                                        <p>Date</p>
+                                                        <h5><%= bill.date %></h5>
                                                     </td>
                                                 </tr>
                                             </tbody>

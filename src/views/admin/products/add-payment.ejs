@@ -27,6 +27,21 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-12">
+            <div class="row py-2">
+                <div class="col-12">
+                    <div class="table-responsive table-details">
+                        <table class="table cart-table table-borderless">
+                            <thead>
+                                <tr>
+                                    <th style="border: 1px solid black;padding: 8px;font-size: 14px">Total Amount : <%= vendor.grand_total %></th>
+                                    <th style="border: 1px solid black;padding: 8px;font-size: 14px">Total Paid : <%= vendor.remaining_balance %></th>
+                                    <th style="border: 1px solid black;padding: 8px;font-size: 14px">Total Due : <%= vendor.grand_total - vendor.remaining_balance %></th>
+                                </tr> 
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
             <div class="card">
                 <div class="card-body">
                     <div class="title-header title-header-block package-card">
