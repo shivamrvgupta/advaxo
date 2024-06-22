@@ -71,7 +71,7 @@ module.exports = {
     
       } catch (error) {
         console.error('Error during login:', error);
-        return res.status(StatusCodesConstants.INTERNAL_SERVER_ERROR).json({ status: false, status_code: StatusCodesConstants.INTERNAL_SERVER_ERROR, message: MessageConstants.INTERNAL_SERVER_ERROR, data: {} });
+        return res.status(500).json({ status: false, status_code: 500, message: 'Internal server error', data: {} });
       }
     },
   

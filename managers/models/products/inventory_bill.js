@@ -8,8 +8,7 @@ const inventorySchema = new mongoose.Schema({
     },
     date : {
         type: String,
-        required: true,
-        default: Date.now
+        default: "YYYY-MM-DD"
     },
     gst : {
         type: String,
