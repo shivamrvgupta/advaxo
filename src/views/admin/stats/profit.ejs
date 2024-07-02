@@ -87,7 +87,7 @@
                     // Open a new window for printing
                     const printWindow = window.open('', '', 'width=800,height=600');
                     printWindow.document.open();
-                    printWindow.document.write('<html><head><style>table, th, td {border: .5px solid black;padding : 5px;}</style></head><body>');
+                    printWindow.document.write('<html><head><style>table, th, td {border: .5px solid black;padding : 2px;}</style></head><body>');
                     printWindow.document.write(tableContent); // Write the table content
                     printWindow.document.write('</body></html');
                     printWindow.document.close();
