@@ -412,10 +412,11 @@ module.exports = {
         })   
       }
       const orderId = req.params.orderId;
-      
+      const order = await models.ProductModel.Order.findOne({order_id : orderId}).populate("client_id");
       res.render('admin/expense/add-payment', {
         orderId,
         user,
+        order,
         error: "Add Payment  for orderId : " + orderId
       })
     }catch(err){
