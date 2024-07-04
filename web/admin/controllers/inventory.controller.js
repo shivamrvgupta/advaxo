@@ -1147,6 +1147,97 @@ module.exports = {
       console.log(err)
       res.redirect(`${referer}?error=${encodeURIComponent(err)}`);
     }
+  },
+  getSearch : async (req, res) => {
+    const referer = req.get('Referer');
+    try{
+      const user = req.user;
+      
+      if(!user){
+        res.render('a-login',{
+          title: "Advaxo",
+          error: "User Not Found"
+        })   
+      }
+
+      const vendors = await models.ProductModel.Vendor.find();
+      res.render('admin/reports/reports-inventory',{user, data : null, vendors, error: "Find all Vendors Reports"})
+
+    }catch(err){
+      console.log(err)
+      res.redirect(`${referer}?error="${encodeURIComponent(err)}"`);
+    }
+  },
+  postSearch : async (req, res) => {
+    const referer = req.get('Referer');
+    try{
+      const user = req.user;
+      
+      if(!user){
+        res.render('a-login',{
+          title: "Advaxo",
+          error: "User Not Found"
+        })   
+      }
+
+      const name = req.body.name;
+      console.log(name);
+      if(!name){
+        res.render('admin/search',{
+          title: "Advaxo",
+          error: "User Not Found"
+        })   
+      }
+
+
+      const customers = await models.ProductModel.Vendor.find();
+      let customer_id = null;
+      customers.forEach(async (customer) => {
+        if(customer.name.trim().toLowerCase() === name.trim().toLowerCase()){
+          console.log(`Found customer with name: ${customer.name}`);
+          customer_id = customer._id;
+          console.log(customer_id);
+        }
+      })
+
+      const bills = await models.ProductModel.InventoryBill.find({vendor_id : customer_id}).populate("vendor_id");
+
+      let overallGrandTotal = 0.0;
+      let overallRemainingBalance = 0.0;
+      let overallClientBalance = 0.0;
+      let paidOrderCount = 0;
+      let unpaidOrderCount = 0;
+      let totalOrders = bills.length;
+      
+      bills.forEach(bill => {
+        console.log(bill);
+          overallGrandTotal += parseFloat(bill.grand_total);
+          overallRemainingBalance += parseFloat(bill.remaining_balance);
+          overallClientBalance += parseFloat(bill.client_balance);
+      
+          if (bill.payment_status === 'paid') {
+              paidOrderCount++;
+          } else if (bill.payment_status === 'unpaid') {
+              unpaidOrderCount++;
+          }
+      });
+
+        const data = {
+          client_name : bills[0].vendor_id.name,
+          grand_total : overallGrandTotal,
+          remaining_balance : overallRemainingBalance,
+          client_balance : overallClientBalance,  
+          paid_order_count : paidOrderCount,
+          unpaid_order_count : unpaidOrderCount,
+          total_orders : totalOrders        
+        }
+
+        res.render('admin/reports/reports-inventory',{user, inventory : bills,vendors : customers, data, options,  error: "Reports"})
+      
+    }catch(err){
+      console.log(err)
+      res.redirect(`${referer}?error="${encodeURIComponent(err)}"`);
+    }
   }
 }
 

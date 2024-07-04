@@ -1789,7 +1789,7 @@ module.exports = {
           total_orders : totalOrders        
         }
 
-        res.render('admin/reports/reports-order',{user, clients : customers, data,  error: "Reports"})
+        res.render('admin/reports/reports-order',{user, inventory : orders,clients : customers, data, options,  error: "Reports"})
       
     }catch(err){
       console.log(err)

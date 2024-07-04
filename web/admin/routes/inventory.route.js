@@ -28,4 +28,7 @@ router.get('/invoice/:vendor_id' , AuthMiddleware.authenticateToken, InventoryCo
 
 router.delete('/delete-product/:product_id', AuthMiddleware.authenticateToken, InventoryController.deleteInventory);
 router.post('/delete-bill/:bill_no', AuthMiddleware.authenticateToken, InventoryController.deleteBill);
+
+router.get('/search', AuthMiddleware.authenticateToken, InventoryController.getSearch);
+router.post('/search', AuthMiddleware.authenticateToken, InventoryController.postSearch);
 module.exports = router;
