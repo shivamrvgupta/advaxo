@@ -1702,6 +1702,98 @@ module.exports = {
       console.log(err)
       res.redirect(`${referer}?error="${encodeURIComponent(err)}"`);
     }
-  }
+  },
 
+  search : async (req, res) => {
+    const referer = req.get('Referer');
+    try{
+      const user = req.user;
+      
+      if(!user){
+        res.render('a-login',{
+          title: "Advaxo",
+          error: "User Not Found"
+        })   
+      }
+
+      const clients = await models.CustomerModel.Client.find();
+
+      console.log(clients);
+      res.render('admin/reports/reports-order',{user, data : null, clients, error: "Find all Customers"})
+
+    }catch(err){
+      console.log(err)
+      res.redirect(`${referer}?error="${encodeURIComponent(err)}"`);
+    }
+  },
+  getSearch : async (req, res) => {
+    const referer = req.get('Referer');
+    try{
+      const user = req.user;
+      
+      if(!user){
+        res.render('a-login',{
+          title: "Advaxo",
+          error: "User Not Found"
+        })   
+      }
+
+      const name = req.body.name;
+      console.log(name);
+      if(!name){
+        res.render('admin/search',{
+          title: "Advaxo",
+          error: "User Not Found"
+        })   
+      }
+
+
+      const customers = await models.CustomerModel.Client.find();
+      let customer_id = null;
+      customers.forEach(async (customer) => {
+        if(customer.name.trim().toLowerCase() === name.trim().toLowerCase()){
+          console.log(`Found customer with name: ${customer.name}`);
+          customer_id = customer._id;
+          console.log(customer_id);
+        }
+      })
+
+      const orders = await models.ProductModel.Order.find({client_id : customer_id}).populate("client_id");
+
+      let overallGrandTotal = 0.0;
+      let overallRemainingBalance = 0.0;
+      let overallClientBalance = 0.0;
+      let paidOrderCount = 0;
+      let unpaidOrderCount = 0;
+      let totalOrders = orders.length;
+      
+      orders.forEach(order => {
+          overallGrandTotal += parseFloat(order.grand_total);
+          overallRemainingBalance += parseFloat(order.remaining_balance);
+          overallClientBalance += parseFloat(order.client_balance);
+      
+          if (order.payment_status === 'paid') {
+              paidOrderCount++;
+          } else if (order.payment_status === 'unpaid') {
+              unpaidOrderCount++;
+          }
+      });
+
+        const data = {
+          client_name : orders[0].client_id.name,
+          grand_total : overallGrandTotal,
+          remaining_balance : overallRemainingBalance,
+          client_balance : overallClientBalance,  
+          paid_order_count : paidOrderCount,
+          unpaid_order_count : unpaidOrderCount,
+          total_orders : totalOrders        
+        }
+
+        res.render('admin/reports/reports-order',{user, clients : customers, data,  error: "Reports"})
+      
+    }catch(err){
+      console.log(err)
+      res.redirect(`${referer}?error="${encodeURIComponent(err)}"`);
+    }
+  }
 }

@@ -39,4 +39,7 @@ router.post('/delete-expense/:expenseId', AuthMiddleware.authenticateToken , Ord
 router.post('/delete-order/:wopId', AuthMiddleware.authenticateToken , OrderControllers.deleteWOP);
 router.post('/delete-other-expenses/:expenseId', AuthMiddleware.authenticateToken , OrderControllers.deleteOtherExpenses);
 
+router.get('/search', AuthMiddleware.authenticateToken, OrderControllers.search);
+router.post('/search', AuthMiddleware.authenticateToken, OrderControllers.getSearch);
+
 module.exports = router;
