@@ -122,7 +122,7 @@ module.exports = {
       const billed_products = (inventory.reduce((sum, inventory) => parseFloat(sum) + parseFloat(inventory.grand_total), 0)).toFixed(2);
       const remaining_balance = (inventory.reduce((sum, inventory) => parseFloat(sum) + parseFloat(inventory.remaining_balance), 0)).toFixed(2);
       const paid_products = billed_products - remaining_balance;
-      const other_expense = await models.ProductModel.GenralExpense.find({mode_of_payment : "Unpaid" , expense_type : {$ne : "Order"}});
+      const other_expense = await models.ProductModel.GenralExpense.find({mode_of_payment : "Unpaid"});
       const all_expense = await models.ProductModel.GenralExpense.find({expense_type : {$ne : "Order"}});
       console.log(other_expense);
       console.log(all_expense);
@@ -682,7 +682,7 @@ module.exports = {
         res.redirect('/admin/auth/login');
       }
 
-      const expenses = await models.ProductModel.GenralExpense.find({mode_of_payment : "Unpaid", expense_type : {$ne: "Order"}}).sort({
+      const expenses = await models.ProductModel.GenralExpense.find({mode_of_payment : "Unpaid"}).sort({
         created_date: -1
       });
 
