@@ -530,7 +530,8 @@ module.exports = {
       const server = req.body;
       const product_id = req.params.productId;
       const product = await models.ProductModel.Purchased.findById(product_id);
-      
+      const difference_bal = parseFloat(product.amount);
+      console.log(difference_bal)
       const orders = await models.ProductModel.Order.findOne({order_id: product.order_id});
       if(!product){
         res.redirect(`${referer}?error="Product Not Found"`);
@@ -548,10 +549,10 @@ module.exports = {
       product.amount = server.total_amount;
 
       await product.save();
-
-      orders.client_balance = parseFloat(product.amount) - (parseFloat(orders.grand_total) - parseFloat(orders.client_balance));
-      orders.remaining_balance =parseFloat(product.amount) - (parseFloat(orders.grand_total) - parseFloat(orders.remaining_balance));
-      orders.grand_total = (product.amount);
+      
+      orders.client_balance = parseFloat(orders.client_balance) - parseFloat(difference_bal) + parseFloat(product.amount);
+      orders.remaining_balance = parseFloat(orders.remaining_balance) - parseFloat(difference_bal) + parseFloat(product.amount);
+      orders.grand_total = parseFloat(orders.grand_total) - parseFloat(difference_bal) + parseFloat(product.amount);
       orders.save();
       const successMsg = `${server.name} -- Updated Successfully`;
       res.redirect(`/admin/order/order-summary/${product.order_id}?success=${encodeURIComponent(successMsg)}`)
@@ -657,11 +658,7 @@ module.exports = {
       const date = server.date || payment.date || formattedDate;
 
       const difference = Number(payment.amount) - Number(server.amount);
-      console.log(server.amount);
       console.log(difference);
-      console.log(payment.amount);
-      console.log(payment.amount < server.amount);
-      console.log(payment.amount > server.amount);
 
       if (payment.amount < server.amount) {
         // Handle payment amount less than server amount
@@ -770,7 +767,11 @@ module.exports = {
       payment.amount = server.amount;
       await payment.save();
       
-      orders.remaining_balance = parseFloat(orders.grand_total) - parseFloat(server.amount);
+      const all_payments = await models.ProductModel.Payment.find({order_id : order_id});
+
+      const total_amount = all_payments.reduce((sum, payment) => sum + parseFloat(payment.amount), 0);
+
+      orders.remaining_balance = parseFloat(orders.grand_total) - parseFloat(total_amount);
       await orders.save();
 
       if(orders.remaining_balance == 0){

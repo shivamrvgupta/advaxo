@@ -75,10 +75,10 @@
     <% } else { %>
         <div class="container-fluid">
             <div class="row">
-                <div class="col-sm-12">
+                <div class="col-sm-12" id="printableArea">
                     <div class="card card-table">
                         <div class="card-body">
-                            <div class="title-header title-header-block package-card">
+                            <div class="title-header title-header-block package-card hide-on-print ">
                                 <div>
                                     <h5>Search Vendor Data </h5>
                                 </div>
@@ -116,6 +116,9 @@
                                 <table class="table all-package theme-table" id="table_id">
                                     <div class="title-header option-title">
                                         <h2>All Bills</h2>
+                                        <div class="d-inline-flex hide-on-print">
+                                            <button class="btn btn-primary text-white print-button rounded ms-2" onclick="printInvoice()" > Print </button>
+                                        </div>
                                     </div>
                                     <thead>
                                         <tr>
@@ -223,6 +226,43 @@
         });
     });
 </script>
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script> 
+<script>
+    function printInvoice() {
+        // Hide elements that should not be printed
+        const elementsToHide = document.querySelectorAll('.hide-on-print');
+        elementsToHide.forEach((element) => {
+            element.style.display = 'none';
+        });
+        
+        // Get the content within the printable area
+        const printableArea = document.getElementById('printableArea');
+        const tableContent = printableArea.innerHTML; // Get the table content
+        
+        // Open a new window for printing
+        const printWindow = window.open('', '', 'width=800,height=600');
+        printWindow.document.open();
+        printWindow.document.write('<html><head><style>table, th, td {border: .5px solid black;padding : 2px;} *{font-size:10px}</style></head><body>');
+        printWindow.document.write(tableContent); // Write the table content
+        printWindow.document.write('</body></html');
+        printWindow.document.close();
+        
+        // Print the content
+        printWindow.print();
+        
+        // Close the print window
+        printWindow.close();
+        
+        // Restore the hidden elements after printing is done
+        elementsToHide.forEach((element) => {
+            element.style.display = '';
+        });
+    }
+        
+</script>
+
 
 <script>
     function validateFloat(floatField) {
