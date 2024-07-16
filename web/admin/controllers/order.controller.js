@@ -300,7 +300,7 @@ module.exports = {
         })   
       }
 
-      const orders = await models.ProductModel.Order.find().populate('client_id').sort({ created_date: -1 })
+      const orders = await models.ProductModel.Order.find().populate('client_id').sort({ date: -1 })
 
       
       res.render('admin/orders/all-wop', {

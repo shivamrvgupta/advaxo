@@ -490,7 +490,7 @@ module.exports = {
       // Retrieve transactions where the bank is either the sender or receiver
       const transactions = await models.ProductModel.Transaction.find({
         type : bankName
-      }).sort({ created_date: -1 });
+      }).sort({ date: 1 });
   
       // Segregate transactions based on debit and credit for the bank
       res.render('admin/banks/transaction', { user: user, transactions, error: "Transaction Lists" });
@@ -551,7 +551,7 @@ module.exports = {
       }
 
       const orders = await models.ProductModel.Order.find().sort({
-        created_date: -1
+        date : -1
       }).populate('client_id');
 
       console.log(orders);
@@ -569,7 +569,7 @@ module.exports = {
       }
 
       const orders = await models.ProductModel.Order.find().sort({
-        created_date: -1
+        date: -1
       }).populate('client_id');
 
       console.log(orders);
@@ -587,7 +587,7 @@ module.exports = {
       }
 
       const all_orders = await models.ProductModel.Order.find().sort({
-        created_date: -1
+        date: -1
       }).populate('client_id');
 
       const orders = [];
@@ -629,7 +629,7 @@ module.exports = {
       }
 
       const inventory = await models.ProductModel.InventoryBill.find({}).sort({
-        created_date: -1
+        date: -1
       }).populate('vendor_id');
 
       console.log(inventory);
@@ -647,7 +647,7 @@ module.exports = {
       }
 
       const inventory = await models.ProductModel.InventoryBill.find({payment_status : "paid"}).sort({
-        created_date: -1
+        date: -1
       }).populate('vendor_id');
 
       console.log(inventory);
@@ -665,7 +665,7 @@ module.exports = {
       }
 
       const inventory = await models.ProductModel.InventoryBill.find({}).sort({
-        created_date: -1
+        date: -1
       }).populate('vendor_id');
 
       console.log(inventory);
@@ -683,7 +683,7 @@ module.exports = {
       }
 
       const expenses = await models.ProductModel.GenralExpense.find({mode_of_payment : "Unpaid"}).sort({
-        created_date: -1
+        date: -1
       });
 
       console.log(expenses);
@@ -701,7 +701,7 @@ module.exports = {
       }
 
       const expenses = await models.ProductModel.GenralExpense.find({expense_type : {$ne: "Order"}}).sort({
-        created_date: -1
+        date: -1
       });
 
       console.log(expenses);

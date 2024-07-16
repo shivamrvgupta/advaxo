@@ -629,7 +629,7 @@ module.exports = {
           })   
         }
 
-        const vendor = await models.ProductModel.InventoryBill.find().populate('vendor_id').sort({ created_date: -1 });
+        const vendor = await models.ProductModel.InventoryBill.find().populate('vendor_id').sort({ date: -1 });
 
         res.render('admin/products/all-bills',{user ,vendor,error: "All Bills"})
       }catch(err){
