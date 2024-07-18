@@ -551,7 +551,7 @@ module.exports = {
       }
 
       const orders = await models.ProductModel.Order.find()
-                      .sort({ date: -1 })  // Sorts by date in descending order
+                      .sort({ order_date : 1 })  // Sorts by date in descending order
                       .populate('client_id');  // Populates the client_id field
 
 
@@ -570,7 +570,7 @@ module.exports = {
       }
 
       const orders = await models.ProductModel.Order.find().sort({
-        date: -1
+        order_date: -1
       }).populate('client_id');
 
       console.log(orders);
@@ -588,7 +588,7 @@ module.exports = {
       }
 
       const all_orders = await models.ProductModel.Order.find().sort({
-        date: -1
+        order_date: -1
       }).populate('client_id');
 
       const orders = [];
