@@ -1200,7 +1200,7 @@ module.exports = {
         }
       })
 
-      const bills = await models.ProductModel.InventoryBill.find({vendor_id : customer_id}).populate("vendor_id").sort({date : -1});
+      const bills = await models.ProductModel.InventoryBill.find({vendor_id : customer_id}).populate("vendor_id").sort({ created_date : -1 });
 
       let overallGrandTotal = 0.0;
       let overallRemainingBalance = 0.0;

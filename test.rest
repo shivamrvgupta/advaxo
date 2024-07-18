@@ -1,0 +1,16 @@
+### find 
+GET http://localhost:9001/admin/auth/find-transaction
+Content-Type: application/json
+
+{
+    "amount" : 126645
+}
+
+###
+POST http://localhost:9001/admin/auth/update-transaction
+Content-Type: application/json
+
+{
+    "transaction_id": "6667e9d637c9b7c81043b1da",
+    "amount" : 8010
+}

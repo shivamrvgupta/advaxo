@@ -509,7 +509,7 @@ module.exports = {
       }
 
       const all_orders = await models.ProductModel.Order.find().sort({
-        created_date: -1
+        date: -1
       }).populate('client_id');
 
       const orders = [];
@@ -550,9 +550,10 @@ module.exports = {
         res.redirect('/admin/auth/login');
       }
 
-      const orders = await models.ProductModel.Order.find().sort({
-        date : -1
-      }).populate('client_id');
+      const orders = await models.ProductModel.Order.find()
+                      .sort({ date: -1 })  // Sorts by date in descending order
+                      .populate('client_id');  // Populates the client_id field
+
 
       console.log(orders);
       res.render('admin/stats/billed', { user: user, orders, options ,error: "All Bills" });

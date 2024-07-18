@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { AuthController }= require('../controllers');
+const { AuthController , ExpenseController }= require('../controllers');
 const { AuthMiddleware } = require('../middlewares');
 
 router.get('/login', AuthController.getLogin);
@@ -30,4 +30,7 @@ router.post('/internal-transfer', AuthMiddleware.authenticateToken, AuthControll
 router.get('/change-password', AuthMiddleware.authenticateToken ,AuthController.getChangePass );
 
 router.post('/change-password', AuthMiddleware.authenticateToken ,AuthController.postChangePass );
+
+router.get('/find-transaction', ExpenseController.findtransactionLists );
+router.post('/update-transaction', ExpenseController.findAndUpdateTransaction );
 module.exports = router;
