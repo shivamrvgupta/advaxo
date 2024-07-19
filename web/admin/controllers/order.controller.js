@@ -1261,10 +1261,10 @@ module.exports = {
           }; 
           const debitTransaction = new models.ProductModel.Transaction(debitTransactionData);
           await debitTransaction.save();
-        }else if ( server.payment_method !== "Unpaid" && server.payment_method !== product.payment_method) {
+        }else if ( server.payment_method !== "Unpaid" ) {
           console.log("PAID TO PAID")
           const from = await models.ProductModel.Bank.findOne({ name: server.payment_method});
-          const to = await models.ProductModel.Bank.findOne({ name: product.payment_method});
+          const to = await models.ProductModel.Bank.findOne({ name: expense.payment_method});
 
           // Calculate the amount to be transferred
           const amount = Number(server.total_amount);
@@ -1308,16 +1308,16 @@ module.exports = {
           console.log(creditTransactionData)
           const creditTransaction = new models.ProductModel.Transaction(creditTransactionData);
           await creditTransaction.save();
-        } else if (server.payment_method === "Unpaid" && (product.payment_method === "CASH" || product.payment_method === "IDFC SWATI" || product.payment_method === "IDFC SAM" || product.payment_method === "NET BANK")) {
+        } else if (server.payment_method === "Unpaid" && (expense.payment_method === "CASH" || expense.payment_method === "IDFC SWATI" || expense.payment_method === "IDFC SAM" || expense.payment_method === "NET BANK")) {
           console.log("PAID TO UNPAID")
-          const from = await models.ProductModel.Bank.findOne({ name : product.payment_method});
+          const from = await models.ProductModel.Bank.findOne({ name : expense.payment_method});
         
           from.amount = Number(from.amount) + Number(server.total_amount);
         
           await from.save();
         
           const debitTransactionData = {
-            type: product.payment_method, // You can adjust the type based on your requirements
+            type: expense.payment_method, // You can adjust the type based on your requirements
             from: "Purchase Refund",
             to: `Product -- ${server.name}`,
             transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
@@ -1642,7 +1642,7 @@ module.exports = {
 
       
       for (const deletedExpense of deletedExpenses) {
-        const expensesWithSameProductId = await models.ProductModel.Expense.find({ order_id: orderId, product_id: deletedExpense.product_id });
+        const expensesWithSameProductId = await models.ProductModel.Expense.find({ order_id: orderId, expense_id: deletedExpense.product_id });
         console.log("Expenses with same product ID:", expensesWithSameProductId);
         const totalQuantityOfDeletedExpense = expensesWithSameProductId.reduce((total, expense) => total + parseInt(expense.quantity), 0);
 

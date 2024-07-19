@@ -489,8 +489,8 @@ module.exports = {
   
       // Retrieve transactions where the bank is either the sender or receiver
       const transactions = await models.ProductModel.Transaction.find({
-        type : bankName
-      }).sort({ date: -1 });
+        type: bankName
+      }).sort({ date: -1, created_date: -1 });
   
       // Segregate transactions based on debit and credit for the bank
       res.render('admin/banks/transaction', { user: user, transactions, error: "Transaction Lists" });
