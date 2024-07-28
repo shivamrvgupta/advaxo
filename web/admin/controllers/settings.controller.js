@@ -23,7 +23,7 @@ module.exports = {
       
           // Retrieve transactions where the bank is either the sender or receiver
           const transactions = await models.ProductModel.Transaction.find({
-            type : "CASH" , available : data 
+            type : "IDFC SWATI" , available : data 
           })
       
           // Segregate transactions based on debit and credit for the bank

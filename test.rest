@@ -3,7 +3,7 @@ GET http://localhost:9001/admin/auth/find-transaction
 Content-Type: application/json
 
 {
-    "amount" : 88517
+    "amount" : 51145
 }
 
 ###
@@ -11,6 +11,6 @@ POST http://localhost:9001/admin/auth/update-transaction
 Content-Type: application/json
 
 {
-    "transaction_id": "669914fae35ee599230f2e44",
-    "amount" : 92447
+    "transaction_id": "666a8f8c528e69f6ae5076cb",
+    "amount" : 1894
 }

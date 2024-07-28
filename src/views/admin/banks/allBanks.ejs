@@ -46,7 +46,6 @@
                                                 <tr>
                                                     <th>Date </th>
                                                     <th>Name </th>
-                                                    <th>Amount</th>
                                                     <th class="hide-on-print">Actions</th>
                                                 </tr>
                                             </thead>
@@ -64,16 +63,14 @@
                                                                 <td>
                                                                     <%= row.name %>
                                                                 </td>
-
-                                                                <td><%= row.amount %></td>
                                                             
                                                                 <td class="hide-on-print">
                                                                     <ul>
-                                                                        <li style="display: contents;">
+                                                                        <!-- <li style="display: contents;">
                                                                             <a href="/admin/auth/update-bank-data/<%= row.id %>">
                                                                                 <i class="ri-pencil-line"></i>
                                                                             </a>
-                                                                        </li>                                                      
+                                                                        </li>                                                       -->
                                                                         <li style="display: contents;">
                                                                             <a href="/admin/auth/transcation-list/<%= row.name %>">
                                                                                 <i class="ri-eye-line"></i>

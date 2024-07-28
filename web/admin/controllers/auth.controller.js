@@ -133,10 +133,34 @@ module.exports = {
       const totalProfit = totalClientBalance - OrderOther;
       console.log("Total Profit", totalProfit);
       const paid_expenses = billed_expenses - unpaid_expenses;  
-      const cash = await models.ProductModel.Bank.findOne({name : "CASH"}) || 0.0;
-      const sam = await models.ProductModel.Bank.findOne({name : "IDFC SAM"}) || 0.0;
-      const swati = await models.ProductModel.Bank.findOne({name : "IDFC SWATI"}) || 0.0;
-      const net = await models.ProductModel.Bank.findOne({name : "NET BANK"}) || 0.0;
+      
+      const cash_transactions = await models.ProductModel.Transaction.find({
+        type: "CASH"
+      })
+      const sam_transactions = await models.ProductModel.Transaction.find({
+        type: "IDFC SAM"
+      })
+      const swati_transactions = await models.ProductModel.Transaction.find({
+        type: "IDFC SWATI"
+      })
+      const net_transactions = await models.ProductModel.Transaction.find({
+        type: "NET BANK"
+      })
+
+      const credit_cash = cash_transactions.reduce((acc, transaction) => acc + parseFloat(transaction.credited), 0)
+      const credit_sam = sam_transactions.reduce((acc, transaction) => acc + parseFloat(transaction.credited), 0)
+      const credit_swati = swati_transactions.reduce((acc, transaction) => acc + parseFloat(transaction.credited), 0)
+      const credit_net = net_transactions.reduce((acc, transaction) => acc + parseFloat(transaction.credited), 0)
+
+      const debit_cash = cash_transactions.reduce((acc, transaction) => acc + parseFloat(transaction.debited), 0)
+      const debit_sam = sam_transactions.reduce((acc, transaction) => acc + parseFloat(transaction.debited), 0)
+      const debit_swati = swati_transactions.reduce((acc, transaction) => acc + parseFloat(transaction.debited), 0)
+      const debit_net = net_transactions.reduce((acc, transaction) => acc + parseFloat(transaction.debited), 0)
+
+      const cash = (credit_cash - debit_cash).toFixed(2);
+      const sam = (credit_sam - debit_sam).toFixed(2);
+      const swati = (credit_swati - debit_swati).toFixed(2);
+      const net = (credit_net - debit_net).toFixed(2);
 
       console.log("Total Expense Amount ------------- ", totalExpense);
       console.log("Total Billing Amount ------------- ", totalOrder);
@@ -491,9 +515,16 @@ module.exports = {
       const transactions = await models.ProductModel.Transaction.find({
         type: bankName
       }).sort({ date: -1, created_date: -1 });
-  
+      
+      // I want total credit 
+      const totalCredit = transactions.reduce((acc, transaction) => acc + parseFloat(transaction.credited), 0);
+      console.log("totalCredit",totalCredit)
+      const totalDebit = transactions.reduce((acc, transaction) => acc + parseFloat(transaction.debited), 0);
+      console.log("totalDebit",totalDebit)
+      const totalBalance = totalCredit - totalDebit;
+      console.log("totalBalance",totalBalance)
       // Segregate transactions based on debit and credit for the bank
-      res.render('admin/banks/transaction', { user: user, transactions, error: "Transaction Lists" });
+      res.render('admin/banks/transaction', { user: user, totalBalance,transactions, totalCredit, totalDebit,error: "Transaction Lists" });
   
     } catch (err) {
       console.log(err)

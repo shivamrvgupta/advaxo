@@ -3,8 +3,14 @@
 
 <style>
     .theme-table tbody tr th:last-child, .theme-table tbody tr td:last-child {
-    text-align: center;
-}
+        text-align: center;
+    }
+
+    .totalBal{
+        border: 1px solid black;
+        padding: 8px;
+        font-size: 14px;
+    }
 </style>
 
             <!-- index body start -->
@@ -20,6 +26,13 @@
                                             <div class="title-header option-title">
                                                 <h2>Transaction History</h2>
                                                 <div class="d-inline-flex hide-on-print">
+                                                    <div class="table-responsive table-details">
+                                                        <div class="totalBal">
+                                                            Total Available Amount : <%= parseFloat(totalBalance).toFixed(2) %>  
+                                                        </div>    
+                                                    </div>
+                                                </div>
+                                                <div class="d-inline-flex hide-on-print">
                                                     <button class="btn btn-primary text-white print-button rounded ms-2" onclick="printInvoice()" > Print </button>
                                                 </div>
                                             </div>
@@ -30,7 +43,6 @@
                                                     <th>To</th>
                                                     <th>Credit</th>
                                                     <th>Debit</th>
-                                                    <th>Amount</th>
                                                     <th>Status</th>
                                                 </tr>
                                             </thead>
@@ -45,10 +57,15 @@
                                                                 <td><%= row.to %></td>
                                                                 <td><%= row.credited %></td>
                                                                 <td><%= row.debited %></td>
-                                                                <td><%= row.available %></td>
                                                                 <td><p><%= row.status ? "Success" : "Failure" %></p></td>
                                                             </tr>
                                                         <% }) %>
+                                                            <tr>
+                                                                <td colspan="3" class="text-center">Total Balance</td>
+                                                                <td> <%= parseFloat(totalCredit).toFixed(2) %> </td>
+                                                                <td> <%= parseFloat(totalDebit).toFixed(2) %> </td>
+                                                                <td> <%= parseFloat(totalBalance).toFixed(2) %>  </td>
+                                                            </tr>
                                                     <% }else{ %>
                                                         <tr>
                                                             <td colspan="7" class="text-center">No Transactions Available</td>
