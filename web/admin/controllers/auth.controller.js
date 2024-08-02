@@ -243,7 +243,6 @@ module.exports = {
                   transaction_id: cbank._id, // Assuming bank _id is unique identifier for transaction
                   credited: parseFloat(server.amount),
                   debited: 0.0,
-                  available: parseFloat(server.amount),
                   date: server.date
               };
   
@@ -265,7 +264,6 @@ module.exports = {
                   transaction_id: uuidv4(),
                   credited: parseFloat(server.amount),
                   debited: 0.0,
-                  available: parseFloat(banks.amount),
                   date: server.date
               };
   
@@ -470,7 +468,6 @@ module.exports = {
               transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
               debited: amount,
               credited: 0.0,
-              available: Number(from.amount),
               date: server.date || formattedDate
           };
           
@@ -486,7 +483,6 @@ module.exports = {
               transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
               debited: 0.0,
               credited: amount,
-              available: Number(to.amount),
               date: server.date || formattedDate
           };
           

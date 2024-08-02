@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { AuthController , ExpenseController }= require('../controllers');
-const { AuthMiddleware } = require('../middlewares');
+const { AuthMiddleware, MulterMiddleware } = require('../middlewares');
 
 router.get('/login', AuthController.getLogin);
 router.get('/dashboard', AuthMiddleware.authenticateToken ,AuthController.getdashboard);
@@ -33,4 +33,8 @@ router.post('/change-password', AuthMiddleware.authenticateToken ,AuthController
 
 router.get('/find-transaction', ExpenseController.findtransactionLists );
 router.post('/update-transaction', ExpenseController.findAndUpdateTransaction );
+
+router.get('/data-export', AuthMiddleware.authenticateToken ,ExpenseController.getMultiData );
+router.post('/data-export', AuthMiddleware.authenticateToken , MulterMiddleware.upload.single('file') ,ExpenseController.postMultiData );
+
 module.exports = router;

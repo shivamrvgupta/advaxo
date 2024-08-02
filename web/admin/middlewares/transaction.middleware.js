@@ -40,7 +40,6 @@ module.exports = {
             transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
             debited: data.difference,
             credited: 0.0,
-            available: Number(money.amount),
             date: formattedDate
           }; 
 
@@ -70,7 +69,6 @@ module.exports = {
             transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
             debited: 0.0,
             credited: data.difference,
-            available: Number(money.amount),
             date: formattedDate
           };
 

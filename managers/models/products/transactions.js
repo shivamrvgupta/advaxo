@@ -36,14 +36,6 @@ const transactionSchema = new mongoose.Schema({
             return parseFloat(value).toFixed(2);
         }
     },
-    available : {
-        type: Number,
-        required: true,
-        default : 0.0,
-        set: function(value) {
-            return parseFloat(value).toFixed(2);
-        }
-    },
     status : {
         type : Boolean,
         default : true

@@ -4,6 +4,8 @@ const { v4: uuidv4 } = require('uuid');
 const { format, addDays, isSameISOWeek, getISOWeek } = require('date-fns');
 const {generateAccessToken} = require('../middlewares/auth.middleware');
 const models = require('../../../managers/models');
+const {DataHelper} = require('../../../managers/helpers');
+const path = require('path');
 const currentDate = new Date();
 
 const formattedDate = currentDate.toISOString().slice(0, 10); // Extract YYYY-MM-DD from ISO string
@@ -58,5 +60,47 @@ module.exports = {
           res.redirect('/admin/auth/all-banks?error=Transaction Lists failed');
         }
     },
+
+    getMultiData : async (req, res) => {
+      const user = req.user;
+
+      if (!user) {
+        return res.render('a-login', {
+          title: "Advaxo",
+          error: "User Not Found"
+        });
+      }
+      
+      res.render('admin/settings/multi-data', {
+        title: "Advaxo",
+        error: "Multi Data",
+        user : user
+      });
+    },
+
+    postMultiData : async (req, res) => {
+      console.log('Request Body:', req.body);
+      console.log('Request File:', req.file);
+    
+      if (!req.file) {
+        return res.status(400).json({ error: 'File is required' });
+      }
+    
+      const filePath = path.join(__dirname, '../../../src/uploads/default/default', req.file.filename);
+      const ext = path.extname(req.file.originalname);
+    
+      try {
+        if (ext === '.csv') {
+          await DataHelper.handleCSV(filePath);
+        } else if (ext === '.xls' || ext === '.xlsx') {
+          await DataHelper.handleXLS(filePath);
+        } else {
+          return res.status(400).json({ error: 'Invalid file type' });
+        }
+        res.json({ message: 'Data successfully inserted' });
+      } catch (err) {
+        res.status(500).json({ error: err.message });
+      }
+    }
 } 
 

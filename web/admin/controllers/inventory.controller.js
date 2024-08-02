@@ -629,7 +629,7 @@ module.exports = {
           })   
         }
 
-        const vendor = await models.ProductModel.InventoryBill.find().populate('vendor_id').sort({ date: -1 });
+        const vendor = await models.ProductModel.InventoryBill.find().populate('vendor_id').sort({ created_date: -1 });
 
         res.render('admin/products/all-bills',{user ,vendor,error: "All Bills"})
       }catch(err){
@@ -700,7 +700,6 @@ module.exports = {
           transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
           debited: server.amount,
           credited: 0.0,
-          available: Number(money.amount),
           date: server.date || formattedDate
         }; 
 
@@ -789,7 +788,11 @@ module.exports = {
         const payment_method = server.payment_method || payment.payment_method ;
         const date = server.date || payment.date || formattedDate;
 
-        const difference = Number(payment.amount) - Number(server.amount);
+        const difference = Math.abs(Number(payment.amount) - Number(server.amount));
+        // If difference is less than 0
+        console.log("Difference",difference);
+        
+
         console.log("Remaining Balance",orders.remaining_balance);
         console.log("Remaining Balance",Number(orders.remaining_balance) + difference);
         console.log(difference);
@@ -813,7 +816,6 @@ module.exports = {
             transaction_id: uuidv4(),
             debited: difference,
             credited: 0.0,
-            available: Number(from.amount),
             date: date
           };
 
@@ -842,7 +844,6 @@ module.exports = {
             transaction_id: uuidv4(),
             debited:  0.0,
             credited: difference,
-            available: Number(from.amount),
             date: date
           };
         
@@ -925,7 +926,6 @@ module.exports = {
           transaction_id: uuidv4(),
           debited: 0.0,
           credited: payment.amount,
-          available: Number(from.amount),
           date: formattedDate
         };
         const creditedTransaction = new models.ProductModel.Transaction(creditedTransactionData);
@@ -1123,7 +1123,6 @@ module.exports = {
                 transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
                 debited: 0.0,
                 credited: payment.amount,
-                available: Number(from.amount),
                 date: formattedDate
               }; 
               

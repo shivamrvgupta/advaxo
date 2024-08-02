@@ -460,7 +460,6 @@ module.exports = {
         transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
         debited: 0.0,
         credited: server.amount,
-        available: Number(money.amount),
         date: server.date || formattedDate
       }; 
 
@@ -657,7 +656,7 @@ module.exports = {
       const payment_method = server.payment_method || payment.payment_method ;
       const date = server.date || payment.date || formattedDate;
 
-      const difference = Number(payment.amount) - Number(server.amount);
+      const difference = Math.abs(Number(payment.amount) - Number(server.amount));
       console.log(difference);
 
       if (payment.amount < server.amount) {
@@ -677,7 +676,6 @@ module.exports = {
           transaction_id: uuidv4(),
           debited: 0.0,
           credited: credit,
-          available: Number(from.amount),
           date: date
         };
       
@@ -700,7 +698,6 @@ module.exports = {
           transaction_id: uuidv4(),
           debited: difference,
           credited: 0.0,
-          available: Number(from.amount),
           date: date
         };
       
@@ -734,7 +731,6 @@ module.exports = {
             transaction_id: uuidv4(),
             debited: amount,
             credited: 0.0,
-            available: Number(from.amount),
             date: server.date || formattedDate
           };
       
@@ -750,7 +746,6 @@ module.exports = {
             transaction_id: uuidv4(),
             debited: 0.0,
             credited: amount,
-            available: Number(to.amount),
             date: server.date || formattedDate
           };
           console.log(creditTransactionData);
@@ -826,7 +821,6 @@ module.exports = {
         transaction_id: uuidv4(),
         debited: payment.amount,
         credited: 0.0,
-        available: Number(from.amount),
         date: formattedDate
       };
       const creditedTransaction = new models.ProductModel.Transaction(creditedTransactionData);
@@ -1117,7 +1111,6 @@ module.exports = {
           transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
           debited: server.amount,
           credited: 0.0,
-          available: Number(money.amount),
           date: server.date || formattedDate
         }; 
         
@@ -1188,15 +1181,13 @@ module.exports = {
       }
 
       const server = req.body
+      console.log("Data from Server ",server)
       const expenseId = req.params.expenseId;
 
       const expense = await models.ProductModel.GenralExpense.findById(expenseId);
         
 
-      const difference = Number(expense.amount) - Number(server.amount);
-        console.log(server.amount);
-        console.log(difference);
-        console.log(expense.amount);
+      const difference = Math.abs(Number(expense.amount) - Number(server.amount));
         const payment_method = server.payment_method || expense.mode_of_payment ;
         const date = server.date || expense.date || formattedDate;
 
@@ -1205,10 +1196,6 @@ module.exports = {
 
         const from = await models.ProductModel.Bank.findOne({ name : payment_method});
 
-        from.amount = (Number(from.amount) + Number(expense.amount)) - Number(server.amount);
-
-        await from.save();
-
         const debitTransactionData = {
           type: payment_method, // You can adjust the type based on your requirements
           from: "Issued Expenses",
@@ -1216,7 +1203,6 @@ module.exports = {
           transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
           debited: difference,
           credited: 0.0,
-          available: Number(from.amount),
           date: date
         }; 
 
@@ -1225,9 +1211,6 @@ module.exports = {
       }else if(expense.amount > server.amount){
         const from = await models.ProductModel.Bank.findOne({ name : payment_method });
 
-        from.amount = (Number(from.amount) + Number(expense.amount)) - Number(server.amount);
-        await from.save();
-
         const debitTransactionData = {
           type: payment_method, // You can adjust the type based on your requirements
           from: "Issued Expenses",
@@ -1235,58 +1218,45 @@ module.exports = {
           transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
           debited: 0.0,
           credited: difference,
-          available: Number(from.amount),
           date: date
         }; 
 
         const debitTransaction = new models.ProductModel.Transaction(debitTransactionData);
         await debitTransaction.save();
       }else{
-        console.log(server.payment_method);
+        console.log("Payment Method",server.payment_method);
         if(expense.mode_of_payment === "Unpaid" && (server.payment_method === "CASH" || server.payment_method === "IDFC SWATI" || server.payment_method === "IDFC SAM" || server.payment_method === "NET BANK")){
           console.log("UNPAID TO CASH")
           const from = await models.ProductModel.Bank.findOne({ name: server.payment_method });
-            from.amount = Number(from.amount) - Number(server.amount);
-            await from.save();
-            
+
           const debitTransactionData = {
             type: server.payment_method,
-            from: "Issued Expenses",
+            from: `Expense -- ${server.item}`,
             to: `${server.item}`,
             transaction_id: uuidv4(),
             debited: Number(server.amount),
             credited: 0.0,
-            available: Number(from.amount),
             date: date
           }; 
           const debitTransaction = new models.ProductModel.Transaction(debitTransactionData);
           await debitTransaction.save();
-        }else if ( server.payment_method !== "Unpaid" ) {
-          console.log("PAID TO PAID")
-          const from = await models.ProductModel.Bank.findOne({ name: server.payment_method});
-          const to = await models.ProductModel.Bank.findOne({ name: expense.payment_method});
-
+        }else if ( server.payment_method !== false ) {
+          const from = await models.ProductModel.Bank.findOne({ name: expense.mode_of_payment});
+          const to = await models.ProductModel.Bank.findOne({ name: server.payment_method});
+          console.log("From -- " + from)
+          console.log("To -- " + to)
           // Calculate the amount to be transferred
-          const amount = Number(server.total_amount);
-          console.log(amount)
-
-          // Update the 'from' bank's amount (debit)
-          from.amount = Number(from.amount) - amount;
-          await from.save();
-
-          // Update the 'to' bank's amount (credit)
-          to.amount = Number(to.amount) + amount;
-          await to.save();
+          const amount = Number(server.amount);
+          console.log(amount);
 
           // Create a transaction record for debit
           const debitTransactionData = {
               type: from.name, // You can adjust the type based on your requirements
-              from: "Purchase",
-              to: `Product -- ${server.name}`,
+              from: "Other Expenses",
+              to: `Expense -- ${server.item}`,
               transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
               debited: amount,
               credited: 0.0,
-              available: Number(from.amount),
               date: server.date || formattedDate
           };
 
@@ -1297,12 +1267,11 @@ module.exports = {
           // Create a transaction record for credit
           const creditTransactionData = {
               type: to.name, // You can adjust the type based on your requirements
-              from: "Purchase Refund",
-              to: `Product -- ${server.name}`,
+              from: "Expense Refund",
+              to: `Expense -- ${server.item}`,
               transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
               debited: 0.0,
               credited: amount,
-              available: Number(to.amount),
               date: server.date || formattedDate
           };
           console.log(creditTransactionData)
@@ -1312,18 +1281,13 @@ module.exports = {
           console.log("PAID TO UNPAID")
           const from = await models.ProductModel.Bank.findOne({ name : expense.payment_method});
         
-          from.amount = Number(from.amount) + Number(server.total_amount);
-        
-          await from.save();
-        
           const debitTransactionData = {
             type: expense.payment_method, // You can adjust the type based on your requirements
-            from: "Purchase Refund",
-            to: `Product -- ${server.name}`,
+            from: "Expense Refund",
+            to: `Expense -- ${server.item}`,
             transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
             debited: 0.0,
             credited: Number(server.total_amount),
-            available: Number(from.amount),
             date: formattedDate
           }; 
           
@@ -1404,7 +1368,6 @@ module.exports = {
           transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
           debited: 0.0,
           credited: expense.amount,
-          available: Number(from.amount),
           date: formattedDate
         }; 
         
@@ -1592,7 +1555,6 @@ module.exports = {
             transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
             debited: 0.0,
             credited: expense.amount,
-            available: Number(from.amount),
             date: formattedDate
           }; 
           
@@ -1622,7 +1584,6 @@ module.exports = {
             transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
             debited: payment.amount,
             credited: 0.0,
-            available: Number(from.amount),
             date: formattedDate
           }; 
           
