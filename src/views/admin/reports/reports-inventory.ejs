@@ -48,6 +48,7 @@
                                         <div class="col-sm-9 col-lg-10">
                                             <div class="custom-dropdown">
                                                 <input class="form-control" type="text" id="customerName" name="name" placeholder="Select or Enter Your Vendor name">
+                                                <input type="hidden" name="customer_id" style="display: none;" id="customer_id">
                                                 <ul class="dropdown-menu" style="width: 97%;" id="customerDropdown">
                                                     <% if (vendors != '') { %>        
                                                         <% vendors.forEach((row, index) => { %> 
@@ -92,6 +93,7 @@
                                             <div class="col-sm-9 col-lg-10">
                                                 <div class="custom-dropdown">
                                                     <input class="form-control" type="text" id="customerName" name="name" placeholder="Select or Enter Your Vendor name">
+                                                    <input type="hidden" name="customer_id" style="display: none;" id="customer_id">
                                                     <ul class="dropdown-menu" style="width: 97%;" id="customerDropdown">
                                                         <% if (vendors != '') { %>        
                                                             <% vendors.forEach((row, index) => { %> 
@@ -359,6 +361,7 @@ var emailInput = document.getElementById('email');
 var phoneInput = document.getElementById('phone');
 var addressInput = document.getElementById('address');
 var customerNameInput = document.getElementById('customerName');
+var customerIdInput = document.getElementById('customer_id');
 var tokenInput = document.getElementById('token');
 
 // Add an event listener to the dropdown menu
@@ -381,7 +384,9 @@ dropdownMenu.addEventListener('click', function(e) {
                 emailInput.value = data.data.email;
                 phoneInput.value = data.data.phone;
                 addressInput.value = data.data.address;
+                customerIdInput.value = data.data._id;
                 customerNameInput.value = data.data.name; 
+                
                 tokenInput.value = data.data.token; 
             })
             .catch(error => console.error('Error fetching customer data:', error));

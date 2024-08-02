@@ -1179,7 +1179,7 @@ module.exports = {
         })   
       }
 
-      const name = req.body.name;
+      const name = req.body.customer_id;
       console.log(name);
       if(!name){
         res.render('admin/search',{
@@ -1190,14 +1190,9 @@ module.exports = {
 
 
       const customers = await models.ProductModel.Vendor.find();
-      let customer_id = null;
-      customers.forEach(async (customer) => {
-        if(customer.name.trim().toLowerCase() === name.trim().toLowerCase()){
-          console.log(`Found customer with name: ${customer.name}`);
-          customer_id = customer._id;
-          console.log(customer_id);
-        }
-      })
+      
+      const vendors = await models.ProductModel.Vendor.findOne({_id : name});
+      const customer_id = vendors._id;
 
       const bills = await models.ProductModel.InventoryBill.find({vendor_id : customer_id}).populate("vendor_id").sort({ created_date : -1 });
 
