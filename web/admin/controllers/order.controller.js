@@ -1700,7 +1700,7 @@ module.exports = {
         })   
       }
 
-      const name = req.body.name;
+      const name = req.body.customer_id;
       console.log(name);
       if(!name){
         res.render('admin/search',{
@@ -1709,19 +1709,15 @@ module.exports = {
         })   
       }
 
+      const client = await models.CustomerModel.Client.find({});
+      const customers = await models.CustomerModel.Client.findOne({_id : name});
 
-      const customers = await models.CustomerModel.Client.find();
-      let customer_id = null;
-      customers.forEach(async (customer) => {
-        if(customer.name.trim().toLowerCase() === name.trim().toLowerCase()){
-          console.log(`Found customer with name: ${customer.name}`);
-          customer_id = customer._id;
-          console.log(customer_id);
-        }
-      })
+      console.log(customers);
+      const customer_id = customers._id;
 
       const orders = await models.ProductModel.Order.find({client_id : customer_id}).populate("client_id").sort({date : -1});
 
+      console.log(orders);
       let overallGrandTotal = 0.0;
       let overallRemainingBalance = 0.0;
       let overallClientBalance = 0.0;
@@ -1751,7 +1747,7 @@ module.exports = {
           total_orders : totalOrders        
         }
 
-        res.render('admin/reports/reports-order',{user, inventory : orders,clients : customers, data, options,  error: "Reports"})
+        res.render('admin/reports/reports-order',{user, inventory : orders,clients : client, data, options,  error: "Reports"})
       
     }catch(err){
       console.log(err)
