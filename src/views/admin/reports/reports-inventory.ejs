@@ -372,22 +372,15 @@ dropdownMenu.addEventListener('click', function(e) {
         var customerId = e.target.getAttribute('value');
 
         // Make an API call to fetch the user data based on the customer ID
-        fetch('/admin/auth/get-user/' + customerId)
+        fetch('/admin/auth/get-vendor/' + customerId)
             .then(response => response.json())
             .then(data => {
-                console.log(data)
-                console.log(data)
                 console.log(data.data.phone)
                 console.log(data.data.name)
-                console.log(data.data.token)
+                console.log(data.data._id)
                 // Update the input fields with the fetched user data
-                emailInput.value = data.data.email;
-                phoneInput.value = data.data.phone;
-                addressInput.value = data.data.address;
                 customerIdInput.value = data.data._id;
                 customerNameInput.value = data.data.name; 
-                
-                tokenInput.value = data.data.token; 
             })
             .catch(error => console.error('Error fetching customer data:', error));
     }

@@ -1017,7 +1017,7 @@ module.exports = {
         })   
       }
 
-      const expenses = await models.ProductModel.GenralExpense.find({}).sort({ created_date: -1 });
+      const expenses = await models.ProductModel.GenralExpense.find({}).sort({ date: -1,created_date: -1 });
 
       res.render('admin/expense/other-expenses', {
         user,

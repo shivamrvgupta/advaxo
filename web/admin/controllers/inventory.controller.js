@@ -1171,7 +1171,7 @@ module.exports = {
     const referer = req.get('Referer');
     try{
       const user = req.user;
-      
+      console.log(req.body);
       if(!user){
         res.render('a-login',{
           title: "Advaxo",
@@ -1190,7 +1190,6 @@ module.exports = {
 
 
       const customers = await models.ProductModel.Vendor.find();
-      
       const vendors = await models.ProductModel.Vendor.findOne({_id : name});
       const customer_id = vendors._id;
 
