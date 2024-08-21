@@ -1,0 +1,492 @@
+<%- include('../../partials/main', { pageTitle: 'Payment In' }) %>
+
+<style>
+    .inline {
+        display: inline-flex;
+    }
+
+    #select2-product-container,
+    #select2-unit-container {
+        font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+    }
+
+    .mb-4 {
+        justify-content: space-evenly;
+    }
+
+    .completebutton {
+        align-items: end;
+        width: 30%;
+        margin-right: 2rem;
+    }
+
+    .addbutton {
+        align-items: flex-end;
+        width: 30%;
+    }
+</style>
+
+<div class="page-body">
+    <!-- tracking table start -->
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="title-header title-header-block package-card">
+                            <div>
+                                <h5>Payment In </h5>
+                            </div>
+
+                            <form class="theme-form theme-form-2 mega-form" >
+                                <div class="add-product">
+                                    <div class="card-header-1"></div>
+
+                                    <div class="mb-4 row align-items-center">
+                                        <label class="form-label-title col-lg-2 col-md-3 mb-0">Customer Name</label>
+                                        <div class="col-sm-9 col-lg-10">
+                                            <div class="custom-dropdown">
+                                                <input class="form-control" type="text" id="customerName" name="name"
+                                                    placeholder="Select or Enter Your Customer name" required>
+                                                <input type="hidden" name="customer_id" style="display: none;"
+                                                    id="customer_id">
+                                                <ul class="dropdown-menu" style="width: 97%;" id="customerDropdown">
+                                                    <% if (clients != '') { %>
+                                                    <% clients.forEach((row, index) => { %>
+                                                        <li value="<%= row._id %>" class="form-control w-100"><%= row.name %></li>
+                                                        <span style="display: none;" id="selected_user"><%= row._id %></span>
+                                                    <% }) %>
+                                                    <% } else { %>
+                                                    <li value="none" class="disabled form-control w-100">No Such Existing Customer</li>
+                                                    <% } %>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="mb-4 row align-items-center">
+                                                <label class="form-label-title col-sm-3 mb-0">Amount</label>
+                                                <div class="col-sm-9">
+                                                    <input class="form-control" type="text" oninput="validateFloat(this)"
+                                                        placeholder="Enter the Amount" name="amount" id="amount" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="col-sm-12">
+                                                <div class="mb-4 row align-items-center">
+                                                    <label class="form-label-title col-sm-3 mb-0">Date</label>
+                                                    <div class="col-sm-9">
+                                                        <input class="form-control" type="date" name="date" id="date" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4 row align-items-center">
+                                        <label class="col-sm-3 col-form-label form-label-title">Payment Method</label>
+                                        <div class="col-sm-9">
+                                            <select class="js-example-basic-single w-100 payment_method" name="payment_method" id="unit">
+                                                <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="none" disabled selected>-- Select Payment Method --</option> 
+                                                <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="CASH">CASH</option> 
+                                                <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="IDFC SAM">IDFC SAM</option> 
+                                                <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="IDFC SWATI">IDFC SWATI</option> 
+                                                <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="NET BANK">NET BANK</option> 
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4 row align-items-center">
+                                        <button class="btn btn-solid continue-btn" id="AttachWorkOrder" disabled>Find</button>
+                                    </div>
+
+                                    <input type="hidden" id="paymentData" name="paymentData">
+
+                                    <!-- Modify the "Allocate Payment" button to handle data submission -->
+                                    <div class="mb-4 row align-items-center">
+                                        <button class="btn btn-solid disburse-btn" style="display: none;" id="Submit">Allocate Payment</button>
+                                    </div>
+                                </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Amount Display -->
+    <div id="totalAmountContainer" class="mb-4" style="text-align: center; display: none;">
+        <h4>Remaining Amount: <span id="remainingAmount"></span></h4>
+    </div>
+
+    <div class="container-fluid" id="orderContainer" style="display: none;">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card card-table">
+                    <div class="card-body">
+                        <div class="table-responsive table-product">
+                            <table class="table all-package theme-table" id="table_id">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align: center;">Select</th>
+                                        <th style="text-align: center;">Date</th>
+                                        <th style="text-align: center;">Order No</th>
+                                        <th style="text-align: center;">Order Cost</th>
+                                        <th style="text-align: center;">Received Amount</th>
+                                        <th style="text-align: center;">Due Balance</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="orderTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- tracking table end -->
+</form>
+
+    <div class="container-fluid">
+        <!-- footer start-->
+        <%- include('../../partials/footer')%>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+    const customerNameInput = $('#customerName');
+    const amountInput = $('#amount');
+    const dateInput = $('#date');
+    const findButton = $('#AttachWorkOrder');
+    const orderContainer = $('#orderContainer');
+    const totalAmountContainer = $('#totalAmountContainer');
+    const remainingAmountSpan = $('#remainingAmount');
+    let remainingAmount = 0;
+
+    // Enable Find button if all required fields are filled
+    function checkFormCompletion() {
+        const isFormComplete = customerNameInput.val() && amountInput.val() && dateInput.val();
+        findButton.prop('disabled', !isFormComplete);
+    }
+
+    // Add event listeners for input changes
+    customerNameInput.on('input', checkFormCompletion);
+    amountInput.on('input', checkFormCompletion);
+    dateInput.on('input', checkFormCompletion);
+
+    // Switch inputs to readonly after clicking Find button
+    findButton.click(function (e) {
+        e.preventDefault(); // Prevent form submission
+        const customerId = $('#customer_id').val();
+        if (!customerId) {
+            alert('Please select a customer.');
+            return;
+        }
+
+        // Set inputs to readonly
+        customerNameInput.prop('readonly', true);
+        amountInput.prop('readonly', true);
+        dateInput.prop('readonly', true);
+
+        // Get and display the remaining amount
+        remainingAmount = parseFloat(amountInput.val());
+        remainingAmountSpan.text(remainingAmount.toFixed(2));
+        totalAmountContainer.show();
+
+        // Make the AJAX call to get unpaid orders
+        $.ajax({
+            url: '/admin/order/get-unpaid-orders',  // Your server route
+            type: 'GET',
+            data: { client_id: customerId },
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            success: function (response) {
+                if (response.data && response.data.length > 0) {
+                    // Clear the table
+                    $('#orderTableBody').empty();
+
+                    // Populate the table with orders
+                    response.data.forEach(data => {
+                        const remainingBalance = (data.grand_total - data.remaining_balance).toFixed(2);
+                        $('#orderTableBody').append(`
+                            <tr>
+                                <td style="text-align: center;">
+                                    <input type="checkbox" name="order_id" value="${data.order_id}" class="orderCheckbox" data-due="${data.remaining_balance}">
+                                </td>
+                                <td style="text-align: center;">${data.order_date}</td>
+                                <td style="text-align: center;">
+                                    <a href="/admin/order/order-summary/${data.order_id}">${data.order_id}</a>
+                                </td>
+                                <td style="text-align: center;">${data.grand_total}</td>
+                                <td style="text-align: center;">${remainingBalance}</td>
+                                <td style="text-align: center;" class="due-balance">${data.remaining_balance}</td>
+                            </tr>
+                        `);
+                    });
+
+                    // Show the table
+                    orderContainer.show();
+                    findButton.hide();
+                    $('.disburse-btn').show();
+
+                    // Handle checkbox clicks
+                    $('.orderCheckbox').on('change', function () {
+                        let dueAmount = parseFloat($(this).data('due'));
+                        let balanceCell = $(this).closest('tr').find('.due-balance');
+
+                        if (this.checked) {
+                            if (remainingAmount >= dueAmount) {
+                                remainingAmount -= dueAmount;
+                                balanceCell.text('0.00'); // Fully paid
+                                $(this).closest('tr').find('td').css('background-color', '#d4edda'); // Green for fully paid
+                            } else {
+                                dueAmount -= remainingAmount;
+                                balanceCell.text(dueAmount.toFixed(2)); // Partially paid
+                                remainingAmount = 0;
+                                $(this).closest('tr').find('td').css('background-color', '#fff3cd'); // Yellow for partially paid
+                            }
+                        } else {
+                            // Uncheck logic (reverse the amount changes)
+                            const originalDue = parseFloat($(this).data('due'));
+                            let previousBalance = parseFloat(balanceCell.text());
+                            remainingAmount += originalDue - previousBalance;
+
+                            balanceCell.text(originalDue.toFixed(2)); // Revert to original due balance
+                            $(this).closest('tr').find('td').css('background-color', ''); // Reset background color
+                        }
+
+                        remainingAmountSpan.text(remainingAmount.toFixed(2));
+
+                        // Disable further checkboxes if amount is fully allocated
+                        $('.orderCheckbox').each(function () {
+                            if (!this.checked && remainingAmount <= 0) {
+                                $(this).prop('disabled', true);
+                            } else {
+                                $(this).prop('disabled', false);
+                            }
+                        });
+                    });
+                } else {
+                    alert('No payments found for the selected customer.');
+                }
+            },
+            error: function (err) {
+                console.error(err);
+                alert('An error occurred while fetching payment data.');
+            }
+        });
+    });
+});
+
+// Function to validate and restrict input to float values
+function validateFloat(floatField) {
+    floatField.value = floatField.value.replace(/[^0-9.]/g, '');
+}
+
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('#Submit').click(function (e) {
+            e.preventDefault(); // Prevent form submission
+    
+            // Collect all the selected orders' data
+            let paymentData = [];
+    
+            $('.orderCheckbox:checked').each(function () {
+                let orderRow = $(this).closest('tr');
+                let orderId = $(this).val();
+                let orderDate = orderRow.find('td:nth-child(2)').text().trim();
+                let orderCost = orderRow.find('td:nth-child(4)').text().trim();
+                let receivedAmount = orderRow.find('td:nth-child(5)').text().trim();
+                let dueBalance = orderRow.find('.due-balance').text().trim();
+    
+                paymentData.push({
+                    order_id: orderId,
+                    order_date: orderDate,
+                    order_cost: parseFloat(orderCost),
+                    received_amount: parseFloat(receivedAmount),
+                    due_balance: parseFloat(dueBalance)
+                });
+            });
+    
+            // Store the data in the hidden input field as a JSON string
+            $('#paymentData').val(JSON.stringify(paymentData));
+    
+            // Submit the form (uncomment if you want to submit traditionally)
+            // this.form.submit();
+    
+            // Alternatively, you can send the data via AJAX
+            $.ajax({
+                url: '/admin/auth/disbursed-payment',
+                type: 'POST',
+                data: {
+                    paymentData: $('#paymentData').val(),
+                    customer_id: $('#customer_id').val(),
+                    amount: $('#amount').val(),
+                    date: $('#date').val(),
+                    payment_method : $('.payment_method').val(),
+                },
+                success: function (response) {
+                    alert('Payment allocated successfully!');
+                    // redirect or clear the form after success
+                    location.reload();
+                    console.log(response);
+                    console.log('Payment allocated successfully!');
+                },
+                error: function (err) {
+                    console.error('Error during payment allocation:', err);
+                    alert('An error occurred while allocating the payment.');
+                }
+            });
+        });
+    });
+    </script>
+
+<script>
+    // Get the dropdown menu
+var dropdownMenu = document.getElementById('customerDropdown');
+
+// Get the input fields
+var emailInput = document.getElementById('email');
+var phoneInput = document.getElementById('phone');
+var addressInput = document.getElementById('address');
+var customerNameInput = document.getElementById('customerName');
+var customerIdInput = document.getElementById('customer_id');
+var tokenInput = document.getElementById('token');
+
+// Add an event listener to the dropdown menu
+dropdownMenu.addEventListener('click', function(e) {
+    // Check if the clicked element is an li element
+    if (e.target && e.target.nodeName == 'LI') {
+        // Get the selected customer's ID from the value attribute of the clicked li element
+        var customerId = e.target.getAttribute('value');
+
+        // Make an API call to fetch the user data based on the customer ID
+        fetch('/admin/auth/get-user/' + customerId)
+            .then(response => response.json())
+            .then(data => {
+                // Update the input fields with the fetched user data
+                customerNameInput.value = data.data.name; 
+                customerIdInput.value = data.data._id;
+            })
+            .catch(error => console.error('Error fetching customer data:', error));
+    }
+});
+
+</script>
+<script>
+    $(document).ready(function () {
+        const remainingAmountSpan = $('#remainingAmount');
+        let remainingAmount = 0;
+    
+        // Calculate remaining amount after user inputs the total amount
+        $('#AttachWorkOrder').click(function (e) {
+            e.preventDefault(); // Prevent form submission
+    
+            remainingAmount = parseFloat($('#amount').val());
+            remainingAmountSpan.text(remainingAmount.toFixed(2));
+        });
+    
+        // Handle checkbox clicks
+        $(document).on('change', '.orderCheckbox', function () {
+            let dueAmount = parseFloat($(this).data('due'));
+            let balanceCell = $(this).closest('tr').find('.due-balance');
+            let receivedAmountCell = $(this).closest('tr').find('td:nth-child(5)');
+    
+            if (this.checked) {
+                let allocatedAmount = 0;
+    
+                if (remainingAmount >= dueAmount) {
+                    allocatedAmount = dueAmount;
+                    remainingAmount -= dueAmount;
+                    balanceCell.text('0.00'); // Fully paid
+                    $(this).closest('tr').find('td').css('background-color', '#d4edda'); // Green for fully paid
+                } else {
+                    allocatedAmount = remainingAmount;
+                    dueAmount -= remainingAmount;
+                    balanceCell.text(dueAmount.toFixed(2)); // Partially paid
+                    remainingAmount = 0;
+                    $(this).closest('tr').find('td').css('background-color', '#fff3cd'); // Yellow for partially paid
+                }
+    
+                // Update the Received Amount column
+                receivedAmountCell.text(allocatedAmount.toFixed(2));
+            } else {
+                // Uncheck logic (reverse the amount changes)
+                const originalDue = parseFloat($(this).data('due'));
+                let previousReceivedAmount = parseFloat(receivedAmountCell.text());
+    
+                remainingAmount += previousReceivedAmount; // Restore the previously allocated amount
+    
+                balanceCell.text(originalDue.toFixed(2)); // Revert to original due balance
+                receivedAmountCell.text('0.00'); // Reset received amount
+                $(this).closest('tr').find('td').css('background-color', ''); // Reset background color
+            }
+    
+            remainingAmountSpan.text(remainingAmount.toFixed(2));
+    
+            // Disable further checkboxes if amount is fully allocated
+            $('.orderCheckbox').each(function () {
+                if (!this.checked && remainingAmount <= 0) {
+                    $(this).prop('disabled', true);
+                } else {
+                    $(this).prop('disabled', false);
+                }
+            });
+        });
+    });
+    </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    var inputField = document.getElementById('customerName');
+    var dropdownMenu = document.getElementById('customerDropdown');
+    var options = dropdownMenu.getElementsByTagName('li');
+
+    inputField.addEventListener('input', function() {
+        var filter = inputField.value.toLowerCase();
+        for (var i = 0; i < options.length; i++) {
+            var textValue = options[i].textContent || options[i].innerText;
+            if (textValue.toLowerCase().indexOf(filter) > -1) {
+                options[i].style.display = "";
+            } else {
+                options[i].style.display = "none";
+            }
+        }
+    });
+
+    inputField.addEventListener('click', function() {
+        toggleDropdown();
+    });
+
+    inputField.addEventListener('focus', function() {
+        toggleDropdown();
+    });
+
+    dropdownMenu.addEventListener('click', function(event) {
+        if (event.target.tagName === 'LI') {
+            inputField.value = event.target.textContent;
+            toggleDropdown();
+        }
+    });
+
+    function toggleDropdown() {
+        if (dropdownMenu.style.display === 'none') {
+            dropdownMenu.style.display = 'block';
+        } else {
+            dropdownMenu.style.display = 'none';
+        }
+    }
+    });
+
+</script>
+<%- include('../../partials/end')%>

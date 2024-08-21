@@ -5,6 +5,10 @@ const ist = createdDate.toLocaleString('en-IN', {
   });
 
 const inventPaySchema = new mongoose.Schema({
+    ledger_id : {
+        type: String,
+        required: true
+    },
     bill_no:{
         type: String,
         required: true

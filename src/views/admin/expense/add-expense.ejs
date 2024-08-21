@@ -204,6 +204,7 @@
                         console.log("changes to sqrft")
                         // Enable width, height, and area inputs
                         $('#width, #height, #total_area').prop('disabled', false);
+                        $('#quantity').prop('disabled', false);
                         document.getElementById("product_unit").value = "SQRFT";
                     }else{
                         console.log("changes to nos")
@@ -229,10 +230,6 @@
         fetch(`/admin/inventory/products/${selectedProductId}`)
             .then(response => response.json())
             .then(data => {
-                var available = parseFloat(data.quantity); // Convert string to float
-                console.log(available)
-                console.log(quantity)
-                console.log(data.unit)
                 if(data.unit === "NOS"){
                     if(quantity > data.quantity) {
                         document.getElementById("addProductButton").disabled = true;

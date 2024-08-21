@@ -39,8 +39,8 @@
                                         <thead>
                                             <tr>
                                                 <th style="border: 1px solid black;padding: 8px;font-size: 14px">Total Amount : <%= bill.grand_total %></th>
-                                                <th style="border: 1px solid black;padding: 8px;font-size: 14px">Total Paid : <%= bill.remaining_balance %></th>
-                                                <th style="border: 1px solid black;padding: 8px;font-size: 14px">Total Due : <%= bill.grand_total - bill.remaining_balance %></th>
+                                                <th style="border: 1px solid black;padding: 8px;font-size: 14px">Total Paid : <%= bill.grand_total - bill.remaining_balance %></th>
+                                                <th style="border: 1px solid black;padding: 8px;font-size: 14px">Total Due : <%= bill.remaining_balance %></th>
                                             </tr> 
                                         </thead>
                                     </table>

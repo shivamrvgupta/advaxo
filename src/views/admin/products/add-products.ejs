@@ -60,10 +60,11 @@
                                     <div class="col-sm-9 col-lg-9">
                                         <div class="custom-dropdown">
                                             <input class="form-control" type="text" name="name" id="productInput" placeholder="Select or Enter the product name">
+                                            <input type="hidden" name="product" id="product_id" oninput="getProductData()">
                                             <ul class="dropdown-menu" style="width: 96%;" id="productDropdown">
                                                 <% if (products != '') { %>        
                                                     <% products.forEach((row, index) => { %> 
-                                                        <li class="form-control w-100" value="<%- row._id %>"><%- row.name %></li>
+                                                        <li class="form-control w-100" data-id="<%- row._id %>" data-name="<%- row.name %>"><%- row.name %></li>
                                                         <% }) %>
                                                 <%  } else { %>
                                                     <li class="form-control w-100 disabled" class="disabled">No Products In Inventory</li>
@@ -75,7 +76,7 @@
 
                                 <div class="mb-4 row align-items-center">
                                     <label class="col-sm-3 col-form-label form-label-title">Unit</label>
-                                    <div class="col-sm-9">
+                                    <div class="col-sm-9" id="input">
                                         <select class="js-example-basic-single w-100" name="unit" id="unit">
                                             <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="none" disabled selected>-- Select Unit Type --</option> 
                                             <option style="font-size: calc(14px +(16 - 14)*((100vw - 320px) /(1920 - 320)));" value="SQRFT">SQRFT</option> 
@@ -398,46 +399,81 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-   var inputField = document.getElementById('productInput');
-   var dropdownMenu = document.getElementById('productDropdown');
-   var options = dropdownMenu.getElementsByTagName('li');
+        var inputField = document.getElementById('productInput');
+        var idField = document.getElementById('product_id'); 
+        var dropdownMenu = document.getElementById('productDropdown');
+        var options = dropdownMenu.getElementsByTagName('li');
 
-   inputField.addEventListener('input', function() {
-       var filter = inputField.value.toLowerCase();
-       for (var i = 0; i < options.length; i++) {
-           var textValue = options[i].textContent || options[i].innerText;
-           if (textValue.toLowerCase().indexOf(filter) > -1) {
-               options[i].style.display = "";
-           } else {
-               options[i].style.display = "none";
-           }
-       }
-   });
+        inputField.addEventListener('input', function() {
+            var filter = inputField.value.toLowerCase();
+            for (var i = 0; i < options.length; i++) {
+                var textValue = options[i].textContent || options[i].innerText;
+                if (textValue.toLowerCase().indexOf(filter) > -1) {
+                    options[i].style.display = "";
+                } else {
+                    options[i].style.display = "none";
+                }
+            }
+        });
 
-   inputField.addEventListener('click', function() {
-       toggleDropdown();
-   });
+        inputField.addEventListener('click', function() {
+            toggleDropdown();
+        });
 
-   inputField.addEventListener('focus', function() {
-       toggleDropdown();
-   });
+        inputField.addEventListener('focus', function() {
+            toggleDropdown();
+        });
 
-   dropdownMenu.addEventListener('click', function(event) {
-       if (event.target.tagName === 'LI') {
-           inputField.value = event.target.textContent;
-           toggleDropdown();
-       }
-   });
+        dropdownMenu.addEventListener('click', function(event) {
+            if (event.target.tagName === 'LI' && !event.target.classList.contains('disabled')) {
+                // Set input field value and hidden field value
+                inputField.value = event.target.textContent;
+                idField.value = event.target.getAttribute('data-id');
 
-   function toggleDropdown() {
-       if (dropdownMenu.style.display === 'none') {
-           dropdownMenu.style.display = 'block';
-       } else {
-           dropdownMenu.style.display = 'none';
-       }
-   }
-});
+                // Fetch product data
+                getProductData();
 
-   </script>
+                toggleDropdown();
+            }
+        });
+
+        function toggleDropdown() {
+            if (dropdownMenu.style.display === 'none' || dropdownMenu.style.display === '') {
+                dropdownMenu.style.display = 'block';
+            } else {
+                dropdownMenu.style.display = 'none';
+            }
+        }
+
+        function getProductData() {
+            var selectedProductId = idField.value;
+            console.log('Selected Product ID:', selectedProductId);
+
+            // Make a request to your API using the selected product ID
+            fetch(`/admin/inventory/products-lists/${selectedProductId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.unit === "SQRFT") {
+                        console.log("Changes to sqrft");
+                        // Enable width, height, and area inputs
+                        document.querySelectorAll('#width, #height, #total_area').forEach(input => input.disabled = false);
+                        document.getElementById("product_unit").value = "SQRFT";
+                    } else {
+                        console.log("Changes to nos");
+                        document.getElementById("product_unit").value = "NOS";
+                        document.querySelectorAll('#width, #height, #total_area').forEach(input => input.disabled = true);
+                    }
+                    // Update the rate input field with the fetched rate value
+                    document.getElementById("rate").value = data.rate;
+                    var unitType = data.unitType; // assuming unitType is the property in the data object
+                    document.getElementById("unit").value = unitType;
+                })
+                .catch(error => console.error('Error fetching product data:', error));
+        }
+    });
+
+</script>
+
+
 <%- include('../../partials/end')%>
 

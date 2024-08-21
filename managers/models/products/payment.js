@@ -5,6 +5,10 @@ const ist = createdDate.toLocaleString('en-IN', {
   });
 
 const paymentSchema = new mongoose.Schema({
+    ledger_id : {
+        type: String,
+        required: true
+    },
     user_id:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Client',

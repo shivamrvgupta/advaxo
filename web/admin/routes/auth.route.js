@@ -37,4 +37,12 @@ router.post('/update-transaction', ExpenseController.findAndUpdateTransaction );
 router.get('/data-export', AuthMiddleware.authenticateToken ,ExpenseController.getMultiData );
 router.post('/data-export', AuthMiddleware.authenticateToken , MulterMiddleware.upload.single('file') ,ExpenseController.postMultiData );
 
+
+router.get('/add-payment', AuthMiddleware.authenticateToken ,AuthController.getPayment)
+router.get('/make-payment', AuthMiddleware.authenticateToken ,AuthController.makePayment)
+// router.post('/add-payment', AuthMiddleware.authenticateToken ,AuthController.addPayment)
+
+router.post('/disbursed-payment', AuthMiddleware.authenticateToken ,AuthController.disbursePayment)
+router.post('/issue-payment', AuthMiddleware.authenticateToken ,AuthController.issuePayment)
+
 module.exports = router;

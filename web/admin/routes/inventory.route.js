@@ -11,16 +11,18 @@ router.get('/product-list', AuthMiddleware.authenticateToken ,InventoryControlle
 router.get('/update-product/:product_id', AuthMiddleware.authenticateToken ,InventoryController.getUpdateInventory);
 router.get('/all-bills', AuthMiddleware.authenticateToken ,InventoryController.getAllBills);
 router.get('/products/:product_id', AuthMiddleware.authenticateToken, InventoryController.getProduct);
+router.get('/products-lists/:product_id', AuthMiddleware.authenticateToken, InventoryController.getSameProduct);
 router.get('/products-detail/:vendor_id', AuthMiddleware.authenticateToken , InventoryController.productDetails);
 router.get('/get-quantity/:product_id', AuthMiddleware.authenticateToken , InventoryController.productDetails);
 router.post('/save-bill', AuthMiddleware.authenticateToken , InventoryController.completeBill);
-router.get('/add-payment/:vendor_id', AuthMiddleware.authenticateToken, InventoryController.getAddPayment)
-router.post('/add-payment/:vendor_id', AuthMiddleware.authenticateToken, InventoryController.postAddPayment);
+// router.get('/add-payment/:vendor_id', AuthMiddleware.authenticateToken, InventoryController.getAddPayment)
+// router.post('/add-payment/:vendor_id', AuthMiddleware.authenticateToken, InventoryController.postAddPayment);
 
-router.get('/update-payment/:paymentId', AuthMiddleware.authenticateToken, InventoryController.getUpdatePayment)
-router.post('/update-payment/:paymentId', AuthMiddleware.authenticateToken, InventoryController.postUpdatePayment);
+// router.get('/update-payment/:paymentId', AuthMiddleware.authenticateToken, InventoryController.getUpdatePayment)
+// router.post('/update-payment/:paymentId', AuthMiddleware.authenticateToken, InventoryController.postUpdatePayment);
 
-router.post('/delete-payment/:paymentId', AuthMiddleware.authenticateToken , InventoryController.deletePayment);
+// router.post('/delete-payment/:paymentId', AuthMiddleware.authenticateToken , InventoryController.deletePayment);
+
 router.post('/update-product/:product_id', AuthMiddleware.authenticateToken ,InventoryController.postUpdateInventory);
 router.post('/save-products', AuthMiddleware.authenticateToken ,InventoryController.saveProducts);
 
@@ -31,4 +33,9 @@ router.post('/delete-bill/:bill_no', AuthMiddleware.authenticateToken, Inventory
 
 router.get('/search', AuthMiddleware.authenticateToken, InventoryController.getSearch);
 router.post('/search', AuthMiddleware.authenticateToken, InventoryController.postSearch);
+
+router.get('/ledger-inventory', AuthMiddleware.authenticateToken, InventoryController.getLedgerSearch);
+router.post('/ledger-inventory', AuthMiddleware.authenticateToken, InventoryController.postLedgerSearch);
+
+router.get('/get-unpaid-bills', AuthMiddleware.authenticateToken, InventoryController.getUnpaidBills);
 module.exports = router;

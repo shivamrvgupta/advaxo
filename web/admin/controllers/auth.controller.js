@@ -189,7 +189,31 @@ module.exports = {
 
         const banks = await models.ProductModel.Bank.find({});
 
-        res.render('admin/banks/allBanks', { banks,options,user: user, error: "Add Bank Opening Data" });
+        // create a loop and find all debit and credit transaction of each banks 
+        const bankData = [];
+        for (const bank of banks) {
+          const transactions = await models.ProductModel.Transaction.find({ type: bank.name });
+          let debited = 0;
+          let credited = 0;
+          for (const transaction of transactions) {
+            debited += transaction.debited;
+            credited += transaction.credited;
+          }
+          bank.debited = debited;
+          bank.credited = credited;
+
+          balance = credited - debited;
+          
+          const data = {
+            name: bank.name,
+            amount : balance,
+            date : bank.date
+          }
+
+          bankData.push(data);
+        }
+
+        res.render('admin/banks/allBanks', { banks : bankData,options,user: user, error: "Add Bank Opening Data" });
 
       }catch(error){
         console.error('Error during getBank:', error);
@@ -578,7 +602,7 @@ module.exports = {
       }
 
       const orders = await models.ProductModel.Order.find()
-                      .sort({ order_date : 1 })  // Sorts by date in descending order
+                      .sort({ order_date : -1 })  // Sorts by date in descending order
                       .populate('client_id');  // Populates the client_id field
 
 
@@ -789,5 +813,209 @@ module.exports = {
       res.status(500).json({ error: 'Internal Server Error' });
     }
   },
+
+  getPayment : async (req, res) => {
+    try {
+      const user = req.user;
+
+      if (!user) {
+        return res.redirect('/admin/auth/login');
+      }
+      
+      const clients = await models.CustomerModel.Client.find();
+      console.log(clients)
+
+      res.render('admin/payments/in', { user: user, clients, error: "Payment In : Customer" });
+    } catch (error) {
+      console.error('Error getting the Payment Screen:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  },
+  
+  disbursePayment : async (req, res) => {
+    try {
+      const user = req.user;
+      if (!user) {
+        return res.redirect('/admin/auth/login');
+      }
+      
+      const server = req.body;
+
+      console.log(server)
+      
+      // now i have oayment data check  if its not null 
+      if(server.paymentData === null){
+        res.send({status : true, status_code : 401, message : "No data found"});
+      }
+
+      // create a loop and find the order from same order id and update the due balance
+      const paymentData = JSON.parse(server.paymentData);
+      for (let i = 0; i < paymentData.length; i++) {
+        const order = paymentData[i];
+        const orders = await models.ProductModel.Order.findOne({ order_id: order.order_id });
+
+        const payData = {
+                          order_id : order.order_id,
+                          date : server.date,
+                          payment_method : server.payment_method,
+                          amount: order.received_amount,
+                        } 
+        const payment = new models.ProductModel.Payment(payData);
+        await payment.save();
+
+        // Update the Ledger
+        const LedgerData = {
+          client_id : orders.client_id,
+          order_id : order.order_id,
+          amount : order.received_amount,
+          date : server.date
+        }
+
+        const ledger = new models.CustomerModel.LedgerOrder(LedgerData);
+        await ledger.save();
+
+        if (orders) {
+          // Update the remaining balance
+          orders.remaining_balance = parseFloat(orders.remaining_balance) - parseFloat(order.received_amount);
+
+          // Update payment status based on remaining balance
+          if (orders.remaining_balance === 0) {
+              orders.payment_status = "paid";
+          } else {
+              orders.payment_status = "partially_paid";
+          }
+
+          // Save the updated order
+          await orders.save(); // Wait for each save to complete before moving to the next one
+        }
+      }
+
+      // Create transaction record
+      const TransactionData = {
+        type: server.payment_method.toUpperCase(), // You can adjust the type based on your requirements
+        from: "Payment In", // Assuming this is from an Opening Balance
+        to: server.payment_method.toUpperCase(),
+        transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
+        debited: 0.0,
+        credited: server.amount,
+        date: server.date,
+        status : true
+      }
+
+      const transaction = new models.ProductModel.Transaction(TransactionData);
+      await transaction.save();
+
+      res.send({status : true, status_code : 200, message : "Payment disbursed successfully"});
+
+    } catch (error) {
+      console.error('Error getting the Payment Screen:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  },
+  
+  makePayment : async (req, res) => {
+    try {
+      const user = req.user;
+
+      if (!user) {
+        return res.redirect('/admin/auth/login');
+      }
+      
+      const vendors = await models.ProductModel.Vendor.find();
+      console.log(vendors)
+
+      res.render('admin/payments/out', { user: user, vendors, error: "Payment Out : Vendors" });
+    } catch (error) {
+      console.error('Error getting the Payment Screen:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  },
+
+  issuePayment : async (req, res) => {
+    try {
+      const user = req.user;
+      if (!user) {
+        return res.redirect('/admin/auth/login');
+      }
+      
+      const server = req.body;
+
+      console.log(server)
+      
+      // now i have oayment data check  if its not null 
+      if(server.paymentData === null){
+        res.send({status : true, status_code : 401, message : "No data found"});
+      }
+
+      var payee = "John Doe"
+
+      // create a loop and find the order from same order id and update the due balance
+      const paymentData = JSON.parse(server.paymentData);
+      for (let i = 0; i < paymentData.length; i++) {
+        const order = paymentData[i];
+        const orders = await models.ProductModel.InventoryBill.findOne({ bill_no : order.order_id }).populate("vendor_id");
+        payee = orders.vendor_id.name;
+        const payData = {
+                          bill_no : order.order_id,
+                          date : server.date,
+                          payment_method : server.payment_method,
+                          amount: order.received_amount,
+                        } 
+
+        const payment = new models.ProductModel.InventoryPay(payData);
+        console.log(payment)
+        await payment.save();
+
+
+        const LedgerData = {
+          vendor_id : orders.vendor_id,
+          bill_no : order.order_id,
+          amount : order.received_amount,
+          date : server.date
+        }
+
+        const ledger = new models.CustomerModel.LedgerIventory(LedgerData);
+        await ledger.save();
+        
+        if (orders) {
+          // Update the remaining balance
+          orders.remaining_balance = parseFloat(orders.grand_total) - parseFloat(order.received_amount);
+
+          // Update payment status based on remaining balance
+          if (orders.remaining_balance === 0) {
+              orders.payment_status = "paid";
+          } else {
+              orders.payment_status = "partially_paid";
+          }
+
+          // Save the updated order
+          await orders.save(); // Wait for each save to complete before moving to the next one
+          console.log(orders)
+        }
+      }
+
+      // Create transaction record
+      const TransactionData = {
+        type: server.payment_method.toUpperCase(), // You can adjust the type based on your requirements
+        from: "Payment Out", // Assuming this is from an Opening Balance
+        to: payee,
+        transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
+        debited: server.amount,
+        credited: 0.0,
+        date: server.date,
+        status : true
+      }
+
+      const transaction = new models.ProductModel.Transaction(TransactionData);
+      await transaction.save();
+      console.log(transaction)
+
+      res.send({status : true, status_code : 200, message : "Payment disbursed successfully"});
+
+    } catch (error) {
+      console.error('Error getting the Payment Screen:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
 } 
 

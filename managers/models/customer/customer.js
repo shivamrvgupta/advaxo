@@ -39,6 +39,10 @@ const clientSchema = new mongoose.Schema({
         type:Date,
         default: Date.now
     },
+    balance : {
+        type: Number,
+        default: 0
+    }
 });
 
 const Client = mongoose.model('Client', clientSchema);
