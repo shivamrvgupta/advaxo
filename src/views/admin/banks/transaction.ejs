@@ -61,7 +61,7 @@
                                                                 <td><p><%= row.status ? "Success" : "Failure" %></p></td>
                                                                 <td>
                                                                     <li style="display: contents;">
-                                                                        <a href="/admin/order/ledger-details/<%= row.ledger_id %>">
+                                                                        <a href="<% if (row.ledger_id.startsWith('PayIN')) { %>/admin/order/ledger-details/<%= row.ledger_id %><% } else if (row.ledger_id.startsWith('PayOUT')) { %>/admin/inventory/ledger-details/<%= row.ledger_id %><% } %>">
                                                                             <i class="ri-eye-line"></i>
                                                                         </a>
                                                                     </li>
