@@ -38,4 +38,5 @@ router.get('/ledger-inventory', AuthMiddleware.authenticateToken, InventoryContr
 router.post('/ledger-inventory', AuthMiddleware.authenticateToken, InventoryController.postLedgerSearch);
 
 router.get('/get-unpaid-bills', AuthMiddleware.authenticateToken, InventoryController.getUnpaidBills);
+router.get('/ledger-details/:ledger_id', AuthMiddleware.authenticateToken, InventoryController.ledgerDetail);
 module.exports = router;

@@ -1693,6 +1693,112 @@ module.exports = {
       console.error(err);
       return res.redirect(`${referer}?error="${encodeURIComponent(err.message)}"`);
     }
+  },
+
+  getLedgerSearch : async (req, res) => {
+    const referer = req.get('Referer');
+    try{
+      const user = req.user;
+      
+      if(!user){
+        res.render('a-login',{
+          title: "Advaxo",
+          error: "User Not Found"
+        })   
+      }
+
+      const vendors = await models.CustomerModel.Client.find();
+      res.render('admin/reports/ledger-order',{user, data : null, vendors, error: "Find all Clients Ledger"})
+
+    }catch(err){
+      console.log(err)
+      res.redirect(`${referer}?error="${encodeURIComponent(err)}"`);
+    }
+  },
+  postLedgerSearch: async (req, res) => {
+    const referer = req.get('Referer');
+    try {
+      const user = req.user;
+  
+      if (!user) {
+        return res.render('a-login', {
+          title: "Advaxo",
+          error: "User Not Found"
+        });
+      }
+      
+      console.log(req.body);
+      const vendors = await models.CustomerModel.Client.find();
+      const vendorId = req.body.customer_id;
+      if (!vendorId) {
+        return res.render('admin/reports/ledger-detail', {
+          title: "Advaxo",
+          error: "Client Not Found",
+          data: null,
+          vendors
+        });
+      }
+  
+      const ledgers = await models.CustomerModel.LedgerOrder.find({ client_id : vendorId })
+        .populate("client_id")
+        .sort({ created_date: -1 });
+
+
+
+      res.render('admin/reports/ledger-order', {
+        user,
+        vendors,
+        data: ledgers, // Pass the combined results array with ledgers, bills, and transactions
+        error: "Reports"
+      });
+  
+    } catch (err) {
+      console.error(err);
+      res.redirect(`${referer}?error="${encodeURIComponent(err.message)}"`);
+    }
+  },
+
+  ledgerDetail : async (req, res) => {
+    const referer = req.get('Referer');
+    try{
+      const user = req.user;
+      
+      if(!user){
+        res.render('a-login',{
+          title: "Advaxo",
+          error: "User Not Found"
+        })   
+      }
+
+      const ledger_id = req.params.ledger_id;
+      console.log(ledger_id)
+
+      const ledgers = await models.CustomerModel.LedgerOrder.findOne({ ledger_id: ledger_id })
+        .populate("client_id")
+        .sort({ created_date: -1 });
+
+      const bills = await models.ProductModel.Payment.find({ ledger_id: ledger_id })
+        .sort({ date : -1 });
+
+      const payments = await models.ProductModel.Transaction.find({ ledger_id : ledger_id })
+        .sort({ date : -1 });
+
+        console.log(payments)
+
+
+      res.render('admin/reports/ledger-detail-wop', {
+        user,
+        data : ledgers,
+        bills,
+        transactions : payments, 
+        error: "Reports",
+        options
+      });
+
+    }catch(err){
+      console.log(err)
+      res.redirect(`${referer}?error="${encodeURIComponent(err)}"`);
+    }
   }
   
 }

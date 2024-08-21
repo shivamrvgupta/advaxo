@@ -42,5 +42,10 @@ router.post('/delete-other-expenses/:expenseId', AuthMiddleware.authenticateToke
 router.get('/search', AuthMiddleware.authenticateToken, OrderControllers.search);
 router.post('/search', AuthMiddleware.authenticateToken, OrderControllers.getSearch);
 
+router.get('/ledger-wop', AuthMiddleware.authenticateToken, OrderControllers.getLedgerSearch);
+router.post('/ledger-wop', AuthMiddleware.authenticateToken, OrderControllers.postLedgerSearch);
+
 router.get('/get-unpaid-orders', AuthMiddleware.authenticateToken, OrderControllers.getUnpaidOrders);
+
+router.get('/ledger-details/:ledger_id', AuthMiddleware.authenticateToken, OrderControllers.ledgerDetail);
 module.exports = router;

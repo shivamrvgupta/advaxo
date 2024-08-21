@@ -848,13 +848,48 @@ module.exports = {
         res.send({status : true, status_code : 401, message : "No data found"});
       }
 
+      const ledgers = await models.CustomerModel.LedgerOrder.find();
+      let maxIdNumber = 0;
+
+        // Extract the numeric part from each ledger's ID and find the maximum number
+        for (const ledger of ledgers) {
+            const idString = ledger.ledger_id;
+            const match = idString.match(/PayIN-(\d+)/);
+
+            if (match) {
+                const idNumber = parseInt(match[1], 10);
+                if (idNumber > maxIdNumber) {
+                    maxIdNumber = idNumber;
+                }
+            }
+        }
+
+        // Generate the next ID in sequence
+        const nextIdNumber = maxIdNumber + 1;
+        const newLedgerId = `PayIN-${nextIdNumber.toString().padStart(4, '0')}`;
+
+        console.log('Next Ledger ID:', newLedgerId);
+
+      const ledgerData = {
+        ledger_id : newLedgerId,
+        client_id : server.customer_id, 
+        amount : server.amount,
+        date : server.date
+      }
+
+      var payee = "John Doe";
+
+      const ledger = new models.CustomerModel.LedgerOrder(ledgerData);
+      await ledger.save();
+
       // create a loop and find the order from same order id and update the due balance
       const paymentData = JSON.parse(server.paymentData);
       for (let i = 0; i < paymentData.length; i++) {
         const order = paymentData[i];
-        const orders = await models.ProductModel.Order.findOne({ order_id: order.order_id });
-
-        const payData = {
+        const orders = await models.ProductModel.Order.findOne({ order_id: order.order_id }).populate('client_id');
+        payee = orders.client_id.name;
+        const payData = { 
+                          ledger_id : ledgerData.ledger_id,
                           order_id : order.order_id,
                           date : server.date,
                           payment_method : server.payment_method,
@@ -862,17 +897,6 @@ module.exports = {
                         } 
         const payment = new models.ProductModel.Payment(payData);
         await payment.save();
-
-        // Update the Ledger
-        const LedgerData = {
-          client_id : orders.client_id,
-          order_id : order.order_id,
-          amount : order.received_amount,
-          date : server.date
-        }
-
-        const ledger = new models.CustomerModel.LedgerOrder(LedgerData);
-        await ledger.save();
 
         if (orders) {
           // Update the remaining balance
@@ -892,9 +916,10 @@ module.exports = {
 
       // Create transaction record
       const TransactionData = {
+        ledger_id : ledgerData.ledger_id,
         type: server.payment_method.toUpperCase(), // You can adjust the type based on your requirements
         from: "Payment In", // Assuming this is from an Opening Balance
-        to: server.payment_method.toUpperCase(),
+        to: payee,
         transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
         debited: 0.0,
         credited: server.amount,
@@ -939,8 +964,6 @@ module.exports = {
       }
       
       const server = req.body;
-
-      console.log(server)
       
       // now i have oayment data check  if its not null 
       if(server.paymentData === null){
@@ -948,6 +971,37 @@ module.exports = {
       }
 
       var payee = "John Doe"
+      const ledgers = await models.CustomerModel.LedgerIventory.find();
+      let maxIdNumber = 0;
+
+        // Extract the numeric part from each ledger's ID and find the maximum number
+        for (const ledger of ledgers) {
+            const idString = ledger.ledger_id;
+            const match = idString.match(/PayIN-(\d+)/);
+
+            if (match) {
+                const idNumber = parseInt(match[1], 10);
+                if (idNumber > maxIdNumber) {
+                    maxIdNumber = idNumber;
+                }
+            }
+        }
+
+        // Generate the next ID in sequence
+        const nextIdNumber = maxIdNumber + 1;
+        const newLedgerId = `PayOUT-${nextIdNumber.toString().padStart(4, '0')}`;
+
+        console.log('Next Ledger ID:', newLedgerId);
+
+      const ledgerData = {
+        ledger_id : newLedgerId,
+        vendor_id : server.customer_id, 
+        amount : server.amount,
+        date : server.date
+      }
+
+      const ledger = new models.CustomerModel.LedgerIventory(ledgerData);
+      await ledger.save();
 
       // create a loop and find the order from same order id and update the due balance
       const paymentData = JSON.parse(server.paymentData);
@@ -956,6 +1010,7 @@ module.exports = {
         const orders = await models.ProductModel.InventoryBill.findOne({ bill_no : order.order_id }).populate("vendor_id");
         payee = orders.vendor_id.name;
         const payData = {
+                          ledger_id : ledgerData.ledger_id,
                           bill_no : order.order_id,
                           date : server.date,
                           payment_method : server.payment_method,
@@ -966,16 +1021,6 @@ module.exports = {
         console.log(payment)
         await payment.save();
 
-
-        const LedgerData = {
-          vendor_id : orders.vendor_id,
-          bill_no : order.order_id,
-          amount : order.received_amount,
-          date : server.date
-        }
-
-        const ledger = new models.CustomerModel.LedgerIventory(LedgerData);
-        await ledger.save();
         
         if (orders) {
           // Update the remaining balance
@@ -996,6 +1041,7 @@ module.exports = {
 
       // Create transaction record
       const TransactionData = {
+        ledger_id : ledgerData.ledger_id,
         type: server.payment_method.toUpperCase(), // You can adjust the type based on your requirements
         from: "Payment Out", // Assuming this is from an Opening Balance
         to: payee,

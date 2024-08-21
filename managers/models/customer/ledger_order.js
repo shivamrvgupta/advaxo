@@ -11,11 +11,7 @@ const ledgerSchema = new mongoose.Schema({
     client_id:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Client',
-    },
-    order_id:{
-        type: String,
-        required: true
-    },
+    },  
     amount : {
         type: Number,
         required: true

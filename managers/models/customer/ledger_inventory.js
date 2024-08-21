@@ -12,10 +12,6 @@ const ledgerInventSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Vendor',
     },
-    bill_no:{
-        type: String,
-        required: true
-    },
     amount : {
         type: Number,
         required: true

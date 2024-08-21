@@ -1313,11 +1313,51 @@ module.exports = {
       res.redirect(`${referer}?error="${encodeURIComponent(err)}"`);
     }
   },
-  postLedgerSearch : async (req, res) => {
+  postLedgerSearch: async (req, res) => {
+    const referer = req.get('Referer');
+    try {
+      const user = req.user;
+  
+      if (!user) {
+        return res.render('a-login', {
+          title: "Advaxo",
+          error: "User Not Found"
+        });
+      }
+  
+      const vendorId = req.body.customer_id;
+      if (!vendorId) {
+        return res.render('admin/search', {
+          title: "Advaxo",
+          error: "Vendor Not Found"
+        });
+      }
+  
+      const vendors = await models.ProductModel.Vendor.find();
+      const ledgers = await models.CustomerModel.LedgerIventory.find({ vendor_id: vendorId })
+        .populate("vendor_id")
+        .sort({ created_date: -1 });
+
+
+
+      res.render('admin/reports/ledger-inventory', {
+        user,
+        vendors,
+        data: ledgers, // Pass the combined results array with ledgers, bills, and transactions
+        error: "Reports"
+      });
+  
+    } catch (err) {
+      console.error(err);
+      res.redirect(`${referer}?error="${encodeURIComponent(err.message)}"`);
+    }
+  },
+
+  ledgerDetail : async (req, res) => {
     const referer = req.get('Referer');
     try{
       const user = req.user;
-      console.log(req.body);
+      
       if(!user){
         res.render('a-login',{
           title: "Advaxo",
@@ -1325,58 +1365,36 @@ module.exports = {
         })   
       }
 
-      const name = req.body.customer_id;
-      console.log(name);
-      if(!name){
-        res.render('admin/search',{
-          title: "Advaxo",
-          error: "User Not Found"
-        })   
-      }
+      const ledger_id = req.params.ledger_id;
+      console.log(ledger_id)
+
+      const ledgers = await models.CustomerModel.LedgerIventory.findOne({ ledger_id: ledger_id })
+        .populate("vendor_id")
+        .sort({ created_date: -1 });
+
+      const bills = await models.ProductModel.InventoryPay.find({ ledger_id: ledger_id })
+        .sort({ date : -1 });
+
+      const payments = await models.ProductModel.Transaction.find({ ledger_id : ledger_id })
+        .sort({ date : -1 });
+
+        console.log(payments)
 
 
-      const customers = await models.ProductModel.Vendor.find();
-      const vendors = await models.ProductModel.Vendor.findOne({_id : name});
-      const customer_id = vendors._id;
-
-      const bills = await models.ProductModel.InventoryBill.find({vendor_id : customer_id}).populate("vendor_id").sort({ created_date : -1 });
-
-      let overallGrandTotal = 0.0;
-      let overallRemainingBalance = 0.0;
-      let overallClientBalance = 0.0;
-      let paidOrderCount = 0;
-      let unpaidOrderCount = 0;
-      let totalOrders = bills.length;
-      
-      bills.forEach(bill => {
-        console.log(bill);
-          overallGrandTotal += parseFloat(bill.grand_total);
-          overallRemainingBalance += parseFloat(bill.remaining_balance);
-          overallClientBalance += parseFloat(bill.client_balance);
-      
-          if (bill.payment_status === 'paid') {
-              paidOrderCount++;
-          } else if (bill.payment_status === 'unpaid') {
-              unpaidOrderCount++;
-          }
+      res.render('admin/reports/ledger-detail', {
+        user,
+        data : ledgers,
+        bills,
+        transactions : payments, 
+        error: "Reports",
+        options
       });
 
-        const data = {
-          client_name : bills[0].vendor_id.name,
-          grand_total : overallGrandTotal,
-          remaining_balance : overallRemainingBalance,
-          client_balance : overallClientBalance,  
-          paid_order_count : paidOrderCount,
-          unpaid_order_count : unpaidOrderCount,
-          total_orders : totalOrders        
-        }
-
-        res.render('admin/reports/ledger-inventory',{user, inventory : bills,vendors : customers, data, options,  error: "Reports"})
-      
     }catch(err){
       console.log(err)
       res.redirect(`${referer}?error="${encodeURIComponent(err)}"`);
     }
-  },
+  }
+  
 }
 

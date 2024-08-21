@@ -8,6 +8,10 @@ const transactionSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    ledger_id : {
+        type: String,
+        required: true
+    },
     from : {
         type: String,
         required: true
