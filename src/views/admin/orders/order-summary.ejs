@@ -231,12 +231,6 @@
                                 <!-- Order table -->
                                 <div class="title-header option-title">
                                     <h4>Payment Details</h4>
-                                    <form class="d-inline-flex">
-                                        <a id="add-expense" href="/admin/order/add-payment/<%= orders.order_id %>"
-                                            class="align-items-center btn btn-theme d-flex">
-                                            <i data-feather="plus-square"></i>Add New Payment
-                                        </a> 
-                                    </form>
                                 </div>
                                 <div class="table-responsive table-details">
                                     <table class="table cart-table table-borderless">
@@ -281,15 +275,9 @@
                                                         <td style="text-align: center;border: 1px solid black;padding: 8px;text-align: center;">
                                                             <ul>
                                                                 <li style="display: contents;">
-                                                                    <a href="/admin/order/update-payment/<%= row.id %>">
-                                                                        <i class="ri-pencil-line"></i>
+                                                                    <a href="/admin/order/ledger-details/<%= row.ledger_id %>">
+                                                                        <i class="ri-eye-line"></i>
                                                                     </a>
-                                                                </li>
-    
-                                                                <li style="display: contents;">
-                                                                    <a href="" onclick="deletePayment('<%= row._id %>')">
-                                                                        <i class="ri-delete-bin-line"></i>
-                                                                    </a>                                                                
                                                                 </li>
                                                             </ul>
                                                         </td>

@@ -39,11 +39,12 @@
                                             <thead>
                                                 <tr>
                                                     <th class="date">Date</th>
-                                                    <th>From</th>
-                                                    <th>To</th>
+                                                    <th>Type</th>
+                                                    <th>Name</th>
                                                     <th>Credit</th>
                                                     <th>Debit</th>
                                                     <th>Status</th>
+                                                    <th>Actions</th>
                                                 </tr>
                                             </thead>
 
@@ -58,6 +59,18 @@
                                                                 <td><%= row.credited %></td>
                                                                 <td><%= row.debited %></td>
                                                                 <td><p><%= row.status ? "Success" : "Failure" %></p></td>
+                                                                <td>
+                                                                    <li style="display: contents;">
+                                                                        <a href="/admin/order/ledger-details/<%= row.ledger_id %>">
+                                                                            <i class="ri-eye-line"></i>
+                                                                        </a>
+                                                                    </li>
+                                                                    <li style="display: contents;">
+                                                                        <a href="/admin/order/ledger-details/<%= row.ledger_id %>">
+                                                                            <i class="ri-delete-bin-line"></i>
+                                                                        </a>
+                                                                    </li>
+                                                                </td>
                                                             </tr>
                                                         <% }) %>
                                                             <tr>
@@ -65,6 +78,7 @@
                                                                 <td> <%= parseFloat(totalCredit).toFixed(2) %> </td>
                                                                 <td> <%= parseFloat(totalDebit).toFixed(2) %> </td>
                                                                 <td> <%= parseFloat(totalBalance).toFixed(2) %>  </td>
+                                                                <td></td>
                                                             </tr>
                                                     <% }else{ %>
                                                         <tr>
