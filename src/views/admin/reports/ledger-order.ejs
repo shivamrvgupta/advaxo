@@ -114,7 +114,6 @@
                                     </div>
                                 </form>
                             </div>
-                            <% data.forEach((ledger, index) => { %>
                                 <!-- Ledger Data Table -->
                                 <div class="table-responsive table-product">
                                     <div class="title-header option-title">
@@ -133,30 +132,31 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td style="text-align: center;"><%= ledger.date %></td>
-                                                <td style="text-align: center;"> <a href="/admin/order/ledger-details/<%= ledger.ledger_id %>"> <b> <%= ledger.ledger_id %> </b> </a> </td>
-                                                <td style="text-align: center;"><%= ledger.amount%></td>
-                                                <td style="text-align: center;">
-                                                    <ul>
-                                                        <li>
-                                                            <a href="/admin/order/ledger-details/<%= ledger.ledger_id %>">
-                                                                <i class="ri-eye-line"></i>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a onclick="deleteOrder('<%= ledger.ledger_id %>')">
-                                                                <i class="ri-delete-bin-line"></i>
-                                                            </a>
-                                                        </li>   
-                                                    </ul>
-                                                </td>
-                                            </tr>
+                                            <% data.forEach((ledger, index) => { %>
+                                                <tr>
+                                                    <td style="text-align: center;"><%= ledger.date %></td>
+                                                    <td style="text-align: center;"> <a href="/admin/order/ledger-details/<%= ledger.ledger_id %>"> <b> <%= ledger.ledger_id %> </b> </a> </td>
+                                                    <td style="text-align: center;"><%= ledger.amount%></td>
+                                                    <td style="text-align: center;">
+                                                        <ul>
+                                                            <li>
+                                                                <a href="/admin/order/ledger-details/<%= ledger.ledger_id %>">
+                                                                    <i class="ri-eye-line"></i>
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a onclick="deleteOrder('<%= ledger.ledger_id %>')">
+                                                                    <i class="ri-delete-bin-line"></i>
+                                                                </a>
+                                                            </li>   
+                                                        </ul>
+                                                    </td>
+                                                </tr>
+                                            <% }) %>
                                         </tbody>
                                     </table>
                                 </div>
                                 <br>
-                            <% }) %>
                         </div>
                     </div>
                 </div>
@@ -238,7 +238,7 @@
             $.ajax({
                 type: "POST",
                 url: `/admin/order/delete-ledger/${ledger_id}`,
-                data: { bill_no : expenseId },
+                data: { ledger_id : ledger_id },
                 success: function (data) {
                 // If the deletion is successful, you can handle the response or reload the page
                 console.log(data); // Optional: Log the server response

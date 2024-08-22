@@ -55,7 +55,7 @@ module.exports = {
       }
 
       const server = req.body;
-
+      console.log(server)
       const vendorData = {
         name: server.vendor.toUpperCase(),
         address: server.vendor_address,
@@ -82,7 +82,7 @@ module.exports = {
         }
         const inventoryBill = new models.ProductModel.InventoryBill(billData);
         await inventoryBill.save();
-  
+        console.log(inventoryBill)
         return res.redirect(`/admin/inventory/add-products/${billData.bill_no}`);
       }else{
         const vendor = new models.ProductModel.Vendor(vendorData);
@@ -252,106 +252,97 @@ module.exports = {
       res.redirect(`/admin/inventory/product-list?error="${encodeURIComponent(err)}"`)
     }
   },
-    
-    saveProducts : async (req, res) => {
-      const referer = req.get('Referer');
-      try{
+  
+  saveProducts: async (req, res) => {
+    const referer = req.get('Referer');
+    try {
         const user = req.user;
-        if(!user){
-          res.render('a-login',{
-            title: "Advaxo",
-            error: "User Not Found"
-          })   
+        if (!user) {
+            return res.render('a-login', {
+                title: "Advaxo",
+                error: "User Not Found"
+            });
         }
 
         const server = req.body;
-        console.log(server)
+        console.log(server);
+        
         const productData = {
-          bill_no : server.orderId,
-          name: server.product.toLowerCase(),
-          unit: server.unit,
-          date: server.date || formattedDate,
-          width: parseFloat(server.width) || 0,
-          height: parseFloat(server.height) || 0,
-          quantity: parseFloat(server.quantity) || 0,
-          area: parseFloat(server.area) || 0,
-          rate: parseFloat(server.rate),
-          amount: parseFloat(server.amount),
+            bill_no: server.orderId,
+            name: server.product.toLowerCase(),
+            unit: server.unit,
+            date: server.date || formattedDate,
+            width: parseFloat(server.width) || 0,
+            height: parseFloat(server.height) || 0,
+            quantity: parseFloat(server.quantity) || 0,
+            area: parseFloat(server.area) || 0,
+            rate: parseFloat(server.rate),
+            amount: parseFloat(server.amount),
         };
 
         const name = server.product.toLowerCase();
-        let billed_products = await models.ProductModel.BillProduct.find({name : name , bill_no : server.orderId});
+        let billed_products = await models.ProductModel.BillProduct.find({ name: name, bill_no: server.orderId });
 
-        if(billed_products.length > 0){  
-          return res.redirect(`${referer}/?error="Product Already Exists"`);
-        }else{
-          billed_products = new models.ProductModel.BillProduct(productData);
-          await billed_products.save();
+        if (billed_products.length > 0) {
+            return res.redirect(`${referer}/?error="Product Already Exists"`);
+        } else {
+            // Save new BillProduct
+            billed_products = new models.ProductModel.BillProduct(productData);
+            await billed_products.save();
 
+            // Update the grand total in InventoryBill
+            const bill = await models.ProductModel.InventoryBill.findOne({ bill_no: server.orderId });
+            console.log(bill);
+            bill.grand_total = parseFloat(bill.grand_total) + parseFloat(server.amount);
+            await bill.save();
 
-          const bill = await models.ProductModel.InventoryBill.findOne({ bill_no : server.orderId});
-          console.log(bill)
-          bill.grand_total = parseFloat(bill.grand_total) + parseFloat(server.amount);
-          await bill.save();
+            // Find or create the Product in Product model
+            const saveProducts = await models.ProductModel.Product.findOne({ name: name });
+            let stock_pID;
 
-          const saveProducts = await models.ProductModel.Product.findOne({name : name});
-          let stock_pID;
-          if(!saveProducts){
-            const product = new models.ProductModel.Product(productData);
-            await product.save();
-            stock_pID = product._id;  
-          }else{
-            stock_pID = saveProducts._id;
-            if(server.unit === 'SQRFT'){
-              saveProducts.width = parseFloat(saveProducts.width) + parseFloat(server.width);
-              saveProducts.height = parseFloat(saveProducts.height) + parseFloat(server.height);
-              saveProducts.quantity = parseFloat(saveProducts.quantity) + parseFloat(server.quantity);
-              saveProducts.area = parseFloat(saveProducts.area) + parseFloat(server.area);
-              saveProducts.rate = parseFloat(server.rate);
-              await saveProducts.save();
-            }else{
-              saveProducts.quantity = parseFloat(saveProducts.quantity) + parseFloat(server.quantity);
-              saveProducts.rate = parseFloat(server.rate);
-              await saveProducts.save();
+            if (!saveProducts) {
+                const product = new models.ProductModel.Product(productData);
+                await product.save();
+                stock_pID = product._id;
+            } else {
+                stock_pID = saveProducts._id;
+
+                if (server.unit === 'SQRFT') {
+                    saveProducts.width = parseFloat(saveProducts.width) + parseFloat(server.width);
+                    saveProducts.height = parseFloat(saveProducts.height) + parseFloat(server.height);
+                    saveProducts.quantity = parseFloat(saveProducts.quantity) + parseFloat(server.quantity);
+                    saveProducts.area = parseFloat(saveProducts.area) + parseFloat(server.area);
+                    saveProducts.rate = parseFloat(server.rate);
+                    await saveProducts.save();
+                } else {
+                    saveProducts.quantity = parseFloat(saveProducts.quantity) + parseFloat(server.quantity);
+                    saveProducts.rate = parseFloat(server.rate);
+                    await saveProducts.save();
+                }
             }
-          }
 
-          const stockUpdate = await models.ProductModel.Stocks.findOne({product_id : stock_pID});
-          if(!stockUpdate){
-            const productData = {
-              product_id : stock_pID,
-              unit: server.unit,
-              height : parseFloat(server.height) || 0,
-              width : parseFloat(server.width) || 0,
-              area : parseFloat(server.area) || 0,
-              quantity: parseFloat(server.quantity) || 0,
-              rate: parseFloat(server.rate),
-              amount: parseFloat(server.amount),
+            // Create Stock entry with adjusted variable name to avoid conflict
+            const stockData = {
+                product_id: stock_pID,
+                unit: server.unit,
+                height: parseFloat(server.height) || 0,
+                width: parseFloat(server.width) || 0,
+                area: parseFloat(server.area) || 0,
+                quantity: parseFloat(server.quantity) || 0,
+                rate: parseFloat(server.rate),
+                amount: parseFloat(server.amount),
             };
-            const product = new models.ProductModel.Stocks(productData);
-            await product.save();
-          }else{
-            if(server.unit === 'SQRFT'){
-              stockUpdate.width = parseFloat(stockUpdate.width) + parseFloat(server.width);
-              stockUpdate.height = parseFloat(stockUpdate.height) + parseFloat(server.height);
-              stockUpdate.quantity = parseFloat(stockUpdate.quantity) + parseFloat(server.quantity);
-              stockUpdate.area = parseFloat(stockUpdate.area) + parseFloat(server.area);
-              stockUpdate.rate = parseFloat(server.rate);
-              await stockUpdate.save();
-            }else{
-              stockUpdate.quantity = parseFloat(stockUpdate.quantity) + parseFloat(server.quantity);
-              stockUpdate.rate = parseFloat(server.rate);
-              await stockUpdate.save();
-            }
-          }
+            const productStock = new models.ProductModel.Stocks(stockData);
+            await productStock.save();
         }
 
         res.redirect(`/admin/inventory/product-list/?success="Product Added Successfully"`);
-      }catch(err){
-        console.log(err)
+    } catch (err) {
+        console.log(err);
         res.redirect(`${referer}/?error=${encodeURIComponent(err)}`);
-      }
-    },
+    }
+},
+
 
       getUpdateInventory : async (req, res) => {
         try{
@@ -1334,7 +1325,7 @@ module.exports = {
       }
   
       const vendors = await models.ProductModel.Vendor.find();
-      const ledgers = await models.CustomerModel.LedgerIventory.find({ vendor_id: vendorId })
+      const ledgers = await models.CustomerModel.LedgerIventory.find({ vendor_id: vendorId , status : true })
         .populate("vendor_id")
         .sort({ created_date: -1 });
 
@@ -1394,7 +1385,77 @@ module.exports = {
       console.log(err)
       res.redirect(`${referer}?error="${encodeURIComponent(err)}"`);
     }
+  },
+
+  deleteLedger :  async (req, res) => {
+    const referer = req.get('Referer');
+    try{
+      const user = req.user;
+
+      if(!user){
+        res.render('a-login',{
+          title: "Advaxo",
+          error: "User Not Found"
+        })   
+      }
+
+      const ledger_id = req.params.ledger_id;
+
+      const ledger = await models.CustomerModel.LedgerIventory.findOne({ ledger_id: ledger_id });
+
+      if (ledger) {
+          // Set status to false
+          ledger.status = false;
+          await ledger.save();
+      
+          // Find all related payments
+          const payments = await models.ProductModel.InventoryPay.find({ ledger_id: ledger_id });
+      
+          for (let i = 0; i < payments.length; i++) {
+              const order = payments[i];
+              
+              // Find the associated order
+              const orders = await models.ProductModel.InventoryBill.findOne({ bill_no: order.bill_no }).populate("vendor_id");
+
+              console.log(orders)
+              if (orders) {
+                  // Update the remaining balance by reverting the received amount
+                  orders.remaining_balance += parseFloat(order.amount);
+      
+                  // Update payment status based on the new remaining balance
+                  if (orders.remaining_balance === orders.grand_total) {
+                      orders.payment_status = "unpaid";
+                  } else {
+                      orders.payment_status = "partially_paid";
+                  }
+      
+                  // Save the updated order
+                  await orders.save();
+                  console.log(`Updated Order: ${orders.order_id}`);
+              }
+      
+              // Delete the payment record
+              await models.ProductModel.InventoryPay.deleteOne({ _id: order._id });
+              console.log(`Deleted Payment: ${order._id}`);
+          }
+
+          const transactions = await models.ProductModel.Transaction.find({ ledger_id : ledger_id });
+
+          for (let i = 0; i < transactions.length; i++) {
+            const transaction = transactions[i];
+
+            // Delete the transaction record
+            await models.ProductModel.Transaction.deleteOne({ _id: transaction._id });
+            console.log(`Deleted Transaction: ${transaction._id}`);
+          } 
+      }
+
+      res.send({status : true, status_code : 200, message : "Ledger deleted successfully"});
+
+    }catch(err){
+      console.log(err)
+      res.redirect(`${referer}?error="${encodeURIComponent(err)}"`);
+    }
   }
-  
 }
 

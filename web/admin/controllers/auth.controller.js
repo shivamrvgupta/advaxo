@@ -977,7 +977,7 @@ module.exports = {
         // Extract the numeric part from each ledger's ID and find the maximum number
         for (const ledger of ledgers) {
             const idString = ledger.ledger_id;
-            const match = idString.match(/PayIN-(\d+)/);
+            const match = idString.match(/PayOUT-(\d+)/);
 
             if (match) {
                 const idNumber = parseInt(match[1], 10);
@@ -1024,13 +1024,13 @@ module.exports = {
         
         if (orders) {
           // Update the remaining balance
-          orders.remaining_balance = parseFloat(orders.grand_total) - parseFloat(order.received_amount);
+          orders.remaining_balance = parseFloat(orders.remaining_balance) + parseFloat(order.received_amount);
 
           // Update payment status based on remaining balance
-          if (orders.remaining_balance === 0) {
+          if (orders.remaining_balance === orders.grand_total) {
               orders.payment_status = "paid";
           } else {
-              orders.payment_status = "partially_paid";
+              orders.payment_status = "Unpaid";
           }
 
           // Save the updated order

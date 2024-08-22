@@ -974,10 +974,11 @@ module.exports = {
       } 
 
       const server = req.body;
-
+      var expense_from = `Expense - ${server.expense_type}`;
       console.log(server)
       var client_name;
       if(server.expense_type === "Order"){
+        expense_from = `Order - ${server.work_order} Expense`;
         const orders = await models.ProductModel.Order.findOne({order_id : server.work_order});
         client_name = orders.client_name;
       }
@@ -1008,8 +1009,9 @@ module.exports = {
         await money.save();
 
         const creditTransaction = {
+          ledger_id : "none",
           type: money.name, // You can adjust the type based on your requirements
-          from: "Issued Expenses",
+          from: expense_from,
           to: `${server.item}`,
           transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
           debited: server.amount,
@@ -1739,7 +1741,7 @@ module.exports = {
         });
       }
   
-      const ledgers = await models.CustomerModel.LedgerOrder.find({ client_id : vendorId })
+      const ledgers = await models.CustomerModel.LedgerOrder.find({ client_id : vendorId , status : true })
         .populate("client_id")
         .sort({ created_date: -1 });
 
@@ -1794,6 +1796,77 @@ module.exports = {
         error: "Reports",
         options
       });
+
+    }catch(err){
+      console.log(err)
+      res.redirect(`${referer}?error="${encodeURIComponent(err)}"`);
+    }
+  },
+
+  deleteLedger :  async (req, res) => {
+    const referer = req.get('Referer');
+    try{
+      const user = req.user;
+
+      if(!user){
+        res.render('a-login',{
+          title: "Advaxo",
+          error: "User Not Found"
+        })   
+      }
+
+      const ledger_id = req.params.ledger_id;
+
+      const ledger = await models.CustomerModel.LedgerOrder.findOne({ ledger_id: ledger_id });
+
+      if (ledger) {
+          // Set status to false
+          ledger.status = false;
+          await ledger.save();
+      
+          // Find all related payments
+          const payments = await models.ProductModel.Payment.find({ ledger_id: ledger_id });
+      
+          for (let i = 0; i < payments.length; i++) {
+              const order = payments[i];
+              
+              // Find the associated order
+              const orders = await models.ProductModel.Order.findOne({ order_id: order.order_id }).populate("client_id");
+
+              console.log(orders)
+              if (orders) {
+                  // Update the remaining balance by reverting the received amount
+                  orders.remaining_balance += parseFloat(order.amount);
+      
+                  // Update payment status based on the new remaining balance
+                  if (orders.remaining_balance === orders.grand_total) {
+                      orders.payment_status = "unpaid";
+                  } else {
+                      orders.payment_status = "partially_paid";
+                  }
+      
+                  // Save the updated order
+                  await orders.save();
+                  console.log(`Updated Order: ${orders.order_id}`);
+              }
+      
+              // Delete the payment record
+              await models.ProductModel.Payment.deleteOne({ _id: order._id });
+              console.log(`Deleted Payment: ${order._id}`);
+          }
+
+          const transactions = await models.ProductModel.Transaction.find({ ledger_id : ledger_id });
+
+          for (let i = 0; i < transactions.length; i++) {
+            const transaction = transactions[i];
+
+            // Delete the transaction record
+            await models.ProductModel.Transaction.deleteOne({ _id: transaction._id });
+            console.log(`Deleted Transaction: ${transaction._id}`);
+          } 
+      }
+
+      res.send({status : true, status_code : 200, message : "Ledger deleted successfully"});
 
     }catch(err){
       console.log(err)

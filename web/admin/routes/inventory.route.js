@@ -39,4 +39,7 @@ router.post('/ledger-inventory', AuthMiddleware.authenticateToken, InventoryCont
 
 router.get('/get-unpaid-bills', AuthMiddleware.authenticateToken, InventoryController.getUnpaidBills);
 router.get('/ledger-details/:ledger_id', AuthMiddleware.authenticateToken, InventoryController.ledgerDetail);
+
+router.post('/delete-ledger/:ledger_id', AuthMiddleware.authenticateToken, InventoryController.deleteLedger);
+
 module.exports = router;

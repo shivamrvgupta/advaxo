@@ -48,4 +48,6 @@ router.post('/ledger-wop', AuthMiddleware.authenticateToken, OrderControllers.po
 router.get('/get-unpaid-orders', AuthMiddleware.authenticateToken, OrderControllers.getUnpaidOrders);
 
 router.get('/ledger-details/:ledger_id', AuthMiddleware.authenticateToken, OrderControllers.ledgerDetail);
+
+router.post('/delete-ledger/:ledger_id', AuthMiddleware.authenticateToken, OrderControllers.deleteLedger);
 module.exports = router;

@@ -209,7 +209,7 @@
             headers: {
                 'Content-Type': 'application/json'
             },
-            success: function (response) {
+            success: function (response) {  
                 if (response.data && response.data.length > 0) {
                     // Clear the table
                     $('#orderTableBody').empty();
@@ -224,7 +224,7 @@
                                 </td>
                                 <td style="text-align: center;">${data.date}</td>
                                 <td style="text-align: center;">
-                                    <a href="/admin/order/order-summary/${data.bill_no}">${data.bill_no}</a>
+                                    <a href="/admin//inventory/products-detail/${data.bill_no}">${data.bill_no}</a>
                                 </td>
                                 <td style="text-align: center;">${data.grand_total}</td>
                                 <td style="text-align: center;">${data.remaining_balance}</td>
