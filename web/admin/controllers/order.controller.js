@@ -1102,112 +1102,15 @@ module.exports = {
         const date = server.date || expense.date || formattedDate;
 
         
-      if (expense.amount < server.amount) {
+      const transaction = await models.ProductModel.Transaction.findOne({_id : expense.transaction_id});
 
-        const from = await models.ProductModel.Bank.findOne({ name : payment_method});
+      transaction.type = payment_method || transaction.type;
+      transaction.to = `${server.item}`;
+      transaction.debited = server.amount || transaction.debited;
+      transaction.credited = 0.0 || transaction.credited;
+      transaction.date = server.date || transaction.date;
 
-        const debitTransactionData = {
-          type: payment_method, // You can adjust the type based on your requirements
-          from: "Issued Expenses",
-          to: `${server.item}`,
-          transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
-          debited: difference,
-          credited: 0.0,
-          date: date
-        }; 
-
-        const debitTransaction = new models.ProductModel.Transaction(debitTransactionData);
-        await debitTransaction.save();
-      }else if(expense.amount > server.amount){
-        const from = await models.ProductModel.Bank.findOne({ name : payment_method });
-
-        const debitTransactionData = {
-          type: payment_method, // You can adjust the type based on your requirements
-          from: "Issued Expenses",
-          to: `${server.item}`,
-          transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
-          debited: 0.0,
-          credited: difference,
-          date: date
-        }; 
-
-        const debitTransaction = new models.ProductModel.Transaction(debitTransactionData);
-        await debitTransaction.save();
-      }else{
-        console.log("Payment Method",server.payment_method);
-        if(expense.mode_of_payment === "Unpaid" && (server.payment_method === "CASH" || server.payment_method === "IDFC SWATI" || server.payment_method === "IDFC SAM" || server.payment_method === "NET BANK")){
-          console.log("UNPAID TO CASH")
-          const from = await models.ProductModel.Bank.findOne({ name: server.payment_method });
-
-          const debitTransactionData = {
-            type: server.payment_method,
-            from: `Expense -- ${server.item}`,
-            to: `${server.item}`,
-            transaction_id: uuidv4(),
-            debited: Number(server.amount),
-            credited: 0.0,
-            date: date
-          }; 
-          const debitTransaction = new models.ProductModel.Transaction(debitTransactionData);
-          await debitTransaction.save();
-        }else if ( server.payment_method !== false ) {
-          const from = await models.ProductModel.Bank.findOne({ name: expense.mode_of_payment});
-          const to = await models.ProductModel.Bank.findOne({ name: server.payment_method});
-          console.log("From -- " + from)
-          console.log("To -- " + to)
-          // Calculate the amount to be transferred
-          const amount = Number(server.amount);
-          console.log(amount);
-
-          // Create a transaction record for debit
-          const debitTransactionData = {
-              type: from.name, // You can adjust the type based on your requirements
-              from: "Other Expenses",
-              to: `Expense -- ${server.item}`,
-              transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
-              debited: amount,
-              credited: 0.0,
-              date: server.date || formattedDate
-          };
-
-          console.log(debitTransactionData)
-          const debitTransaction = new models.ProductModel.Transaction(debitTransactionData);
-          await debitTransaction.save();
-
-          // Create a transaction record for credit
-          const creditTransactionData = {
-              type: to.name, // You can adjust the type based on your requirements
-              from: "Expense Refund",
-              to: `Expense -- ${server.item}`,
-              transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
-              debited: 0.0,
-              credited: amount,
-              date: server.date || formattedDate
-          };
-          console.log(creditTransactionData)
-          const creditTransaction = new models.ProductModel.Transaction(creditTransactionData);
-          await creditTransaction.save();
-        } else if (server.payment_method === "Unpaid" && (expense.payment_method === "CASH" || expense.payment_method === "IDFC SWATI" || expense.payment_method === "IDFC SAM" || expense.payment_method === "NET BANK")) {
-          console.log("PAID TO UNPAID")
-          const from = await models.ProductModel.Bank.findOne({ name : expense.payment_method});
-        
-          const debitTransactionData = {
-            type: expense.payment_method, // You can adjust the type based on your requirements
-            from: "Expense Refund",
-            to: `Expense -- ${server.item}`,
-            transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
-            debited: 0.0,
-            credited: Number(server.total_amount),
-            date: formattedDate
-          }; 
-          
-          const debitTransaction = new models.ProductModel.Transaction(debitTransactionData);
-          await debitTransaction.save();
-        }else{
-          console.log("Passed")
-        }
-      }
-
+      await transaction.save();
 
       expense.date  = server.date || expense.date;
       expense.item_name  = server.item;
