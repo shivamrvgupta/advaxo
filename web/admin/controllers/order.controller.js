@@ -1025,6 +1025,11 @@ module.exports = {
 
         const transaction = new models.ProductModel.Transaction(creditTransaction);
         await transaction.save();
+
+        expense.transaction_id = transaction._id;
+        await expense.save();
+
+        console.log("Created expense", expense);
       }
 
       if(server.expense_type === "Order"){
@@ -1258,29 +1263,12 @@ module.exports = {
         await orders.save()
       }
 
-      if(expense.mode_of_payment === 'CASH' || expense.mode_of_payment === 'NET BANK' || expense.mode_of_payment === 'IDFC SWATI' || expense.mode_of_payment === 'IDFC SAM'){
-            
-        const from = await models.ProductModel.Bank.findOne({ name : expense.mode_of_payment});
-
-        from.amount = (Number(from.amount) + Number(expense.amount));
-
-        await from.save();
-
-        const debitTransactionData = {
-          type: from.name, // You can adjust the type based on your requirements
-          from: "Expense Refund",
-          to: `General -- ${expense.item_name}`,
-          transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
-          debited: 0.0,
-          credited: expense.amount,
-          date: formattedDate
-        }; 
-        
-        const debitTransaction = await models.ProductModel.Transaction.create(debitTransactionData);
-        await debitTransaction.save();
-        
-      }else{
-        console.log("Passed")
+      const transaction = await models.ProductModel.Transaction.find({_id : expense.transaction_id});
+      console.log(transaction)
+      if(transaction){
+        for(let i = 0; i < transaction.length; i++){
+          await models.ProductModel.Transaction.findByIdAndDelete(transaction[i]._id);
+        }
       }
 
       await models.ProductModel.GenralExpense.findByIdAndDelete(expenseId);

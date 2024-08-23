@@ -8,6 +8,11 @@ const generalExpenseSchema = new mongoose.Schema({
     order_id : {
         type: String,
     },
+    transaction_id : {
+        type : mongoose.Schema.Types.ObjectId,
+        ref : 'Transaction',
+        required: false
+    },
     expense_type : {
         type: String,
         required: true
