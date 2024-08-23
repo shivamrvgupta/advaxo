@@ -1424,7 +1424,7 @@ module.exports = {
       
                   // Update payment status based on the new remaining balance
                   if (orders.remaining_balance === orders.grand_total) {
-                      orders.payment_status = "unpaid";
+                      orders.payment_status = "Unpaid";
                   } else {
                       orders.payment_status = "partially_paid";
                   }
