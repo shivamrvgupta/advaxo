@@ -67,22 +67,22 @@
                                                                                 <i class="ri-eye-line"></i>
                                                                             </a>
                                                                         </li>
-                                                                        <li style="display: contents;">
-                                                                            <a href="/admin/order/delete-ledger/<%= row.ledger_id %>">
+                                                                        <li>
+                                                                            <a onclick="deleteOrderLedger('<%= row.ledger_id %>')">
                                                                                 <i class="ri-delete-bin-line"></i>
                                                                             </a>
-                                                                        </li>
+                                                                        </li>   
                                                                     <% } else if (row.ledger_id && row.ledger_id.startsWith('PayOUT')) { %>
                                                                         <li style="display: contents;">
                                                                             <a href="/admin/inventory/ledger-details/<%= row.ledger_id %>">
                                                                                 <i class="ri-eye-line"></i>
                                                                             </a>
                                                                         </li>
-                                                                        <li style="display: contents;">
-                                                                            <a href="/admin/inventory/delete-ledger/<%= row.ledger_id %>">
+                                                                        <li>
+                                                                            <a onclick="deleteOrderInventory('<%= row.ledger_id %>')">
                                                                                 <i class="ri-delete-bin-line"></i>
                                                                             </a>
-                                                                        </li>
+                                                                        </li>   
                                                                     <% } else { %>
                                                                         <li style="display: contents;">
                                                                             --
@@ -230,4 +230,59 @@
                     .catch(error => console.error('Error fetching data from API:', error));
             </script>
 
+<script>
+    function deleteOrderInventory(ledger_id) {
+        if (confirm("Are you sure you want to delete this Bill?")) {
+            // Send AJAX request to delete payment
+            $.ajax({
+                type: "POST",
+                url: `/admin/inventory/delete-ledger/${ledger_id}`,
+                data: { bill_no : expenseId },
+                success: function (data) {
+                // If the deletion is successful, you can handle the response or reload the page
+                console.log(data); // Optional: Log the server response
+                    // Handle error message
+                    alert(data.message);
+                    window.location.reload(); // Reload the page to reflect the changes
+                },
+                error: function (error) {
+                // Handle errors if any
+                console.error(error);
+                alert(`${error.responseText}`);
+                window.location.reload(); // Reload the page to reflect the changes
+                },
+            });
+        }
+        // Prevent default anchor action
+        return false;
+    }
+</script>
+
+<script>
+    function deleteOrderLedger(ledger_id) {
+        if (confirm("Are you sure you want to delete this Bill?")) {
+            // Send AJAX request to delete payment
+            $.ajax({
+                type: "POST",
+                url: `/admin/order/delete-ledger/${ledger_id}`,
+                data: { ledger_id : ledger_id },
+                success: function (data) {
+                // If the deletion is successful, you can handle the response or reload the page
+                console.log(data); // Optional: Log the server response
+                    // Handle error message
+                    alert(data.message);
+                    window.location.reload(); // Reload the page to reflect the changes
+                },
+                error: function (error) {
+                // Handle errors if any
+                console.error(error);
+                alert(`${error.responseText}`);
+                window.location.reload(); // Reload the page to reflect the changes
+                },
+            });
+        }
+        // Prevent default anchor action
+        return false;
+    }
+</script>
 <%- include('../../partials/end')%>
