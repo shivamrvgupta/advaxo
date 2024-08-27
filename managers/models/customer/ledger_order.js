@@ -11,7 +11,12 @@ const ledgerSchema = new mongoose.Schema({
     client_id:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Client',
-    },  
+    },
+    payment_method :{
+        type : String,
+        required : true,
+        default : "IDFC Swati"
+    },
     amount : {
         type: Number,
         required: true

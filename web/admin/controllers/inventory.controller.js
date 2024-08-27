@@ -1209,8 +1209,33 @@ module.exports = {
       const vendors = await models.ProductModel.Vendor.findOne({_id : name});
       const customer_id = vendors._id;
 
-      const bills = await models.ProductModel.InventoryBill.find({vendor_id : customer_id}).populate("vendor_id").sort({ created_date : -1 });
+      const bills = await models.ProductModel.InventoryBill.find({vendor_id : customer_id}).populate("vendor_id").sort({ date : -1 });
+      
+      const billWithType = bills.map(bill => ({
+        ...bill._doc,
+        type: "bill",
+        date: new Date(bill.date) // Convert to Date object
+      }));
+      
+      const ledger = await models.CustomerModel.LedgerIventory.find({vendor_id : customer_id}).sort({ date : -1 });
+      console.log(ledger);
 
+      const LedgerWithType = ledger.map(bill => ({
+        ...bill._doc,
+        type: "ledger",
+        date: new Date(bill.date) // Convert to Date object
+      }));
+
+      console.log("Test --- ",billWithType, LedgerWithType);
+      const billData = [...billWithType, ...LedgerWithType];
+
+      const combinedData = billData.sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return dateB - dateA;
+      })
+
+      console.log(combinedData);
       let overallGrandTotal = 0.0;
       let overallRemainingBalance = 0.0;
       let overallClientBalance = 0.0;
@@ -1226,7 +1251,7 @@ module.exports = {
       
           if (bill.payment_status === 'paid') {
               paidOrderCount++;
-          } else if (bill.payment_status === 'unpaid') {
+          } else if (bill.payment_status === 'Unpaid' || bill.payment_status === 'partially_paid') {
               unpaidOrderCount++;
           }
       });
@@ -1241,7 +1266,7 @@ module.exports = {
           total_orders : totalOrders        
         }
 
-        res.render('admin/reports/reports-inventory',{user, inventory : bills,vendors : customers, data, options,  error: "Reports"})
+        res.render('admin/reports/reports-inventory',{user, inventory : bills,vendors : customers, combinedData, data, options,  error: "Reports"})
       
     }catch(err){
       console.log(err)

@@ -12,6 +12,10 @@ const ledgerInventSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Vendor',
     },
+    payment_method :{
+        type : String,
+        required : true,
+    },
     amount : {
         type: Number,
         required: true

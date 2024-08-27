@@ -874,6 +874,7 @@ module.exports = {
         ledger_id : newLedgerId,
         client_id : server.customer_id, 
         amount : server.amount,
+        payment_method : server.payment_method,
         date : server.date
       }
 
@@ -997,6 +998,7 @@ module.exports = {
         ledger_id : newLedgerId,
         vendor_id : server.customer_id, 
         amount : server.amount,
+        payment_method : server.payment_method,
         date : server.date
       }
 

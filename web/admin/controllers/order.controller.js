@@ -1498,7 +1498,6 @@ module.exports = {
       }
 
       const name = req.body.customer_id;
-      console.log(name);
       if(!name){
         res.render('admin/search',{
           title: "Advaxo",
@@ -1509,12 +1508,39 @@ module.exports = {
       const client = await models.CustomerModel.Client.find({});
       const customers = await models.CustomerModel.Client.findOne({_id : name});
 
-      console.log(customers);
       const customer_id = customers._id;
 
-      const orders = await models.ProductModel.Order.find({client_id : customer_id}).populate("client_id").sort({date : -1});
+      const orders = await models.ProductModel.Order.find({ client_id: customer_id })
+          .populate("client_id")
+          .sort({ order_date: 1 });
 
-      console.log(orders);
+      const ordersWithType = orders.map(order => ({
+          ...order._doc,
+          type: "order",
+          date: new Date(order.order_date) // Convert to Date object
+      }));
+
+      const payments = await models.CustomerModel.LedgerOrder.find({ client_id: customer_id })
+          .sort({ date: 1 });
+
+      const paymentsWithType = payments.map(payment => ({
+          ...payment._doc,
+          type: "transaction",
+          date: new Date(payment.date) // Convert to Date object
+      }));
+
+      // Combine the orders and payments into a single array
+      const Orderdata = [...ordersWithType, ...paymentsWithType];
+
+      // Sort the combined array by date
+      const combinedData = Orderdata.sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return dateB - dateA;
+      });
+
+
+
       let overallGrandTotal = 0.0;
       let overallRemainingBalance = 0.0;
       let overallClientBalance = 0.0;
@@ -1523,15 +1549,15 @@ module.exports = {
       let totalOrders = orders.length;
       
       orders.forEach(order => {
-          overallGrandTotal += parseFloat(order.grand_total);
-          overallRemainingBalance += parseFloat(order.remaining_balance);
-          overallClientBalance += parseFloat(order.client_balance);
-      
-          if (order.payment_status === 'paid') {
-              paidOrderCount++;
-          } else if (order.payment_status === 'unpaid') {
-              unpaidOrderCount++;
-          }
+        overallGrandTotal += parseFloat(order.grand_total);
+        overallRemainingBalance += parseFloat(order.remaining_balance);
+        overallClientBalance += parseFloat(order.client_balance);
+    
+        if (order.payment_status === 'paid') {
+            paidOrderCount++;
+        } else if (order.payment_status === 'Unpaid' || order.payment_status === 'partially_paid') {
+            unpaidOrderCount++;
+        }
       });
 
         const data = {
@@ -1544,7 +1570,7 @@ module.exports = {
           total_orders : totalOrders        
         }
 
-        res.render('admin/reports/reports-order',{user, inventory : orders,clients : client, data, options,  error: "Reports"})
+        res.render('admin/reports/reports-order',{user, inventory : orders,clients : client, combinedData, data, options,  error: "Reports"})
       
     }catch(err){
       console.log(err)

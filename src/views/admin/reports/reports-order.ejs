@@ -115,7 +115,7 @@
                                 </form>
                             </div>
                             <div class="table-responsive table-product">
-                                <table class="table all-package theme-table" id="table_id">
+                                <table class="table all-package theme-table">
                                     <div class="title-header option-title ">
                                         <h2>All Bills</h2> 
                                         <div class="d-inline-flex hide-on-print">
@@ -124,46 +124,13 @@
                                     </div>
                                     <thead>
                                         <tr>
-                                            <th style="text-align: center;">Date</th>
-                                            <th style="text-align: center;">Order No</th>
-                                            <th style="text-align: center;">Order Cost</th>
+                                            <th style="text-align: center;">Customer Name</th>
+                                            <th style="text-align: center;">Orders</th>
+                                            <th style="text-align: center;">Paid Orders</th>
+                                            <th style="text-align: center;">Unpaid Orders</th>
+                                            <th style="text-align: center;">Grand Total</th>
                                             <th style="text-align: center;">Received Amount</th>
                                             <th style="text-align: center;">Due Balance</th>
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-                                        
-                                            <% if (inventory != '') { %>
-                                                <% inventory.forEach((row, index) => { %>
-                                                        <tr>
-                                                            <td style="text-align: center;"><%= row.created_date.toLocaleDateString('en-UK',options) %></td>
-                                                            <td style="text-align: center;"><a href="/admin/order/order-summary/<%= row.order_id %>"><%= row.order_id %></a></td>
-                                                            <td style="text-align: center;"><%= row.grand_total %></td>
-                                                            <td style="text-align: center;"><%= (row.grand_total - row.remaining_balance).toFixed(2) %></td>
-                                                            <td style="text-align: center;"><%= row.remaining_balance.toFixed(2) %></td>
-                                                        </tr>
-                                                <% }) %>
-                                            <% }else{ %>
-                                                <tr>
-                                                    <td colspan="7" class="text-center">No Transactions Available</td>
-                                                </tr>
-                                            <% } %>
-                                        
-                                    </tbody>
-                                </table>
-                                <br>
-                                <br>
-                                <table class="table all-package theme-table">
-                                    <thead>
-                                        <tr>
-                                            <th style="text-align: center;">Customer Name</th>
-                                            <th style="text-align: center;">No of Orders</th>
-                                            <th style="text-align: center;">No of Paid Orders</th>
-                                            <th style="text-align: center;">No of Unpaid Orders</th>
-                                            <th style="text-align: center;">Grand Total</th>
-                                            <th style="text-align: center;">Total Paid</th>
-                                            <th style="text-align: center;">Total Due</th>
                                         </tr>
                                     </thead>
     
@@ -179,6 +146,71 @@
                                         </tr>
                                     </tbody>
                                 </table>
+                                <br>
+                                <br>
+                                <br>
+
+                                <table class="table all-package theme-table" id="table_id">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align: center;">Date</th>
+                                            <th style="text-align: center;">TXN Type</th>
+                                            <th style="text-align: center;">Order No</th>
+                                            <th style="text-align: center;">Payment In</th>
+                                            <th style="text-align: center;">Received Amount</th>
+                                            <th style="text-align: center;">Due Balance</th>
+                                            <th style="text-align: center;">Total Amount</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <% if (combinedData.length > 0) { %>
+                                            <% combinedData.forEach((row, index) => { %>
+                                                <% 
+                                                    const date = new Date(row.date);
+                                                    const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+                                                %>
+                                                <!-- Display the Order Details -->
+                                                <% if (row.type === 'order') { %>
+                                                    <tr>
+                                                        <td style="text-align: center;">
+                                                            <%= formattedDate %>
+                                                        </td>
+                                                        <td style="text-align: center;">Sale</td>
+                                                        <td style="text-align: center;"><a href="/admin/order/order-summary/<%= row.order_id %>"><%= row.order_id %></a></td>
+                                                        <td style="text-align: center;"><%= row.payment_type %></td>
+                                                        <td style="text-align: center;"><%= (row.grand_total - row.remaining_balance).toFixed(2) %></td>
+                                                        <td style="text-align: center;"><%= row.remaining_balance.toFixed(2) %></td>
+                                                        <td style="text-align: center;"><%= row.grand_total.toFixed(2) %></td>
+                                                    </tr>
+                                                <% } else { %>
+                                                        <tr>
+                                                            <td style="text-align: center;"><%= formattedDate %></td>
+                                                            <td style="text-align: center;">Payment-In</td>
+                                                            <td style="text-align: center;">
+                                                                <a href="/admin/order/ledger-details/<%= row.ledger_id %>">
+                                                                    <%= row.ledger_id %>
+                                                                </a>
+                                                            </td>
+                                                            <td style="text-align: center;"><%= row.payment_method %></td>
+                                                            <td style="text-align: center;"><%= row.amount %></td>
+                                                            <td style="text-align: center;">0.00</td>
+                                                            <td style="text-align: center;"><%= row.amount %></td>
+                                                        </tr>
+                                                <% } %>
+
+                                    
+                                            <% }) %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="7" class="text-center">No Transactions Available</td>
+                                            </tr>
+                                        <% } %>
+                                                
+                                    </tbody>
+                                    
+                                </table>
+                                
                             </div>
                         </div>
                     </div>
