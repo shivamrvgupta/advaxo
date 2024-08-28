@@ -40,6 +40,9 @@ router.post('/delete-order/:wopId', AuthMiddleware.authenticateToken , OrderCont
 router.post('/delete-other-expenses/:expenseId', AuthMiddleware.authenticateToken , OrderControllers.deleteOtherExpenses);
 
 router.get('/search', AuthMiddleware.authenticateToken, OrderControllers.search);
+router.get('/expense/search', AuthMiddleware.authenticateToken, OrderControllers.expenseSearch);
+router.post('/expense/search', AuthMiddleware.authenticateToken, OrderControllers.getExpenseSearch);
+
 router.post('/search', AuthMiddleware.authenticateToken, OrderControllers.getSearch);
 
 router.get('/ledger-wop', AuthMiddleware.authenticateToken, OrderControllers.getLedgerSearch);

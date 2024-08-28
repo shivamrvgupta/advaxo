@@ -1217,7 +1217,7 @@ module.exports = {
         date: new Date(bill.date) // Convert to Date object
       }));
       
-      const ledger = await models.CustomerModel.LedgerIventory.find({vendor_id : customer_id}).sort({ date : -1 });
+      const ledger = await models.CustomerModel.LedgerIventory.find({vendor_id : customer_id, status : false }).sort({ date : -1 });
       console.log(ledger);
 
       const LedgerWithType = ledger.map(bill => ({

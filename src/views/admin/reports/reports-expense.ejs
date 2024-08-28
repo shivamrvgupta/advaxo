@@ -1,0 +1,367 @@
+<%- include('../../partials/main', { pageTitle: 'Reports' }) %>
+
+<style>
+    .inline{
+        display: inline-flex;
+    }
+    #select2-product-container , #select2-unit-container{
+        font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+    }
+        .mb-4{
+            justify-content: space-evenly;
+        }
+        .completebutton{
+            align-items: end;
+            width: 30%;
+            margin-right: 2rem;
+        }
+        .addbutton{
+            align-items: flex-end;
+            width: 30%;
+            }
+</style>
+
+
+<div class="page-body">
+<!-- tracking table start -->
+<div class="container-fluid">
+
+
+    <% if(data === null){ %>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="title-header title-header-block package-card">
+                            <div>
+                                <h5>Search Expense Data </h5>
+                            </div>
+    
+                            <form class="theme-form theme-form-2 mega-form" method="post" action="/admin/order/expense/search">
+                                <div class="add-product">
+                                    <div class="card-header-1">
+
+                                    </div>
+    
+                                    <div class="mb-4 row align-items-center">
+                                        <label class="form-label-title col-lg-2 col-md-3 mb-0">Expense Type</label>
+                                        <div class="col-sm-9 col-lg-10">
+                                            <div class="custom-dropdown">
+                                                <input class="form-control" type="text" id="customerName" name="name" placeholder="Select or Enter Your Expense Type">
+                                                <ul class="dropdown-menu" style="width: 97%;" id="customerDropdown">
+                                                    <% if (clients != '') { %>        
+                                                        <% clients.forEach((row, index) => { %> 
+                                                            <li value="<%= row.type %>" class="form-control w-100"><%= row.type %></li>
+                                                            <span style="display: none;" id="selected_user"><%= row.type %></span>
+                                                        <% }) %>
+                                                    <% } %>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+    
+                                    <div class="mb-4 row align-items-center">
+                                        <button class="btn btn-solid continue-btn" type="submit">Find</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>    
+                </div>
+            </div> 
+        </div>        
+    <% } else { %>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-12" id="printableArea">
+                    <div class="card card-table">
+                        <div class="card-body">
+                            <div class="title-header title-header-block package-card hide-on-print" >
+                                <div>
+                                    <h5>Search Expense Data </h5>
+                                </div>
+                                <form class="theme-form theme-form-2 mega-form" method="post" action="/admin/order/expense/search">
+                                    <div class="card-header-1">
+
+                                    </div>
+                                    <div class="add-product">
+                                        <div class="mb-4 row align-items-center">
+                                            <label class="form-label-title col-lg-2 col-md-3 mb-0">Expense Type</label>
+                                            <div class="col-sm-9 col-lg-10">
+                                                <div class="custom-dropdown">
+                                                    <input class="form-control" type="text" id="customerName" name="name" placeholder="Select or Enter Your Expense Type">
+                                                    <ul class="dropdown-menu" style="width: 97%;" id="customerDropdown">
+                                                        <% if (clients != '') { %>        
+                                                            <% clients.forEach((row, index) => { %> 
+                                                                <li value="<%= row.type %>" class="form-control w-100"><%= row.type %></li>
+                                                                <span style="display: none;" id="selected_user"><%= row.type %></span>
+                                                            <% }) %>
+                                                        <%  } else { %>
+                                                            <li value="none" class="disabled form-control w-100">No Such Expense</li>
+                                                        <% } %>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+        
+                                        <div class="mb-4 row align-items-center">
+                                            <button class="btn btn-solid continue-btn" type="submit">Find</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="table-responsive table-product">
+                                <table class="table all-package theme-table" id="table_id">
+                                    <div class="title-header option-title ">
+                                        <h2>All Expenses</h2> 
+                                        <div class="d-inline-flex hide-on-print">
+                                            <button class="btn btn-primary text-white print-button rounded ms-2" onclick="printInvoice()" > Print </button>
+                                        </div>
+                                    </div>
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align: center;">Date</th>
+                                            <th style="text-align: center;">Item</th>
+                                            <th style="text-align: center;">Description</th>
+                                            <th style="text-align: center;">Payment In</th>
+                                            <th style="text-align: center;">Amount</th>
+                                            <th style="text-align: center;">Status</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <% if (customers.length > 0) { %>
+                                            <% customers.forEach((row, index) => { %>
+                                                    <tr>
+                                                        <td style="text-align: center;">
+                                                            <%= row.date.toLocaleDateString('en-UK',options) %>
+                                                        </td>
+                                                        <td style="text-align: center;"> <%= row.item_name %></td>
+                                                        <td style="text-align: center;"> <%= row.description %></td>
+                                                        <td style="text-align: center;"> <%= row.mode_of_payment %></td>
+                                                        <td style="text-align: center;"> <%= row.amount %></td>
+                                                        <td style="text-align: center;">
+                                                            <div class="<%= row.payment_status ? 'status-close' : 'status-danger' %>">
+                                                                <span><%= row.payment_status ? 'Paid' : 'Unpaid' %></span>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="6" class="text-center">No Expense Available</td>
+                                            </tr>
+                                        <% } %>
+                                                
+                                    </tbody>
+                                    
+                                </table>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div>
+<!-- tracking table end -->
+
+<div class="container-fluid">
+    <!-- footer start-->
+    <%- include('../../partials/footer')%>
+</div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script> 
+<script>
+    function printInvoice() {
+        // Hide elements that should not be printed
+        const elementsToHide = document.querySelectorAll('.hide-on-print');
+        elementsToHide.forEach((element) => {
+            element.style.display = 'none';
+        });
+        
+        // Get the content within the printable area
+        const printableArea = document.getElementById('printableArea');
+        const tableContent = printableArea.innerHTML; // Get the table content
+        
+        // Open a new window for printing
+        const printWindow = window.open('', '', 'width=800,height=600');
+        printWindow.document.open();
+        printWindow.document.write('<html><head><style>table, th, td {border: .5px solid black;padding : 2px;} *{font-size:10px}</style></head><body>');
+        printWindow.document.write(tableContent); // Write the table content
+        printWindow.document.write('</body></html');
+        printWindow.document.close();
+        
+        // Print the content
+        printWindow.print();
+        
+        // Close the print window
+        printWindow.close();
+        
+        // Restore the hidden elements after printing is done
+        elementsToHide.forEach((element) => {
+            element.style.display = '';
+        });
+    }
+        
+</script>
+
+
+
+<script>
+    $(document).ready(function() {
+        // Add click event listener to the continue button
+        $('.continue-btn').click(function() {
+            // Show the table content
+            $('.hide-table').show();
+
+            // Get the active tab pane
+            var activeTabPane = $('.tab-pane.active');
+            // Find the next tab pane
+            var nextTabPane = activeTabPane.next('.tab-pane');
+
+            // Check if there is a next tab pane
+            if (nextTabPane.length > 0) {
+                // Hide the current tab pane
+                activeTabPane.removeClass('show active');
+                // Show the next tab pane
+                nextTabPane.addClass('show active');
+            }
+        });
+    });
+</script>
+
+<script>
+    function validateFloat(floatField) {
+        // Remove any non-numeric characters (including '.') from the input
+        floatField.value = floatField.value.replace(/[^0-9.]/g, '');
+
+        // Parse the entered value as a float
+        var enteredValue = parseFloat(floatField.value);
+
+        // Display an error message if the entered value is not a valid number or less than or equal to 0
+        var errorMessage = document.getElementById("errorMessage");
+        if (isNaN(enteredValue) || enteredValue <= 0) {
+            errorMessage.textContent = "Please enter a valid number greater than 0.";
+            document.getElementById("confirmStatusChange").disabled = true;
+        } else {
+            errorMessage.textContent = "";
+            document.getElementById("confirmStatusChange").disabled = false;
+        }
+    }
+</script>
+
+
+<script>
+    // Update Total Area
+    function updateTotalArea() {
+        var width = parseFloat(document.getElementById('width').value) || 0; // Default to 1 if width is 0
+        var height = parseFloat(document.getElementById('height').value) || 0; // Default to 1 if height is 0
+        var quantity = parseFloat(document.getElementById('quantity').value) || 0;
+        var total_area = (width * height * quantity).toFixed(2);
+        document.getElementById('total_area').value = total_area;
+    }
+
+    // Update Total Amount
+    function updateTotalAmount() {
+        var width = parseFloat(document.getElementById('width').value) || 1; // Default to 1 if width is 0
+        var height = parseFloat(document.getElementById('height').value) || 1; // Default to 1 if height is 0
+        var quantity = parseFloat(document.getElementById('quantity').value) || 0;
+        var rate = parseFloat(document.getElementById('rate').value) || 0;
+        var total_amount = (width * height * quantity * rate).toFixed(2);
+        document.getElementById('total_amount').value = total_amount;
+    }
+
+    // Update Rate
+    function updateRate() {
+        var width = parseFloat(document.getElementById('width').value) || 1; // Default to 1 if width is 0
+        var height = parseFloat(document.getElementById('height').value) || 1; // Default to 1 if height is 0
+        var quantity = parseFloat(document.getElementById('quantity').value) || 0;
+        var amount = parseFloat(document.getElementById('total_amount').value) || 0;
+        var rate = (amount / (width * height * quantity)).toFixed(2);
+        document.getElementById('rate').value = rate;
+    }
+
+    // Event listeners for input fields
+    document.getElementById('width').addEventListener('input', updateTotalArea);
+    document.getElementById('height').addEventListener('input', updateTotalArea);
+    document.getElementById('quantity').addEventListener('input', updateTotalArea);
+
+    document.getElementById('width').addEventListener('input', updateTotalAmount);
+    document.getElementById('height').addEventListener('input', updateTotalAmount);
+    document.getElementById('quantity').addEventListener('input', updateTotalAmount);
+    document.getElementById('rate').addEventListener('input', updateTotalAmount);
+
+    document.getElementById('width').addEventListener('input', updateRate);
+    document.getElementById('height').addEventListener('input', updateRate);
+    document.getElementById('quantity').addEventListener('input', updateRate);
+    document.getElementById('total_amount').addEventListener('input', updateRate);
+</script>
+
+<script>
+    $(document).ready(function() {
+        // Add event listener to unit select element
+        $('#unit').on('change', function() {
+            var unitValue = $(this).val();
+            // Check the selected unit value
+            if (unitValue === 'SQRFT') {
+                console.log("changes to sqrft")
+                // Enable width, height, and area inputs
+                $('#width, #height, #total_area').prop('disabled', false);
+            } else if (unitValue === 'NOS') {
+                console.log("changes to nos")
+                // Disable width, height, and area inputs
+                $('#width, #height, #total_area').prop('disabled', true); 
+            }
+        });
+    });
+</script>
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    var inputField = document.getElementById('customerName');
+    var dropdownMenu = document.getElementById('customerDropdown');
+    var options = dropdownMenu.getElementsByTagName('li');
+
+    inputField.addEventListener('input', function() {
+        var filter = inputField.value.toLowerCase();
+        for (var i = 0; i < options.length; i++) {
+            var textValue = options[i].textContent || options[i].innerText;
+            if (textValue.toLowerCase().indexOf(filter) > -1) {
+                options[i].style.display = "";
+            } else {
+                options[i].style.display = "none";
+            }
+        }
+    });
+
+    inputField.addEventListener('click', function() {
+        toggleDropdown();
+    });
+
+    inputField.addEventListener('focus', function() {
+        toggleDropdown();
+    });
+
+    dropdownMenu.addEventListener('click', function(event) {
+        if (event.target.tagName === 'LI') {
+            inputField.value = event.target.textContent;
+            toggleDropdown();
+        }
+    });
+
+    function toggleDropdown() {
+        if (dropdownMenu.style.display === 'none') {
+            dropdownMenu.style.display = 'block';
+        } else {
+            dropdownMenu.style.display = 'none';
+        }
+    }
+    });
+
+</script>
+<%- include('../../partials/end')%>
+

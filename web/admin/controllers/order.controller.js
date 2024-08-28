@@ -1520,7 +1520,7 @@ module.exports = {
           date: new Date(order.order_date) // Convert to Date object
       }));
 
-      const payments = await models.CustomerModel.LedgerOrder.find({ client_id: customer_id })
+      const payments = await models.CustomerModel.LedgerOrder.find({ client_id: customer_id , status : false })
           .sort({ date: 1 });
 
       const paymentsWithType = payments.map(payment => ({
@@ -1571,6 +1571,77 @@ module.exports = {
         }
 
         res.render('admin/reports/reports-order',{user, inventory : orders,clients : client, combinedData, data, options,  error: "Reports"})
+      
+    }catch(err){
+      console.log(err)
+      res.redirect(`${referer}?error="${encodeURIComponent(err)}"`);
+    }
+  },
+
+  expenseSearch : async (req, res) => {
+    const referer = req.get('Referer');
+    try{
+      const user = req.user;
+      
+      if(!user){
+        res.render('a-login',{
+          title: "Advaxo",
+          error: "User Not Found"
+        })   
+      }
+
+      const clients = [
+        {type : "General"},
+        {type : "Fuels"},
+        {type : "Office"},
+        {type : "Order"},
+        {type : "Salary"},
+        {type : "Loan"}
+      ]
+
+      console.log(clients);
+      res.render('admin/reports/reports-expense',{user, data : null, clients, error: "Find all Expenses"})
+
+    }catch(err){
+      console.log(err)
+      res.redirect(`${referer}?error="${encodeURIComponent(err)}"`);
+    }
+  },
+
+  getExpenseSearch : async (req, res) => {
+    const referer = req.get('Referer');
+    try{
+      const user = req.user;
+      
+      if(!user){
+        res.render('a-login',{
+          title: "Advaxo",
+          error: "User Not Found"
+        })   
+      }
+
+      const name = req.body.name;
+      console.log(req.body)
+      if(!name){
+        res.render('admin/reports/reports-expense',{
+          title: "Advaxo",
+          error: "User Not Found",
+          data : null
+        })   
+      }
+
+      const client = [
+        {type : "General"},
+        {type : "Fuels"},
+        {type : "Office"},
+        {type : "Order"},
+        {type : "Salary"},
+        {type : "Loan"}
+      ]
+
+      const customers = await models.ProductModel.GenralExpense.find({ expense_type : name }).sort({ date: -1 });
+      console.log(customers)
+      res.render('admin/reports/reports-expense',{user, clients : client, data:customers, customers, options,  error: "Reports"})
       
     }catch(err){
       console.log(err)
