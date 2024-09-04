@@ -52,7 +52,7 @@
                                                 <% if (orders != '') { %>        
                                                     <% orders.forEach((row, index) => { %>                                                     
                                                         <tr class="order-row">
-                                                            <td><%= row.created_date.toLocaleDateString('en-UK',options) %></td>
+                                                            <td><%= row.order_date%></td>
                                                             <td>    
                                                                 <div class="user-name">
                                                                     <a href="/admin/order/order-summary/<%= row.order_id %>"><%= row.order_id %></a>
