@@ -237,7 +237,7 @@
             $.ajax({
                 type: "POST",
                 url: `/admin/inventory/delete-ledger/${ledger_id}`,
-                data: { bill_no : expenseId },
+                data: { bill_no : ledger_id },
                 success: function (data) {
                 // If the deletion is successful, you can handle the response or reload the page
                 console.log(data); // Optional: Log the server response
