@@ -141,8 +141,8 @@
                                             <td style="text-align: center;"><%= data.paid_order_count %></td>
                                             <td style="text-align: center;"><%= data.unpaid_order_count %></td>
                                             <td style="text-align: center;"><%= (data.grand_total).toFixed(2) %></td>
-                                            <td style="text-align: center;"><%= (data.remaining_balance).toFixed(2) %></td>
                                             <td style="text-align: center;"><%= (data.grand_total - data.remaining_balance).toFixed(2) %></td>
+                                            <td style="text-align: center;"><%= (data.remaining_balance).toFixed(2) %></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -184,8 +184,8 @@
                                                             </td>
                                                             <td style="text-align: center;"><%= row.payment_type %></td>
                                                             <td style="text-align: center;"><%= row.grand_total.toFixed(2) %></td>
-                                                            <td style="text-align: center;"><%= row.remaining_balance.toFixed(2) %></td>
                                                             <td style="text-align: center;"><%= (parseFloat(row.grand_total) - parseFloat(row.remaining_balance.toFixed(2))).toFixed(2) %></td>
+                                                            <td style="text-align: center;"><%= row.remaining_balance.toFixed(2) %></td>
                                                         </tr>
                                                     <% } else { %>
                                                             <tr>
