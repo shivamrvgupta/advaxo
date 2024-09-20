@@ -21,21 +21,21 @@
                         <div class="col-sm-12" id="printableArea">
                             <div class="card card-table">
                                 <div class="card-body">
-                                    <div class="table-responsive table-product">
-                                        <table class="table all-package theme-table" id="table_id">
-                                            <div class="title-header option-title">
-                                                <h2>Transaction History</h2>
-                                                <div class="d-inline-flex hide-on-print">
-                                                    <div class="table-responsive table-details">
-                                                        <div class="totalBal">
-                                                            Total Available Amount : <%= parseFloat(totalBalance).toFixed(2) %>  
-                                                        </div>    
-                                                    </div>
-                                                </div>
-                                                <div class="d-inline-flex hide-on-print">
-                                                    <button class="btn btn-primary text-white print-button rounded ms-2" onclick="printInvoice()" > Print </button>
-                                                </div>
+                                    <div class="title-header option-title">
+                                        <h2>Transaction History</h2>
+                                        <div class="d-inline-flex hide-on-print">
+                                            <div class="table-responsive table-details">
+                                                <div class="totalBal">
+                                                    Total Available Amount : <%= parseFloat(totalBalance).toFixed(2) %>  
+                                                </div>    
                                             </div>
+                                        </div>
+                                        <div class="d-inline-flex hide-on-print">
+                                            <button class="btn btn-primary text-white print-button rounded ms-2" onclick="printInvoice()" > Print </button>
+                                        </div>
+                                    </div>
+                                    <div class="table-responsive table-customer">
+                                        <table class="table all-package theme-table" id="table_id">
                                             <thead>
                                                 <tr>
                                                     <th class="date">Date</th>
