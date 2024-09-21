@@ -1217,7 +1217,7 @@ module.exports = {
         date: new Date(bill.date) // Convert to Date object
       }));
       
-      const ledger = await models.CustomerModel.LedgerIventory.find({vendor_id : customer_id, status : false }).sort({ date : -1 });
+      const ledger = await models.CustomerModel.LedgerIventory.find({vendor_id : customer_id, status : true }).sort({ date : -1 });
       console.log(ledger);
 
       const LedgerWithType = ledger.map(bill => ({
@@ -1226,7 +1226,7 @@ module.exports = {
         date: new Date(bill.date) // Convert to Date object
       }));
 
-      console.log("Test --- ",billWithType, LedgerWithType);
+      console.log("Testt ",LedgerWithType);
       const billData = [...billWithType, ...LedgerWithType];
 
       const combinedData = billData.sort((a, b) => {
@@ -1235,7 +1235,6 @@ module.exports = {
         return dateB - dateA;
       })
 
-      console.log(combinedData);
       let overallGrandTotal = 0.0;
       let overallRemainingBalance = 0.0;
       let overallClientBalance = 0.0;

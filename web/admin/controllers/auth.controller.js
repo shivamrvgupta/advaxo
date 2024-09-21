@@ -60,7 +60,7 @@ module.exports = {
           const token = generateAccessToken(userExists);
           
           //  Set the token as a cookie or in the response body, depending on your preference
-          if (loginData.remember) {
+          if (loginData.remember === "on") {
             res.cookie('jwt',  token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpOnly: true }); 
           } else {
             res.cookie('jwt', token, { httpOnly: true });
