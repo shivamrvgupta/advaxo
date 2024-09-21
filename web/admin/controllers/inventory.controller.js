@@ -1444,7 +1444,7 @@ module.exports = {
               console.log(orders)
               if (orders) {
                   // Update the remaining balance by reverting the received amount
-                  orders.remaining_balance += parseFloat(order.amount);
+                  orders.remaining_balance -= parseFloat(order.amount);
       
                   // Update payment status based on the new remaining balance
                   if (orders.remaining_balance === orders.grand_total) {
