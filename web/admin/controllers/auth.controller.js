@@ -1064,6 +1064,42 @@ module.exports = {
       console.error('Error getting the Payment Screen:', error);
       res.status(500).json({ error: 'Internal Server Error' });
     }
-  }
+  },
+
+  client_data : async (req, res) => {
+    try {
+      const user = req.user;
+
+      if (!user) {
+        return res.redirect('/admin/auth/login');
+      }
+
+      const clients = await models.CustomerModel.Client.find();
+      console.log(clients)
+
+      res.render('admin/data/client', { user: user, clients, error: "All Clients Data" });
+    } catch (error) {
+      console.error('Error getting the Payment Screen:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  },
+  
+  vendor_data : async (req, res) => {
+    try {
+      const user = req.user;
+
+      if (!user) {
+        return res.redirect('/admin/auth/login');
+      }
+
+      const vendors = await models.ProductModel.Vendor.find();
+      console.log(vendors)
+
+      res.render('admin/data/vendor', { user: user, vendors, error: "All Clients Data" });
+    } catch (error) {
+      console.error('Error getting the Payment Screen:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  },
 } 
 

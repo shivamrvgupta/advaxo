@@ -45,4 +45,8 @@ router.get('/make-payment', AuthMiddleware.authenticateToken ,AuthController.mak
 router.post('/disbursed-payment', AuthMiddleware.authenticateToken ,AuthController.disbursePayment)
 router.post('/issue-payment', AuthMiddleware.authenticateToken ,AuthController.issuePayment)
 
+
+router.get('/all-clients', AuthMiddleware.authenticateToken ,AuthController.client_data);
+router.get('/all-vendors', AuthMiddleware.authenticateToken ,AuthController.vendor_data);
+
 module.exports = router;

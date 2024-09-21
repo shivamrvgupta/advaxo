@@ -1095,24 +1095,59 @@ module.exports = {
       const expenseId = req.params.expenseId;
 
       const expense = await models.ProductModel.GenralExpense.findById(expenseId);
-        
+      console.log("Expense" , expense)
 
       const difference = Math.abs(Number(expense.amount) - Number(server.amount));
-        const payment_method = server.payment_method || expense.mode_of_payment ;
-        const date = server.date || expense.date || formattedDate;
+      const payment_method = server.payment_method || expense.mode_of_payment ;
+      const date = new Date(expense.date).toISOString().split('T')[0];
+      
+      var expense_from = `Expense - ${expense.expense_type}`;
+      var client_name;
+      if(expense.expense_type === "Order"){
+        expense_from = `Order - ${expense.work_order} Expense`;
+        const orders = await models.ProductModel.Order.findOne({order_id : expense.order_id});
+        client_name = orders.client_name;
+      }
 
+      if(expense.mode_of_payment === "Unpaid" && server.payment_method != "Unpaid"){
+
+        const money = await models.ProductModel.Bank.findOne({name : server.payment_method.toUpperCase()});
+        money.amount = parseFloat(money.amount) - parseFloat(server.amount);
+        await money.save();
+
+        const creditTransaction = {
+          ledger_id : "none",
+          type: money.name, // You can adjust the type based on your requirements
+          from: expense_from,
+          to: `${server.item}`,
+          transaction_id: uuidv4(), // Assuming bank _id is unique identifier for transaction
+          debited: server.amount,
+          credited: 0.0,
+          date: date
+        }; 
+
+        const transaction = new models.ProductModel.Transaction(creditTransaction);
+        await transaction.save();
+
+        expense.transaction_id = transaction._id;
+        await expense.save();
+
+        console.log("Created expense", expense);
         
-      const transaction = await models.ProductModel.Transaction.findOne({_id : expense.transaction_id});
-
-      transaction.type = payment_method || transaction.type;
-      transaction.to = `${server.item}`;
-      transaction.debited = server.amount || transaction.debited;
-      transaction.credited = 0.0 || transaction.credited;
-      transaction.date = server.date || transaction.date;
-
-      await transaction.save();
-
-      expense.date  = server.date || expense.date;
+      }else{
+        const transaction = await models.ProductModel.Transaction.findOne({_id : expense.transaction_id});
+        console.log(transaction)
+        transaction.type = payment_method || transaction.type;
+        transaction.to = `${server.item}`;
+        transaction.debited = server.amount || transaction.debited;
+        transaction.credited = 0.0 || transaction.credited;
+        transaction.date = date;
+  
+        await transaction.save();
+  
+      }
+        
+      expense.date  = date || expense.date;
       expense.item_name  = server.item;
       expense.description  = server.description;
       expense.created_date = server.created_date;
