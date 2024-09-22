@@ -1549,13 +1549,18 @@ module.exports = {
           .populate("client_id")
           .sort({ order_date: 1 });
 
+      console.log(orders);
+
+      if (!orders || orders.length === 0) {
+        return res.redirect('/admin/order/search?error=No%20Orders%20Found');
+      }
       const ordersWithType = orders.map(order => ({
           ...order._doc,
           type: "order",
           date: new Date(order.order_date) // Convert to Date object
       }));
 
-      const payments = await models.CustomerModel.LedgerOrder.find({ client_id: customer_id , status : false })
+      const payments = await models.CustomerModel.LedgerOrder.find({ client_id: customer_id , status : true })
           .sort({ date: 1 });
 
       const paymentsWithType = payments.map(payment => ({
