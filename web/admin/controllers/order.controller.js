@@ -1294,13 +1294,15 @@ module.exports = {
       }
 
       const orderId = req.params.orderId;
+      const clients = await models.CustomerModel.Client.find()
 
       const order = await models.ProductModel.Order.findOne({order_id : orderId}).populate("order_id").populate("client_id");
 
       res.render('admin/orders/update-order', {
         user,
         order,
-        error: "Update Order"
+        error: "Update Order",
+        clients
       })
 
     }catch(err){
@@ -1327,7 +1329,6 @@ module.exports = {
       const order = await models.ProductModel.Order.findOne({order_id : orderId});
 
       const client = await models.CustomerModel.Client.findOne({_id : order.client_id});
-
       client.name = server.name;
       client.phone = server.phone;
       client.email = server.email;
@@ -1341,8 +1342,6 @@ module.exports = {
       order.created_by = server.created_by || order.created_by;
 
       await order.save();
-
-
       
       res.redirect(`/admin/order/order-summary/${order.order_id}?success="Order Details Updated Successfully"`)
     }catch(err){
